@@ -35,7 +35,7 @@ cd <your-repo>
 
 2) **Get the experimental data**
 
-Download the experimental data from [Hunt et al. (2018)](https://www.nature.com/articles/s41593-018-0239-5) at the CRCNS data repository [http://crcns.org/](http://crcns.org/) under dataset pfc-7.
+Download the experimental data from [Hunt et al. (2018)](https://www.nature.com/articles/s41593-018-0239-5) on the [CRCNS platform](https://crcns.org/data-sets/pfc/pfc-7/about-pfc-7).
 
 Store the data to recreate the following architecture:
 
