@@ -17,15 +17,19 @@ function outputPath = getPath(pathName)
 
 
 % Get the path to the project folder
-rootPath = fileparts(fileparts(pwd));
+rootPath = pwd;
 
 % Select the list of sub-directories to reach the target directory
 if nargin == 1
     switch pathName
         case "ModelsRaw"
-            listFolder = ["data", "raw", "models"]
+            listFolder = ["data", "raw", "models"];
+        case "Models"
+            listFolder = ["data", "processed", "models"];
         case "MonkeyRawData"
-            listFolder = ["data", "raw", "monkeys"]
+            listFolder = ["data", "raw", "monkeys"];
+        case "MonkeyData"
+            listFolder = ["data", "processed", "monkeys"];
         case "VBA_toolbox"
             listFolder = ["utils", "VBA_dep"];
         case "Figures"
@@ -36,7 +40,7 @@ if nargin == 1
 end
 
 % Create necessary sub-directories if they don't exist
-outputPath = rootPath
+outputPath = rootPath;
 for folder = listFolder
     outputPath = fullfile(outputPath, folder);
     if ~isfolder(outputPath)
