@@ -1,134 +1,149 @@
-% Propagates inputs through an ANN defined by its weights, and outputs the
-% ANN predicted outputs as well as its internal activity.
-
 function [activity_x, activity_z, output] = propagateThroughANN(...
-    Weights, f_activation, input, i_step, impaired)
-% --- INPUT ---
-% Weights: structure
-%   .connect_in_to_x: [n_inputs x n_units_x] double
-%       Sparse connection matrix between the inputs and the x layer.
-%   .biases_x: [1 x n_units_x] double
-%       Bias vector applied to the units of the x layer.
-%   .connect_x_to_z: [n_units_x x n_units_z] double
-%       Connection matrix between the x and z layer.
-%   .bias_z: [1 x n_units_z] double
-%       Bias vector applied to the units of the z layer.
-%   .connect_z_to_z: [n_units_x x n_unit_x] double
-%       If the network has a recurrent connection from the z layer to
-%       itself, this matrix defines the connection.
-%   .connect_z_to_x: [n_units_z x n_unit_x] double
-%       If the network has a recurrent connection from the x layer to
-%       the x layer, this matrix defines the connection.
-%   .readout: [n_units_z x n_outputs] double
-%       Readout vector enabling to decode the activity in the z layer
-%       in order to extract the outputs.
-% f_activation: function handle
-%   Activation function applied by each internal unit.
-% input: [n_sample x n_inputs] double
-%   Inputs provided to the ANN, where each line corresponds to the sampling
-%   of a cue.
-% i_step: [1 x n_samples] double
-%   [Optional] Index of the step at which each cue was sampled. If this
-%   information is not provided, by default all trials are considered to
-%   last 4 steps.
+    Weights, f_activation, input, i_step, options)
+% Propagate inputs through an RNN and return internal activity and outputs.
 %
-% --- OUTPUT ---
-% activity_x: [n_samples x n_units_x] double
-%   Activity of each unit in the x layer in response to each sampling.
-% activity_z: [n_samples x n_units_z] double
-%   Activity of each unit in the z layer in response to each sampling.
-% output: [n_samples x n_outputs] double
-%   Predicted output for each sampling.
-
-% --- CHECK INPUT ARGUMENTS --- %
+% This function performs a forward pass through an RNN defined by a set of
+% weights and biases and an activation function. For each input sample, it
+% computes the activity of the first (x) and second (z) hidden layers,
+% applies recurrent connections, and generates the corresponding network
+% output via a linear readout. See also: observeANN,
+% shapeParametersIntoWeights.
+%
+% INPUTS ------------------------------------------------------------------
+% Weights : <struct 1x1>
+%     Structure containing weight matrices and bias vectors. See also:
+%     shapeParametersIntoWeights.
+%       - connect_in_to_x: input-to-x feedforward weight matrix
+%       - biases_x: bias vector for the x layer
+%       - connect_x_to_z: feedforward weight matrix from x to z
+%       - bias_z: bias vector for the z layer
+%       - connect_z_to_z: recurrent weight matrix from z to z
+%       - connect_z_to_x: recurrent weight matrix from z to x
+%       - readout: linear readout matrix mapping z activity to outputs
+%     Exactly one of the two recurrent connection fields (connect_z_to_z,
+%     connect_z_to_x) must be present.
+%
+% f_activation : <function_handle 1x1>
+%     Activation function applied element-wise to x and z units.
+%
+% input : <float NxM>
+%     Input samples provided to the network. Each row corresponds to one
+%     cue sampling.
+%
+% i_step (optional) : <int 1xN>
+%     Step index associated with each sample, used to reset recurrent
+%     activity at the beginning of a trial. If empty, samples are assumed
+%     to be grouped in trials of four steps.
+%
+% impaired_x (optional) : <bool 1xX>
+%     Mask indicating x-layer units to be silenced (set to empty).
+%
+% impaired_z (optional) : <bool 1xZ>
+%     Mask indicating z-layer units to be silenced (set to empty).
+%
+% OUTPUTS -----------------------------------------------------------------
+% activity_x : <float NxX>
+%     Activity of x-layer units for each input sample.
+%
+% activity_z : <float NxZ>
+%     Activity of z-layer units for each input sample.
+%
+% output : <float NxO>
+%     Network output associated with each input sample.
 
 arguments
-    Weights (1,1) struct;
-    f_activation (1,1) function_handle;
-    input (:,:) double {mustBeFinite};
-    i_step (:,:) double {mustBeFinite} = [];
-    impaired.impaired_x (:,:) double {mustBeFinite} = [];
-    impaired.impaired_z (:,:) double {mustBeFinite} = [];
+    Weights (1,1) struct
+    f_activation (1,1) function_handle
+    input (:,:) double
+    i_step (:,:) double = []
+    options.impaired_x (:,:) double {mustBeFinite} = []
+    options.impaired_z (:,:) double {mustBeFinite} = []
 end
 
-% Format input
-impaired.impaired_x = logical(impaired.impaired_x);
-impaired.impaired_z = logical(impaired.impaired_z);
+% Convert impairment masks to logical arrays
+options.impaired_x = logical(options.impaired_x);
+options.impaired_z = logical(options.impaired_z);
 
-% Initialize the storing variables
+% Initialize storage variables
 n_samples = size(input, 1);
 activity_x = NaN(n_samples, length(Weights.biases_x));
 activity_z = NaN(n_samples, length(Weights.biases_z));
 output = NaN(n_samples, size(Weights.readout, 2));
 
-% Set the default step index
+% Default step indexing (four steps per trial)
 if isempty(i_step)
     i_step = repmat(1:4, 1, floor(n_samples / 4));
 end
 
-% --- Propagate the inputs through the networks --- %
+% --- Forward propagation through the network --- %
 
 for i_sample = 1:n_samples
 
-    % Do not take recurrent connection into account at the first step
+    % First step of a trial: no recurrent contribution
     if i_step(i_sample) == 1
+
         activity_x(i_sample, :) = f_activation( ...
             (input(i_sample, :) * Weights.connect_in_to_x), ...
             Weights.biases_x);
-        % Impair some units in layer x
-        if ~ isempty(impaired.impaired_x)
-            activity_x(i_sample, impaired.impaired_x) = 0;
+
+        % Apply x-layer impairment if requested
+        if ~ isempty(options.impaired_x)
+            activity_x(i_sample, options.impaired_x) = 0;
         end
+
         activity_z(i_sample, :) = f_activation(...
             (activity_x(i_sample, :) * Weights.connect_x_to_z), ...
             Weights.biases_z);
-        % Impair some units in layer z
-        if ~ isempty(impaired.impaired_z)
-            activity_z(i_sample, impaired.impaired_z) = 0;
+
+        % Apply z-layer impairment if requested
+        if ~ isempty(options.impaired_z)
+            activity_z(i_sample, options.impaired_z) = 0;
         end
 
-    % Take the z-to-x recurrent connection into account for the next steps
+    % Recurrent connection from z to x
     elseif isfield(Weights, 'connect_z_to_x')
+
         activity_x(i_sample, :) = f_activation(...
             (input(i_sample, :) * Weights.connect_in_to_x) ...
             + (activity_z(i_sample - 1, :) * Weights.connect_z_to_x), ...
             Weights.biases_x);
-        % Impair some units in layer x
-        if ~ isempty(impaired.impaired_x)
-            activity_x(i_sample, impaired.impaired_x) = 0;
+
+        if ~ isempty(options.impaired_x)
+            activity_x(i_sample, options.impaired_x) = 0;
         end
+
         activity_z(i_sample, :) = f_activation(...
             (activity_x(i_sample, :) * Weights.connect_x_to_z), ...
             Weights.biases_z);   
-        % Impair some units in layer z
-        if ~ isempty(impaired.impaired_z)
-            activity_z(i_sample, impaired.impaired_z) = 0;
+
+        if ~ isempty(options.impaired_z)
+            activity_z(i_sample, options.impaired_z) = 0;
         end     
     
-    % Take the z-to-z recurrent connection into account for the next steps
+    % Recurrent connection from z to z
     elseif isfield(Weights, 'connect_z_to_z')
+
         activity_x(i_sample, :) = f_activation(...
             (input(i_sample, :) * Weights.connect_in_to_x), ...
             Weights.biases_x);
-        % Impair some units in layer x
-        if ~ isempty(impaired.impaired_x)
-            activity_x(i_sample, impaired.impaired_x) = 0;
+
+        if ~ isempty(options.impaired_x)
+            activity_x(i_sample, options.impaired_x) = 0;
         end
+
         activity_z(i_sample, :) = f_activation(...
             (activity_x(i_sample, :) * Weights.connect_x_to_z) ...
             + (activity_z(i_sample - 1, :) * Weights.connect_z_to_z), ...
             Weights.biases_z);
-        % Impair some units in layer z
-        if ~ isempty(impaired.impaired_z)
-            activity_z(i_sample, impaired.impaired_z) = 0;
+
+        if ~ isempty(options.impaired_z)
+            activity_z(i_sample, options.impaired_z) = 0;
         end
     else
-        error("Unknown recurrent connection matrix.");
+        error("No valid recurrent connection defined in Weights.");
     end
 
-    % Linear readout of the z layer activity
+    % Linear readout from z-layer activity
     output(i_sample, :) = activity_z(i_sample, :) * Weights.readout;
-
-end
 
 end

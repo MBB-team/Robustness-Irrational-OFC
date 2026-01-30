@@ -1,42 +1,44 @@
-% Selects some fields of a 'DataSamples' structure.
-
-function info = selectDataInfo(DataSamples, info_labels)
-% --- INPUT ---
-% DataSamples: structure
-%   This structure contains relevant information regarding the sampling
-%   scenarii of a session.
-% info_labels: [1 x n_info] string
-%   String array containing the name of the fields to select in
-%   'DataSamples'. All fields must designate double arrays in the
-%   structure.
+function data_info = selectDataInfo(DataSamples, info_labels)
+% Extracts selected information fields from a DataSamples structure.
 %
-% --- OUTPUT ---
-% info: [n_samples x n_info] double
-%   Matrix selected from the 'DataSamples' structure.
+% This function selects a set of numeric fields from a 'DataSamples'
+% structure and concatenates them into a matrix, with one column per
+% selected field. Although generic in principle, it is primarily used to
+% assemble input and/or output matrices for RNN training and evaluation.
 %
-% --- CALLED BY ---
-% trainNetworkCohorts
-% checkInformationLoss
-% simulateNetworkCohortsH0
-% fitNetworkToBehaviour
-% computeNeuralRepresentation
-% computeLogLikelihoodDynamics
+%
+% INPUTS ------------------------------------------------------------------
+% DataSamples : <struct 1x1>
+%     Structure containing original cue-sample fields and all derived
+%     variables (see also: expandCueSamples). Each selected field must be
+%     a numeric vector with one entry per sample.
+%
+% info_labels : <string 1xN>
+%     Names of the fields to extract from DataSamples. All specified
+%     fields are expected to correspond to double-valued vectors of
+%     equal length.
+%
+% OUTPUTS -----------------------------------------------------------------
+% data_info: <float MxN>
+%     Matrix containing the selected information. Each column corresponds
+%     to one entry in info_labels.
 
+arguments
+    DataSamples (1, 1) struct
+    info_labels (1, :) string
+end
 
-% Initialize the output
+% Initialize the output matrix
 n_samples = length(DataSamples.i_trial);
 n_info = length(info_labels);
-info = NaN(n_samples, n_info);
+data_info = NaN(n_samples, n_info);
 
-% Select the fields
+% Extract each requested field
 for i_info = 1:n_info
     try
-        info(:, i_info) = DataSamples.(info_labels(i_info));
+        data_info(:, i_info) = DataSamples.(info_labels(i_info));
     catch
         warning("Impossible to select the field %s in DataSamples.", ...
             info_labels(i_info));
     end
-
-end
-
 end

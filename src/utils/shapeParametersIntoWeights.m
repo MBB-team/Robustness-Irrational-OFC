@@ -1,93 +1,69 @@
-% Shapes the parameters vector of an ANN into easily manipulable weights.
-
 function Weights = shapeParametersIntoWeights(parameters, Config)
-% --- INPUT ---
-% parameters: [n_params x 1] double
-%   Vector of parameters of the ANN (without the connection between the
-%   inputs and x layer, and the biases of the x layer).
-% Config: structure
-%   .input_labels: [1 x n_inputs] string
-%       List of labels defining the information taken as input by the ANN.
-%       The labels correspond to the fields that will be selected from the
-%       'SamplesData' structure defining all the possible information
-%       regarding each sample.
-%   .output_labels: [1 x n_outputs] string
-%       List of labels defining the target information outputted by the
-%       ANN.
-%   .f_activation: function handle
-%       Activation function applied by each internal unit of the ANN.
-%   .recur_connect: "to_x" or "to_z"
-%       String defining whether the recurrent connection of the ANN
-%       connects the x layer to itself, or the x layer to the z layer.
-%   .n_units_x: [1 x n_inputs] double
-%       List containing the number of units dedicated to encoding each
-%       input in the x layer, depending on whether it is binary or not.
-%   .n_units_z: double
-%       Number of units in the z layer.
-%   .ParamRange: structure
-%       The fields of this structure contain the indices of the
-%       parameters constructing the corresponding field in a 'Weights'
-%       structure: connect_x_to_z, biases_z, connect_z_to_x or
-%       connect_z_to_z and readout.
-%   .n_params: double
-%       Total number of parameters in the ANN.
+% Shapes a parameter vector into structured weight matrices of an RNN.
+%
+% This function converts the flat parameter vector into a structured,
+% ready-to-use set of weight matrices and bias vectors. Connections and
+% biases between the inputs and the x layer are not learned but
+% deterministically constructed using a population-code scheme:
+%   - Each input projects onto a dedicated pool of x units.
+%   - Unit sensitivities span the input range uniformly.
+%   - Input-to-x mappings are strictly monotonic, such that increasing
+%     input values always increase x-unit activity.
+%
+% INPUTS ------------------------------------------------------------------
+% parameters : <float Nx1>
+%     Vector of free parameters of the RNN. This vector excludes the
+%     input-to-x connection weights and x-layer biases, which are fixed
+%     and defined by the population code.
+%
+% Config : <struct 1x1>
+%     Structure defining the network architecture, input-output mapping,
+%     activation function, and output format. See also:
+%     getDesiredNetworkConfigs.
 %
 % --- OUTPUT ---
-% Weights: structure
-%   .connect_in_to_x: [n_inputs x n_units_x] double
-%       Sparse connection matrix between the inputs and the x layer.
-%   .biases_x: [1 x n_units_x] double
-%       Bias vector applied to the units of the x layer.
-%   .connect_x_to_z: [n_units_x x n_units_z] double
-%       Connection matrix between the x and z layer.
-%   .bias_z: [1 x n_units_z] double
-%       Bias vector applied to the units of the z layer.
-%   .connect_x_to_x: [n_units_x x n_unit_x] double
-%       If the network has a recurrent connection from the x layer to
-%       itself, this matrix defines the connection.
-%   .connect_z_to_x: [n_units_z x n_unit_x] double
-%       If the network has a recurrent connection from the x layer to
-%       the z layer, this matrix defines the connection.
-%   .readout: [n_units_z x n_outputs] double
-%       Readout vector enabling to decode the activity in the z layer
-%       in order to extract the outputs.
-%   .readout_sigmoid: [1 x 2] double
-%       If the ANN outputs a categorical prediction (i.e the choice of the
-%       best option), this vector contains the slope and bias of the
-%       sigmoid applied to the linear readout.
-%
-% --- CALLED BY ---
-% observeANN
-% trainNetworkCohort
-% checkInformationLoss
-% computeNeuralRepresentation
+% Weights : <struct 1x1>
+%     Structure containing weight matrices and bias vectors. See also:
+%     shapeParametersIntoWeights.
+%       - connect_in_to_x: input-to-x feedforward weight matrix
+%       - biases_x: bias vector for the x layer
+%       - connect_x_to_z: feedforward weight matrix from x to z
+%       - bias_z: bias vector for the z layer
+%       - connect_z_to_z: recurrent weight matrix from z to z
+%       - connect_z_to_x: recurrent weight matrix from z to x
+%       - readout: linear readout matrix mapping z activity to outputs
+%     Exactly one of the two recurrent connection fields (connect_z_to_z,
+%     connect_z_to_x) is present, as specified by Config.recur_connect.
 
+arguments
+    parameters (:, 1) double
+    Config (1, 1) struct
+end
 
-% --- Create the connections and biases to the x layer using population
-% code --- %
+% --- Construct fixed input-to-x connections using a population code --- %
 
-% Initialize the matrices
+% Initialize input-to-x weights and biases
 Weights.connect_in_to_x = zeros(length(Config.inputs), ...
     sum(Config.n_units_x));
 Weights.biases_x = zeros(1, sum(Config.n_units_x));
 
-% Fill in the connection matrix and biases input per input
+% Fill in the population code for each input dimension
 i_unit = 1;
 for i_input = 1:length(Config.inputs)
-    % Get the range of inputs for binary inputs
+
+    % Define the input range
     if Config.n_units_x(i_input) == 2
+        % Binary inputs
         range_min = 0;
         range_max = 1;
-    % Get the range of inputs for non-binary inputs (cue value)
     else
+        % Continuous cue values
         range_min = 0.1;
         range_max = 0.9;
     end
-    % Compute the interval between uniformaly distributed activation 
-    % functions on this range
+
+    % Uniform spacing of unit sensitivities over the input range
     interval = (range_max - range_min) / Config.n_units_x(i_input);
-    % Define the slope of the transformation between input and unit
-    % activity
     if functions(Config.f_activation).function == "gaussANN"
         slope = (2 / interval) * sqrt(log(2));
     elseif functions(Config.f_activation).function == "sigANN"
@@ -95,27 +71,30 @@ for i_input = 1:length(Config.inputs)
     else
         error("Unknown activation function");
     end
-    % Define the biases of each unit
+
+    % Biases positioning unit tuning curves over the input range
     peaks = range_min:interval:range_max;
     peaks = (interval / 2) + peaks(1:(end - 1));
     biases = slope * peaks;
-    % Store this information into the weight matrices
+
+    % Store weights and biases
     Weights.connect_in_to_x(...
         i_input, i_unit:(i_unit + Config.n_units_x(i_input) - 1)) = ...
         slope;
     Weights.biases_x(i_unit:(i_unit + Config.n_units_x(i_input) - 1)) = ...
         biases;
-    % Update the unit index
+
+    % Update unit index
     i_unit = i_unit + Config.n_units_x(i_input);
 end
 
-% --- Shape the parameters into easily manipulable weight matrices --- %
+% --- Reshape free parameters into ready-to-use weight matrices --- %
 
-% Connection from x to z
+% Feedforward connection from x to z
 Weights.connect_x_to_z = reshape(...
     parameters(Config.ParamRange.connect_x_to_z), ...
     sum(Config.n_units_x), Config.n_units_z);
-% z biases
+% Biases of the z layer
 Weights.biases_z = reshape(...
     parameters(Config.ParamRange.biases_z), ...
     1, Config.n_units_z);
@@ -131,7 +110,7 @@ elseif Config.recur_connect == "to_z"
 else
     error("Undefined recurrent connection.");
 end
-% Readout vector
+% Linear readout from z layer to outputs
 Weights.readout = reshape(...
     parameters(Config.ParamRange.readout), ...
     Config.n_units_z, []);
