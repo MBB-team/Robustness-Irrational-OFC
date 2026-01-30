@@ -1,51 +1,56 @@
-function outputPath = getPath(pathName)
-% Stores and returns any path needed to execute the scripts.
+function output_path = getPath(path_name)
+% Return the absolute path to a project directory.
 %
-%% INPUTS
-%  ======
+% This utility function centralizes the definition of project paths
+% (data, models, figures, external toolboxes, etc.) to ensure consistency
+% across scripts and to simplify future changes in the project
+% architecture. Missing directories along the requested path are created
+% automatically.
 %
-% Mandatory:
-% ----------
-% - pathName [string]
-%       Target of the desired path.
+% INPUTS ------------------------------------------------------------------
+% path_name : <string 1x1>
+%     Label identifying the target directory. Supported values include:
+%       - "ModelsRaw"
+%       - "Models"
+%       - "MonkeyRawData"
+%       - "MonkeyData"
+%       - "VBA_toolbox"
+%       - "Figures"
 %
-%% OUTPUTS
-%  =======
-%
-% - outputPath [string]
-%       Path to the desired target.
+% OUTPUTS -----------------------------------------------------------------
+% output_path : <string 1x1>
+%     Absolute path to the requested directory.
 
-
-% Get the path to the project folder
-rootPath = pwd;
-
-% Select the list of sub-directories to reach the target directory
-if nargin == 1
-    switch pathName
-        case "ModelsRaw"
-            listFolder = ["data", "raw", "models"];
-        case "Models"
-            listFolder = ["data", "processed", "models"];
-        case "MonkeyRawData"
-            listFolder = ["data", "raw", "monkeys"];
-        case "MonkeyData"
-            listFolder = ["data", "processed", "monkeys"];
-        case "VBA_toolbox"
-            listFolder = ["utils", "VBA_dep"];
-        case "Figures"
-            listFolder = ["results", "figures"];
-        otherwise
-            error("Unknown path name.");
-    end
+arguments
+    path_name (1, 1) string
 end
 
-% Create necessary sub-directories if they don't exist
-outputPath = rootPath;
-for folder = listFolder
-    outputPath = fullfile(outputPath, folder);
-    if ~isfolder(outputPath)
-        mkdir(outputPath)
-    end
+% Get the root path of the project (current working directory)
+root_path = pwd;
+
+% Define the subdirectory sequence associated with each path label
+switch path_name
+    case "ModelsRaw"
+        list_folder = ["data", "raw", "models"];
+    case "Models"
+        list_folder = ["data", "processed", "models"];
+    case "MonkeyRawData"
+        list_folder = ["data", "raw", "monkeys"];
+    case "MonkeyData"
+        list_folder = ["data", "processed", "monkeys"];
+    case "VBA_toolbox"
+        list_folder = ["utils", "VBA_dep"];
+    case "Figures"
+        list_folder = ["results", "figures"];
+    otherwise
+        error("Unknown path name.");
 end
 
+% Build the full path and create missing directories if needed
+output_path = root_path;
+for folder = list_folder
+    output_path = fullfile(output_path, folder);
+    if ~isfolder(output_path)
+        mkdir(output_path)
+    end
 end
