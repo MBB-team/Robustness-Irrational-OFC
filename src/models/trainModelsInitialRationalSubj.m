@@ -11,7 +11,7 @@ function [] = trainModelsInitialRationalSubj()
 % For each cohort, RNNs are trained from independently generated initial
 % states and datasets. Training and testing datasets, as well as initial
 % network states, are randomly generated using cohort-specific seeds. The
-% same set of seeds is used across all cohorts to enable direct comparison
+% same set of seeds is used across all cohortdfdfs to enable direct comparison
 % between task variants.
 %
 % Networks are retained only if they generalize correctly to held-out test
@@ -101,6 +101,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     end
 
     % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(DatasetSpecs);
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks);
 
 end

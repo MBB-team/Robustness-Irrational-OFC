@@ -32,7 +32,7 @@ function [DatasetSpecs, shift_i_network] = ...
 
 arguments
     path_specs (1, 1) string
-    n_config (1, 1) int
+    n_config (1, 1) double {mustBeInteger}
     monkey (1, 1) string {mustBeMember(monkey, ["", "Franck", "Miles"])} = ""
 end
 

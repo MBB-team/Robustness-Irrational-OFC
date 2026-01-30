@@ -35,7 +35,7 @@ function output = observeANN(~, P, ~, in)
 
 arguments
     ~
-    P (:, 1) float
+    P (:, 1) double
     ~
     in (1, 1) struct
 end

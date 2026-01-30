@@ -28,9 +28,9 @@ function [subset_included_paths] = selectCohortSubset(path_specs, path_networks,
 % --- CHECK INPUT ARGUMENTS --- %
 
 arguments
-    path_specs;
-    path_networks;
-    delete_unshared_seeds (1,1) {mustBeNumericOrLogical} = false;
+    path_specs (1, 1) string
+    path_networks (1, 1) string
+    delete_unshared_seeds (1,1) {mustBeNumericOrLogical} = false
 end
 
 

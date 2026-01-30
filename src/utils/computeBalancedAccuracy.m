@@ -1,41 +1,50 @@
-% Computes the balanced accuracy of a model.
-
-function bacc = computeBalancedAccuracy(output_true, output_predicted)
-% --- INPUTS ---
-% output_true: [n_samples x n_outputs] double
-%   Array containing in column the true outputs.
-% output_predicted: [n_samples x n_outputs] double
-%   Array containing in column the outputs predicted by the model.
+function bacc = computeBalancedAccuracy(measure_true, measure_predicted)
+% Computes balanced accuracy for binary predictions.
 %
-% --- OUTPUT ---
-% bacc: [1 x n_outputs] double
-%   Balanced accuracy on each output.
+% This function compares ground-truth binary measures with predicted values
+% (possibly across multiple output dimensions) and computes the balanced
+% accuracy for each dimension. Balanced accuracy is defined as the average
+% of sensitivity (true positive rate) and specificity (true negative rate).
 %
-% --- CALLED BY ---
-% trainNetworkCohorts
-% checkInformationLoss
-% simulateNetworkCohortsH0
-% fitNetworkToBehaviour
+% INPUTS ------------------------------------------------------------------
+% measure_true : <float NxM>
+%     Ground-truth measures. Values are thresholded at 0.5 to obtain binary
+%     labels (0 or 1).
+%
+% measure_predicted : <float NxM>
+%     Predicted measures. Values are thresholded at 0.5 to obtain binary
+%     predictions (0 or 1).
+%
+% OUTPUTS -----------------------------------------------------------------
+% bacc : <float 1xM>
+%     Balanced accuracy for each output dimension.
 
+arguments
+    measure_true (:, :) double
+    measure_predicted (:, :) double
+end
 
-% Get the number of different outputs
-n_outputs = size(output_true, 2);
+% Number of output dimensions
+n_dim = size(measure_true, 2);
 
-% Initialize bacc
-bacc = NaN(1, n_outputs);
+% Initialize output
+bacc = NaN(1, n_dim);
 
-% Compute the balanced accuracy for each output separately
-for i_output = 1:n_outputs
-    % Convert the outputs into binary values
-    output_true(output_true(:, i_output) < 0.5, i_output) = 0;
-    output_true(output_true(:, i_output) >= 0.5, i_output) = 1;
-    output_predicted(output_predicted(:, i_output) < 0.5, i_output) = 0;
-    output_predicted(output_predicted(:, i_output) >= 0.5, i_output) = 1;
-    % True positive, false positive, true negative, false negative
-    TP = sum(output_predicted(:, i_output) & output_true(:, i_output));
-    FP = sum(output_predicted(:, i_output) & ~ output_true(:, i_output));
-    TN = sum(~ output_predicted(:, i_output) & ~ output_true(:, i_output));
-    FN = sum(~ output_predicted(:, i_output) & output_true(:, i_output));
+% Compute balanced accuracy independently for each output dimension
+for i_output = 1:n_dim
+
+    % Binarize ground-truth and predicted values
+    measure_true(measure_true(:, i_output) < 0.5, i_output) = 0;
+    measure_true(measure_true(:, i_output) >= 0.5, i_output) = 1;
+    measure_predicted(measure_predicted(:, i_output) < 0.5, i_output) = 0;
+    measure_predicted(measure_predicted(:, i_output) >= 0.5, i_output) = 1;
+
+    % Confusion matrix components
+    TP = sum(measure_predicted(:, i_output) & measure_true(:, i_output));
+    FP = sum(measure_predicted(:, i_output) & ~ measure_true(:, i_output));
+    TN = sum(~ measure_predicted(:, i_output) & ~ measure_true(:, i_output));
+    FN = sum(~ measure_predicted(:, i_output) & measure_true(:, i_output));
+    
     % Balanced accuracy
     bacc(i_output) = ((TP / (TP + FN)) + (TN / (TN + FP))) / 2;
 end

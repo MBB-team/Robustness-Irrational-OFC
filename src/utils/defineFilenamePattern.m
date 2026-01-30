@@ -1,27 +1,32 @@
-% Returns the regexp pattern corresponding to the file where an ANN is
-% saved.
-
 function filename_pattern = defineFilenamePattern(Config, seed)
-% --- INPUT --- %
-% This function takes an optional input 'Config', which characterizes the
-% only cohort configuration that the pattern should be able to match. If
-% this input is not provided, the pattern should be able to match any ANN.
-% If the optional double 'seed' is provided, then the function outputs the
-% corresponding file name.
+% Returns a regular-expression pattern identifying RNN model files.
 %
-% --- OUTPUT --- %
-% This function outputs the string of a regexp pattern matching all ANNs or
-% a given configuration of ANN, or a givern ANN.
+% This function generates a regexp pattern matching filenames of saved
+% RNNs. Depending on the input arguments, the pattern can match:
+%   (i) any RNN file produced by this project,
+%   (ii) all RNNs corresponding to a specific configuration, or
+%   (iii) a single RNN identified by both configuration and seed.
 %
-% --- CALLED BY ---
-% getAllNetworkPaths
-% saveNetwork
-% trainNetworkCohorts
-% simulateNetworkCohortsH0
+% INPUTS ------------------------------------------------------------------
+% Config (optional) : <struct 1x1>
+%     Structure defining the RNN architecture, input–output mapping,
+%     activation function, and output format. See also:
+%     getDesiredNetworkConfigs.
+%
+% seed (optional) : <int 1x1>
+%     Random seed used to generate the initial state and associated
+%     training and test datasets for the RNN.
+%
+% OUTPUTS -----------------------------------------------------------------
+% filename_pattern : <string 1x1>
+%     Regular-expression pattern matching the corresponding RNN filename.
 
+arguments
+    Config (1, 1) struct = struct()
+    seed (1, 1) double = NaN
+end
 
-% === The pattern matches any ANN === %
-
+% Match any RNN
 if nargin == 0
     filename_pattern = ...
         "(loc|order)" ... input info
@@ -30,20 +35,16 @@ if nargin == 0
         + "_(\d+).mat" ... seed and extension
     ;
 
-% === The pattern matches a given ANN configuration === %
-
+% Match a given RNN variant
 else
-
-    % Function of the ANN
+    % Input-output mapping
     filename_pattern = Config.input_label + ...
         "_TO_" + Config.output_label + ...
         "-" + Config.output_format_label + ...
         "_ARCH_";
-
-    % Activation function (remove the "ANN" in the function name)
+    % Activation function
     filename_pattern = filename_pattern + ...
         string(functions(Config.f_activation).function(1:end-3));
-
     % Recurrent connection
     if Config.recur_connect == "to_x"
         filename_pattern = filename_pattern + "_x";
@@ -52,14 +53,11 @@ else
     else
         error("Unknown recurrent connection");
     end
-
     % Seed and extension
     if nargin == 2
         filename_pattern = filename_pattern + "_" + num2str(seed) + ".mat";
     else
         filename_pattern = filename_pattern + "_(\d+).mat";
     end
-
-end
 
 end

@@ -55,12 +55,12 @@ function [fit_train, fit_test, params] = testTrainingGeneralizability(...
 arguments
     out (1, 1) struct
     Config (1, 1) struct
-    input_train (:, :) float
-    output_train (:, :) float
-    input_test (:, :) float
-    output_test (:, :) float
-    i_step_train (:, 1) int = []
-    i_step_test (:, 1) int = []
+    input_train (:, :) double
+    output_train (:, :) double
+    input_test (:, :) double
+    output_test (:, :) double
+    i_step_train (:, 1) double {mustBeInteger} = []
+    i_step_test (:, 1) double {mustBeInteger} = []
 end
 
 % Retrieve parameter trajectories across training

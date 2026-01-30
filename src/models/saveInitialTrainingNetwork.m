@@ -45,13 +45,12 @@ function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
 
 arguments
     Config (1, 1) struct
-    i_network (1, 1) int
-    fit_label (1, 1) string {mustBeMember(fit_label, ["FitRational", ...
-        "FitRationalSubj", "FitIrrationalFranck", "FitIrrationalFranck"])}
-    params (:, :) float
-    fit_train (:, :) float
-    fit_test (:, :) float
-    out (1, 1) struct
+    i_network (1, 1) double {mustBeInteger}
+    fit_label % Either a string or a cell array of strings
+    params % Either a double matrix or a cell array of double matrices
+    fit_train % Either a double matrix or a cell array of double matrices
+    fit_test % Either a double matrix or a cell array of double matrices
+    out % Either a struct or a cell array of structs
     path_networks (1, 1) string
 end
 

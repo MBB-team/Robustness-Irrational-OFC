@@ -1,186 +1,139 @@
-% Completes the basic scenario information of each trial with relevant
-% features.
-
 function CueSamples = expandCueSamples(CueSamples, monkey, options)
-% --- INPUT ---
-% CueSamples: structure
-%   .i_trial: [1 x n_samples] double
-%       Trial index.
-%   .i_step: [1 x n_samples] double
-%       Step index.
-%   .cue_pos: [1 x n_samples] double
-%       Position (1-4) of the sampled cue.
-%   .cue_rank: [1 x n_samples] double
-%       Rank (1-5) of the sampled cue.
+% Expands cue sample sequences into derived attributes, values, and choices.
 %
-% --- OUTPUT ---
-% This function returns an expanded version of the 'CueSamples' structure,
-% containing the additional following fields:
-%   .trial_type: [1 x n_samples] "undefined" / "option" / "attribute"
-%       If at least two cues were sampled during the trial, it can be
-%       either an option trial (two first cues belong to the same option)
-%       or an attribute trial (two first cues represent the same
-%       attribute). If only one cue was sampled, the trial type is
-%       undefined.
-%   .cue_rank: [1 x n_samples] double
-%       Rank (1-5) of the attended cue.
-%   .cue_value: [1 x n_samples] double
-%       Value (from 0.1 to 0.9) of the attended cue.
-%   .cue_type: [1 x n_samples] 0 / 1
-%       Type (probability/magnitude) of the attended cue.
-%   .option_loc: [1 x n_samples] 0 / 1
-%       Location (left/right) of the attended option.
-%   .option_order: [1 x n_samples] 0 / 1
-%       Order of attendance (first/second) of the attended option within
-%       the current trial.
-%   .prob_left: [1 x n_samples] double
-%       Estimated probability of the left option.
-%   .mag_left: [1 x n_samples] double
-%       Estimated magnitude of the left option.
-%   .prob_right: [1 x n_samples] double
-%       Estimated probability of the right option.
-%   .mag_right: [1 x n_samples] double
-%       Estimated magnitude of the right option.
-%   .value_left: [1 x n_samples] double
-%       Estimated value of the left option.
-%   .value_right: [1 x n_samples] double
-%       Estimated value of the right option.
-%   .diff_value_loc: [1 x n_samples] double
-%       Difference between the estimated values of the left and right
-%       options.
-%   .choice_loc: [1 x n_samples] double
-%       Which option is currently the best (0 for the left, 1 for the
-%       right, 0.5 in case of equality).
-%   .prob_first: [1 x n_samples] double
-%       Estimated probability of the first option.
-%   .mag_first: [1 x n_samples] double
-%       Estimated magnitude of the first option.
-%   .prob_second: [1 x n_samples] double
-%       Estimated probability of the second option.
-%   .mag_second: [1 x n_samples] double
-%       Estimated magnitude of the second option.
-%   .value_first: [1 x n_samples] double
-%       Estimated value of the firstly attended option.
-%   .value_second: [1 x n_samples] double
-%       Estimated value of the secondly attended option.
-%   .diff_value_order: [1 x n_samples] double
-%       Difference between the estimated values of the firstly and
-%       secondly attended options.
-%   .choice_order: [1 x n_samples] double
-%       Which option is currently the best (0 for the first, 1 for the
-%       second, 0.5 in case of equality).
-%   .prob_attended: [1 x n_samples] double
-%       Estimated probability of the attended option.
-%   .mag_attended: [1 x n_samples] double
-%       Estimated magnitude of the attended option.
-%   .prob_unattended: [1 x n_samples] double
-%       Estimated probability of the unattended option.
-%   .mag_unattended: [1 x n_samples] double
-%       Estimated magnitude of the unattended option.
-%   .value_attended: [1 x n_samples] double
-%       Estimated value of the attended option.
-%   .value_unattended: [1 x n_samples] double
-%       Estimated value of the unattended option.
-%   .diff_value_attention: [1 x n_samples] double
-%       Difference between the estimated values of the attended and
-%       unattended options.
-%   .choice_attention: [1 x n_samples] double
-%       Which option is currently the best (0 for the attended, 1 for the
-%       unattended, 0.5 in case of equality).
+% This function takes a sequence of sampled cues across trials and derives
+% all relevant task variables, including cue attributes, option identity
+% (left/right, first/second, attended/unattended), inferred option values,
+% rational or observed choices, and decision confidence over time.
 %
-% --- CALLED BY ---
-% trainNetworkCohorts
-% checkInformationLoss
-% simulateNetworkCohortsH0
-% fitNetworkToBehaviour
-% computeNeuralRepresentation
-% computeLogLikelihoodDynamics
+% INPUTS ------------------------------------------------------------------
+% CueSamples : <struct 1x1>
+%     Structure containing row vectors describing sampled cues. See also:
+%     generateRandomCueSamples. Required fields:
+%       - i_trial: trial index
+%       - i_step: step index
+%       - cue_pos: position (1-4) of the sampled cue
+%       - cue_rank: rank (1-5) of the sampled cue
+%
+% monkey (optional) : <string 1x1>
+%     Name of the monkey whose subjective value function is used to map cue
+%     attributes to option values. If empty, an optimal (rational) value
+%     function is used.
+%
+% override_choice (optional) : <logical 1x1>
+%     Whether to override existing monkey choices and recompute them from
+%     inferred option values. Default is true.
+%
+% OUTPUTS -----------------------------------------------------------------
+% CueSamples : <struct 1x1>
+%     Structure containing the original cue-sample fields and all derived
+%     variables, including:
+%       - trial_type: "option", "attribute", or "undefined"
+%       - cue_type: probability (0) or magnitude (1)
+%       - cue_value: numerical value of the sampled cue (0.1 - 0.9)
+%       - option_loc: left (0) or right (1)
+%       - option_order: first (0) or second (1) attended option
+%       - prob_*, mag_* [left/right, first/second, attended/unattended]:
+%       estimated option attributes inferred from previously sampled cues
+%
+%     Estimated option values and choices:
+%       - value_* [location, order, attention]: inferred option values
+%       within each option-identity framework
+%       - diff_value_*: difference between the inferred values of the first
+%       and second options within the corresponding option-identity
+%       framework
+%       - choice_*: predicted or observed choice, indicating selection of
+%       the first option within the corresponding option-identity
+%       framework (0), the second option (1), or indifference (0.5)
+%
+%     Decision-related variables:
+%       - decision_conf: confidence in the final choice, defined as the
+%       proportion of trials in which the same cue configuration led to the
+%       same final choice
 
 
 arguments
-    CueSamples (1, 1) struct;
-    monkey (1, 1) string = "";
-    options.override_choice = true;
+    CueSamples (1, 1) struct
+    monkey (1, 1) string {mustBeMember(monkey, ["", "Franck", "Miles"])} = ""
+    options.override_choice = true
 end
 
-
-% Get samples dimensions
+% Number of cue samples
 n_samples = length(CueSamples.i_trial);
 
 % --- Cue type --- %
 
-%{
-Cue positions:
-1: left probability
-2: left magnitude
-3: right probability
-4: right magnitude
-%}
-% Initialize all types to 1 (magnitude)
+% Cue positions:
+% 1: left probability
+% 2: left magnitude
+% 3: right probability
+% 4: right magnitude
+
+% Initialize all cues as magnitude (1)
 CueSamples.cue_type = ones(1, n_samples);
-% Update concerned types to 0 (probability)
+% Update probability cues
 CueSamples.cue_type((CueSamples.cue_pos == 1)) = 0;
 CueSamples.cue_type((CueSamples.cue_pos == 3)) = 0;
 
 % --- Cue value --- %
 
+% Map cue ranks to numerical values
 CueSamples.cue_value = 0.2 * CueSamples.cue_rank - 0.1;
 
 % --- Option location (left/right) --- %
 
-% Initialize all locations to 1 (right)
+% Initialize all options as right (1)
 CueSamples.option_loc = ones(1, n_samples);
-% Update concerned locations to 0 (left)
+% Update left options
 CueSamples.option_loc((CueSamples.cue_pos == 1)) = 0;
 CueSamples.option_loc((CueSamples.cue_pos == 2)) = 0;
 
 % --- Option order (first/second) --- %
 
-% Initialize all orders
 CueSamples.option_order = NaN(1, n_samples);
 no_sample_start_trial = 1;
+
 for i_trial = unique(CueSamples.i_trial)
-    % Get number of attended cues during the trial
+    % Number of attended cues in this trial
     n_steps = max(CueSamples.i_step(CueSamples.i_trial == i_trial));
-    % Compute the indices of the starting and ending samples
+    % Sample indices for this trial
     no_sample_end_trial = no_sample_start_trial + n_steps - 1;
     range_sample_trial = no_sample_start_trial:no_sample_end_trial;
-    % Initialize local identity of options to 0 (first option)
-    option_order = zeros(1, n_steps);
-    % Define the first option attended
+    % Identify the first attended option
     option_first = CueSamples.option_loc(no_sample_start_trial);
-    % Update concerned orders to 1 (second option)
+    % Initialize as first option (0)
+    option_order = zeros(1, n_steps);
+    % Mark second option (1)
     option_order(CueSamples.option_loc(range_sample_trial) ~= option_first) = 1;
-    % Save info in the output structure
+
     CueSamples.option_order(range_sample_trial) = option_order;
-    % Update next trial start
     no_sample_start_trial = no_sample_start_trial + n_steps;
 end
 
 % --- Trial type (option/attribute) --- %
 
-% Initialize all trial types
 CueSamples.trial_type = repmat("undefined", 1, n_samples);
 no_sample_start_trial = 1;
+
 for i_trial = unique(CueSamples.i_trial)
-    % Get number of attended cues during the trial
+    % Number of attended cues in this trial
     n_steps = max(CueSamples.i_step(CueSamples.i_trial == i_trial));
-    % Compute the indices of the starting and ending samples
+    % Sample indices for this trial
     no_sample_end_trial = no_sample_start_trial + n_steps - 1;
     range_sample_trial = no_sample_start_trial:no_sample_end_trial;
-    % Update trials with at least two cues sampled
+
     if n_steps >= 2
-        % Option trial
+        % Option trial: same option sampled twice
         if CueSamples.option_loc(no_sample_start_trial) == ...
            CueSamples.option_loc(no_sample_start_trial + 1)
             CueSamples.trial_type(range_sample_trial) = "option";
-        % Attribute trial
+        % Attribute trial: same attribute sampled twice
         elseif CueSamples.cue_type(no_sample_start_trial) == ...
                CueSamples.cue_type(no_sample_start_trial + 1)
             CueSamples.trial_type(range_sample_trial) = "attribute";
         end
     end
-    % Update next trial start
+
     no_sample_start_trial = no_sample_start_trial + n_steps;
 end
 
@@ -203,8 +156,9 @@ prob_unattended = NaN(1, n_samples);
 mag_unattended = NaN(1, n_samples);
 
 no_sample_start_trial = 1;
+
 for i_trial = unique(CueSamples.i_trial)
-    % Get number of attended cues during the trial
+    % Number of attended cues in this trial
     n_steps = max(CueSamples.i_step(CueSamples.i_trial == i_trial));
     % Default cue values [P left, M left, P right, M right]
     % known_cue_values = 0.2 * [3, 3, 3, 3] - 0.1;
@@ -399,6 +353,4 @@ for step = 1:3
         % Store this proportion as the decision confidence
         CueSamples.(field_conf)(select_samples) = prop_same_choice;
     end
-end
-
 end

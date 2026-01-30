@@ -32,9 +32,7 @@ DatasetSpecs = generateTrainTestDataset(path_specs);
 
 %  Exclude seeds that failed in any cohort
 [subset_included_paths] = selectCohortSubset(...
-    path_specs, path_networks, ...
-    n_networks_cohort = DatasetSpecs.n_target_networks_cohort, ...
-    delete_outside_subset = true);
+    path_specs, path_networks, true);
 
 % Compute the number of successfully trained networks per cohort
 all_Config = getDesiredNetworkConfigs();

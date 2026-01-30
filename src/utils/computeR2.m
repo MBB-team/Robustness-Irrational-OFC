@@ -1,38 +1,48 @@
-% Computes the proportion of variance explained by a model.
-
-function R2 = computeR2(output_true, output_predicted)
-% --- INPUTS ---
-% output_true: [n_samples x n_outputs] double
-%   Array containing in column the true outputs.
-% output_predicted: [n_samples x n_outputs] double
-%   Array containing in column the outputs predicted by the model.
+function R2 = computeR2(measure_true, measure_predicted)
+% Computes the proportion of variance explained (R²).
 %
-% --- OUTPUT ---
-% R2: [1 x n_outputs] double
-%   Percentage of variance explained by the model on each separate output.
+% This function compares ground-truth measures with predicted values
+% (possibly across multiple output dimensions) and computes the coefficient
+% of determination (R²) for each dimension. R² is defined as:
 %
-% --- CALLED BY ---
-% trainNetworkCohorts
-% checkInformationLoss
-% simulateNetworkCohortsH0
+%   R² = 1 − (SS_error / SS_total)
+%
+% where SS_error is the sum of squared prediction errors and SS_total is the
+% total variance of the ground-truth data.
+%
+% INPUTS ------------------------------------------------------------------
+% measure_true : <float NxM>
+%     Ground-truth measures.
+%
+% measure_predicted : <float NxM>
+%     Predicted measures.
+%
+% OUTPUTS -----------------------------------------------------------------
+% R2 : <float 1xM>
+%     Percentage of variance explained for each output dimension.
 
+arguments
+    measure_true (:, :) double
+    measure_predicted (:, :) double
+end
 
 % Get the number of different outputs
-n_outputs = size(output_true, 2);
+n_outputs = size(measure_true, 2);
 
 % Initialize R2
 R2 = NaN(1, n_outputs);
 
-% Compute the R2 for each output separately
+% Compute R2 independently for each output dimension
 for i_output = 1:n_outputs
-    % Total explainable variance
-    sum_squares_total = sum((output_true(:, i_output) - ...
-        mean(output_true(:, i_output))).^2);
-    % Prediction error of the model
-    sum_squares_error = sum((output_true(:, i_output) - ...
-        output_predicted(:, i_output)).^2);
-    % Proportion of variance explained by the model
-    R2(i_output) = 1 - (sum_squares_error / sum_squares_total);
-end
 
+    % Total explainable variance
+    sum_squares_total = sum((measure_true(:, i_output) - ...
+        mean(measure_true(:, i_output))).^2);
+
+    % Residual prediction variance
+    sum_squares_error = sum((measure_true(:, i_output) - ...
+        measure_predicted(:, i_output)).^2);
+
+    % Proportion of variance explained
+    R2(i_output) = 1 - (sum_squares_error / sum_squares_total);
 end

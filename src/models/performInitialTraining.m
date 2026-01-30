@@ -36,10 +36,10 @@ function [out] = performInitialTraining(Config, input_train, ...
 
 arguments
     Config (1, 1) struct
-    input_train (:, :) float
-    output_train (:, :) float
-    init_params (:, 1) float
-    i_step (:, 1) int = [];
+    input_train (:, :) double
+    output_train (:, :) double
+    init_params (:, 1) double
+    i_step (:, 1) double {mustBeInteger} = [];
 end
 
 % Easily toggle test mode

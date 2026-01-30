@@ -46,7 +46,7 @@ function [init_params, input_train, output_train, input_test, output_test] = ...
 
 arguments
     DatasetSpecs (1, 1) struct
-    i_network (1, 1) int
+    i_network (1, 1) double {mustBeInteger}
     Config (1, 1) struct
     monkey (1, 1) string {mustBeMember(monkey, ["", "Franck", "Miles"])} = ""
 end
