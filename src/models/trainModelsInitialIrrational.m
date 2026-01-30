@@ -49,7 +49,7 @@ end
 
 % Initialize folders and training specifications
 [all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
-    prepareInitialTraining("irrational_" + monkey, monkey);
+    prepareInitialTraining("irrational_" + monkey);
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
 while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
@@ -74,11 +74,11 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
-                output_test] = selectInitialTrainingData(DatasetSpecs, i_network, TrainingConfig);
+                output_test] = selectTrainingData(DatasetSpecs, i_network, TrainingConfig);
 
             % Train a single RNN
-            out = performInitialTraining(TrainingConfig, input_train, ...
-                output_train, init_params, DatasetSpecs.CueDatasetTrain{i_network}.i_step);
+            out = performTraining(TrainingConfig, input_train, output_train, ...
+                init_params, DatasetSpecs.CueDatasetTrain{i_network}.i_step);
 
             % Evaluate RNN performance on training and test datasets
             [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...

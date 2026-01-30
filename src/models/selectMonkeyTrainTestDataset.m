@@ -1,4 +1,4 @@
-function DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey)
+function DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey, new_batch)
 % Loads or initializes RNN training specifications and selects monkey
 % trials to generate datasets.
 %
@@ -14,6 +14,10 @@ function DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey)
 %
 % monkey : <string 1x1>
 %     Name of the monkey on whose behaviour the RNNs will be trained.
+%
+% new_batch (optional) : <bool 1x1>
+%     Whether to generate datasets for a new training batch. Defaults to
+%     True.
 %
 % OUTPUTS -----------------------------------------------------------------
 % DatasetSpecs : <struct 1x1>
@@ -32,6 +36,7 @@ function DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey)
 arguments
     path_specs (1, 1) string
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
+    new_batch (1, 1) logical = True
 end
 
 % Load global configuration
@@ -67,7 +72,7 @@ end
 
 % --- Generate new batch if previous batch is complete --- %
 
-if DatasetSpecs.last_batch_trained
+if new_batch && DatasetSpecs.last_batch_trained
 
     % Generate random initial RNN parameters
     DatasetSpecs.init_params = [DatasetSpecs.init_params, ...
@@ -123,9 +128,10 @@ if DatasetSpecs.last_batch_trained
 
     % Mark batch as in-progress
     DatasetSpecs.last_batch_trained = false;
+
+    % Save updated training specifications
+    save(path_specs, "-struct", "DatasetSpecs");
 end
 
-% --- Save updated training specifications --- %
-save(path_specs, "-struct", "DatasetSpecs");
 
 end

@@ -1,11 +1,13 @@
 function [init_params, input_train, output_train, input_test, output_test] = ...
-    selectInitialTrainingData(DatasetSpecs, i_network, Config, monkey)
+    selectTrainingData(DatasetSpecs, i_network, Config, monkey)
 % Selects initial conditions and datasets for training and testing one RNN.
 %
 % This function extracts the initial network parameters and the
 % corresponding training and test datasets for a single RNN, identified by
 % its seed index. Inputs and target outputs are selected according to the
-% specified RNN configuration.
+% specified RNN configuration. When re-training RNNs through distortion,
+% the initial parameters will be overriden by the RNNs' initial training
+% state.
 %
 % INPUTS ------------------------------------------------------------------
 % DatasetSpecs : <struct 1x1>

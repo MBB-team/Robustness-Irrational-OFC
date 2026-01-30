@@ -5,9 +5,10 @@ function output = observeANN(~, P, ~, in)
 % for a given set of parameters and inputs. It reshapes the parameter
 % vector into weight matrices, propagates inputs through the RNN according
 % to its architecture, applies the activation function, and returns
-% vectorized predictions. If the network produces choice outputs, the
-% predictions are converted to probabilities. Optional biological
-% constraints can also be applied.
+% vectorized predictions. If weight matrices are already provided, only
+% recurrent connections are optimized. If the network produces choice
+% outputs, the predictions are converted to probabilities. Optional
+% biological constraints can also be applied.
 %
 % INPUTS ------------------------------------------------------------------
 % P : <float Px1>
@@ -20,6 +21,8 @@ function output = observeANN(~, P, ~, in)
 %           getDesiredNetworkConfigs)
 %       - input : inputs provided to the RNN, where each row corresponds to
 %           one sample
+%       - Weights : structure containing weight matrices and bias vectors
+%           (see also: reshapeParametersIntoWeights)
 %       - i_step (optional) : index of the within-trial step at which each
 %           input is sampled (if missing, all trials are assumed to last
 %           four steps)
@@ -40,9 +43,16 @@ arguments
     in (1, 1) struct
 end
 
-
-% Reshape parameters into weight matrices
-Weights = shapeParametersIntoWeights(P, in.Config);
+if isfield(in, "Weights")
+    % Replace existing recurrent connection parameters with tunable
+    % parameters
+    Weights = in.Weights;
+    Weights.("connect_z_" + in.Config.recur_connect) = reshape(P, ...
+        size(Weights.("connect_z_" + in.Config.recur_connect)));
+else
+    % Reshape parameters into weight matrices
+    Weights = shapeParametersIntoWeights(P, in.Config);
+end
 
 % Propagate inputs through the RNN
 if isfield(in, 'i_step')

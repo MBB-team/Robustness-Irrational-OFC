@@ -1,11 +1,12 @@
-function [out] = performInitialTraining(Config, input_train, ...
-    output_train, init_params, i_step)
+function [out] = performTraining(Config, input_train, output_train, ...
+    init_params, i_step, train_all_params)
 % Trains a single RNN from a specified initial parameter state.
 %
 % This function fits an RNN to a training dataset using variational
 % Bayesian inference. Training starts from a predefined set of initial
-% parameters and optimizes network parameters to reproduce the desired task
-% outputs.
+% parameters and can either optimize all network parameters or selectively
+% re-train the recurrent connections while keeping all other parameters
+% fixed.
 %
 % INPUTS ------------------------------------------------------------------
 % Config : <struct 1x1>
@@ -28,6 +29,10 @@ function [out] = performInitialTraining(Config, input_train, ...
 %     Within-trial time step at which each cue is sampled. Required when
 %     fitting choice outputs; if empty, all trials are assumed to last
 %     four time steps.
+%
+% train_all_params (optional) : <logical 1x1>
+%     Whether to re-train all network parameters (true) or restrict
+%     optimization to recurrent connections only (false, default).
 % 
 % OUTPUTS -----------------------------------------------------------------
 % out : <struct 1x1>
@@ -39,7 +44,8 @@ arguments
     input_train (:, :) double
     output_train (:, :) double
     init_params (:, 1) double
-    i_step (:, 1) double {mustBeInteger} = [];
+    i_step (:, 1) double {mustBeInteger} = []
+    train_all_params (1, 1) logical = True
 end
 
 % Easily toggle test mode
@@ -49,15 +55,31 @@ TEST_MODE = false;
         
 % Evolution and observation functions (static dynamics)
 f_fname = [];
-g_fname = @observeANN;
+if distort_all
+    g_fname = @observeANN;
+else
+    g_fname = @observeANNTuneRecurrent;
+end
 
 % Parameters of the observation function
 options = struct();
 options.inG.Config = Config;
 options.inG.input = input_train;
+if ~ train_all_params
+    % Send all parameters to the observation function
+    Weights = shapeParametersIntoWeights(init_params, Config);
+    options.inG.Weights = Weights;
+end
 
 % Model dimensions (no hidden states; parameters only)
-dim = struct('n', 0, 'n_theta', 0, 'n_phi', Config.n_params);
+if train_all_params
+    dim = struct('n', 0, 'n_theta', 0, 'n_phi', Config.n_params);
+else
+    % Re-train recurrent connections only
+    i_recur_connect = Config.ParamRange.("connect_z_" + Config.recur_connect);
+    dim = struct('n', 0, 'n_theta', 0, 'n_phi', ...
+        length(i_recur_connect) + 1);
+end
 % Prior mean different from 0
 options.priors.muPhi = 1e-1 * ones(dim.n_phi, 1);
 % Same prior variance for all parameters, no covariance
@@ -88,6 +110,9 @@ options.DisplayWin = false;
 
 % Overwrite posterior mean with predefined initial parameters
 posterior.muPhi = init_params;
+if ~ train_all_params
+    posterior.muPhi = posterior.muPhi(i_recur_connect);
+end
 
 % Special initialization for reduced ("value comparison") architectures
 if Config.n_params < 220

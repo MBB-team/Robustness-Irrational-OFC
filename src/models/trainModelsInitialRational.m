@@ -56,10 +56,10 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
-                output_test] = selectInitialTrainingData(DatasetSpecs, i_network, Config);
+                output_test] = selectTrainingData(DatasetSpecs, i_network, Config);
 
             % Train a single RNN
-            out = performInitialTraining(Config, input_train, output_train, init_params);
+            out = performTraining(Config, input_train, output_train, init_params);
 
             % Evaluate RNN performance on training and test datasets
             [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...

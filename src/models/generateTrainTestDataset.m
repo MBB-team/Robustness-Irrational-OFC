@@ -1,4 +1,4 @@
-function DatasetSpecs = generateTrainTestDataset(path_specs)
+function DatasetSpecs = generateTrainTestDataset(path_specs, new_batch)
 % Loads or initializes RNN training specifications and generates datasets.
 %
 % This function loads an existing batch training specification file or
@@ -10,6 +10,10 @@ function DatasetSpecs = generateTrainTestDataset(path_specs)
 % INPUTS ------------------------------------------------------------------
 % path_specs : <string 1x1>
 %     Path to the file where training specifications are stored.
+%
+% new_batch (optional) : <bool 1x1>
+%     Whether to generate datasets for a new training batch. Defaults to
+%     True.
 %
 % OUTPUTS -----------------------------------------------------------------
 % DatasetSpecs : <struct 1x1>
@@ -25,6 +29,7 @@ function DatasetSpecs = generateTrainTestDataset(path_specs)
 
 arguments
     path_specs (1, 1) string
+    new_batch (1, 1) logical = True
 end
 
 % Load global configuration
@@ -58,7 +63,7 @@ end
 
 % --- Generate new batch if previous batch is complete --- %
 
-if DatasetSpecs.last_batch_trained
+if new_batch && DatasetSpecs.last_batch_trained
 
     % Generate random initial RNN parameters
     DatasetSpecs.init_params = [DatasetSpecs.init_params, ...
@@ -82,9 +87,9 @@ if DatasetSpecs.last_batch_trained
 
     % Mark batch as in-progress
     DatasetSpecs.last_batch_trained = false;
-end
 
-% --- Save updated training specifications --- %
-save(path_specs, "-struct", "DatasetSpecs");
+    % Save updated training specifications
+    save(path_specs, "-struct", "DatasetSpecs");
+end
 
 end
