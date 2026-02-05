@@ -49,11 +49,11 @@ end
 % Load the training information
 path_specs = fullfile(path_networks, "_DatasetSpecs.mat");
 monkey = regexp(folder_name, ".*(Franck|Miles).*", "tokens");
-if ~ isempty(monkey) && contains(target_folder, "irrational")
+if ~ isempty(monkey) && contains(folder_name, "irrational")
     monkey = monkey{1};
-    DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey, False);
+    DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey, false);
 else
-    DatasetSpecs = generateTrainTestDataset(path_specs, False);
+    DatasetSpecs = generateTrainTestDataset(path_specs, false);
 end
 
 % Initialize the parallel pools

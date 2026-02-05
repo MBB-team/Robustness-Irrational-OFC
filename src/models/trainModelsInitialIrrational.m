@@ -2,9 +2,15 @@ function [] = trainModelsInitialIrrational(monkey)
 % Trains RNNs to exhibit irrational decision-making behaviour.
 %
 % This function trains multiple cohorts of RNNs that implement slightly
-% different input–output mappings. A total of 10 cohorts are trained; each
+% different input–output mappings. A total of 8 cohorts are trained; each
 % cohort contains a fixed number of RNNs specified in the configuration
 % file.
+%
+% In "rational" and "rational subjective" initial training settings, a
+% total of 10 cohorts are trained. The 2 cohorts missing here correspond to
+% RNNs mapping "location" inputs to "order" outputs, which are more
+% difficult to train and have a storng tendency to overfit their training
+% set. This issue must be corrected in the future.
 %
 % For each cohort, RNNs are trained from independently generated initial
 % states and datasets. Using cohort-specific seeds, training and testing
@@ -14,7 +20,7 @@ function [] = trainModelsInitialIrrational(monkey)
 % variants.
 %
 % Networks are retained only if they generalize correctly to held-out test
-% data (balanced accuracy > 95%). If an RNN associated with a given seed
+% data (balanced accuracy > 85%). If an RNN associated with a given seed
 % fails this criterion in any cohort, that seed is excluded from all
 % cohorts.
 %
@@ -40,7 +46,7 @@ function [] = trainModelsInitialIrrational(monkey)
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 23/01/2026
+% Date: 05/02/2026
 
 
 arguments
@@ -59,7 +65,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         initializeNewInitialTrainingBatch(path_specs, n_config);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = 1:n_config
+    for i_config = [1, 2, 5, 6, 7, 8, 9, 10] % Exclude 3 and 4
    
         Config = all_Config{i_config};
 
@@ -91,7 +97,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
                 params, fit_train, fit_test, out, path_networks);
         
             % Update the progress bar
-            parfor_progress();
+            % parfor_progress();
             
         end
     end

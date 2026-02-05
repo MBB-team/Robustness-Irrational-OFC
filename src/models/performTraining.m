@@ -25,7 +25,7 @@ function [out] = performTraining(Config, input_train, output_train, ...
 %     Vector of initial network parameters (connection weights and unit
 %     biases) used to initialize RNN training.
 %
-% i_step (optional) : <int Nx1>
+% i_step (optional) : <int 1xN>
 %     Within-trial time step at which each cue is sampled. Required when
 %     fitting choice outputs; if empty, all trials are assumed to last
 %     four time steps.
@@ -44,8 +44,8 @@ arguments
     input_train (:, :) double
     output_train (:, :) double
     init_params (:, 1) double
-    i_step (:, 1) double {mustBeInteger} = []
-    train_all_params (1, 1) logical = True
+    i_step (1, :) double {mustBeInteger} = []
+    train_all_params (1, 1) logical = true
 end
 
 % Easily toggle test mode
@@ -55,7 +55,7 @@ TEST_MODE = false;
         
 % Evolution and observation functions (static dynamics)
 f_fname = [];
-if distort_all
+if train_all_params
     g_fname = @observeANN;
 else
     g_fname = @observeANNTuneRecurrent;

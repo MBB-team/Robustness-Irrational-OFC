@@ -36,7 +36,7 @@ function DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, monkey, new_bat
 arguments
     path_specs (1, 1) string
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
-    new_batch (1, 1) logical = True
+    new_batch (1, 1) logical = true
 end
 
 % Load global configuration

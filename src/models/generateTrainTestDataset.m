@@ -29,7 +29,7 @@ function DatasetSpecs = generateTrainTestDataset(path_specs, new_batch)
 
 arguments
     path_specs (1, 1) string
-    new_batch (1, 1) logical = True
+    new_batch (1, 1) logical = true
 end
 
 % Load global configuration

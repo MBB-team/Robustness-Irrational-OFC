@@ -49,6 +49,6 @@ shift_i_network = length(DatasetSpecs.CueDatasetTrain) - ...
     DatasetSpecs.batch_size;
 
 % Initialize progress bar for parallel training
-parfor_progress(n_config * DatasetSpecs.batch_size);
+% parfor_progress(n_config * DatasetSpecs.batch_size);
 
 end

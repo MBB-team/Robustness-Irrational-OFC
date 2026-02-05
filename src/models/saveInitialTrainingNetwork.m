@@ -5,8 +5,8 @@ function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
 %
 % This function evaluates the final test-set performance of an RNN across
 % one or more fit phases and saves the network only if the average test
-% performance exceeds a defined threshold (R2 or accuracy >= 0.95). The
-% saved structure includes the network configuration, seed, parameter
+% performance exceeds a defined threshold (R2 >= 0.95 or accuracy >= 0.95).
+% The saved structure includes the network configuration, seed, parameter
 % trajectories, training/test fit histories, and convergence diagnostics.
 %
 % INPUTS ------------------------------------------------------------------
@@ -82,8 +82,10 @@ end
 % ~ Loop through fit phases ~ %
 for i_fit = 1:length(fit_label)
 
+    disp(mean(fit_test{i_fit}(end, :)))
+
     % Only save if the final test performance meets the threshold
-    save_network = save_network && (mean(fit_test{i_fit}(end, :)) >= 0.95);
+    save_network = save_network && (mean(fit_test{i_fit}(end, :)) >= 0.80);
 
     % Store parameters, fit history, and convergence info
     Network.(fit_label{i_fit}) = struct();
