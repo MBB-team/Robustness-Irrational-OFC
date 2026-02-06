@@ -10,8 +10,8 @@ requiredToolboxes = {'Statistics and Machine Learning Toolbox','Deep Learning To
 installedToolboxes = ver;
 installedToolboxes = {installedToolboxes.Name};
 missingToolboxes = setdiff(requiredToolboxes, installedToolboxes);
-if ~isempty(installedToolboxes)
-    warning("Missing toolboxes: %s", strjoin(installedToolboxes, ", "));
+if ~isempty(missingToolboxes)
+    warning("Missing toolboxes: %s", strjoin(missingToolboxes, ", "));
 end
 
 % Display validation
