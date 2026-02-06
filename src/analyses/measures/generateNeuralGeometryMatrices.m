@@ -63,7 +63,6 @@ function analysis_output = generateNeuralGeometryMatrices(params, Config, ~, inp
 %           - CCM_attribute_p <9x9>: p-values associated with each entry in
 %           CCM_attribute
 
-
 arguments
     params (:,1) double = []
     Config (1,1) struct = struct()
@@ -71,11 +70,11 @@ arguments
     inputs (1,1) struct = struct()
 end
 
-% --- Preprocessing mode: generate datasets and regression matrices --- %
-
 if isempty(params)
 
-    % Generate cue-sampling scenarios for RDM and CCM analyses
+    % --- Preprocessing mode: generate datasets and regression matrices --- %
+
+    % Generate cue-sampling scenarii for RDM and CCM analyses
     CueSamplesRDM = generateRDMcueSamples();
     CueSamplesCCM = generateCCMcueSamples();
     DataSamplesRDM = expandCueSamples(CueSamplesRDM);
@@ -105,7 +104,7 @@ if isempty(params)
 
 else
 
-% --- Analysis mode: compute neural geometry measures --- %
+    % --- Analysis mode: compute neural geometry matrices --- %
 
     % Initialize output structure
     analysis_output = struct();

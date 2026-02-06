@@ -1,193 +1,113 @@
-function analysis_output = computeNeuralDistance(params, Config, ~, inputs)
-% Computes the Representational Dissimilarity Matrices (RDM), Coefficients
-% of Partial Determination (CPD) and Cross-Correlation Matrices (CCM) of an
-% ANN, using the same analysis as in Hunt et al. (2018). Also computes the
-% distance between the RDM / CPD / CCM of the ANN and that of both monkeys.
+function analysis_output = computeNeuralDistance(params, ~, ~, inputs)
+% Computes RDM and CCM neural distances between an RNN and monkeys.
 %
-% This function is called by the function callMeasure once without
-% any argument, to pre-compute any useful variables, and then with its full
-% arguments.
+% This function quantifies how similar an RNN’s neural geometry is to that
+% of individual monkeys or their pooled neural activity. Distances are
+% computed for both the Representational Dissimilarity Matrix (RDM) and the
+% Cross-Correlation Matrices (CCM) for option and attribute trials. The RDM
+% distance is measured as one minus the Spearman correlation of the upper
+% triangles of the RDMs, and the CCM distance is computed as the Euclidean
+% norm of interpretable CCM cells that represent meaningful cue-step pairs.
 %
-% INPUTS ----------
-% - params [vector num]
-%       Vector of parameters defining an ANN.
-% - Config [struct]
-%       'Configuration' structure defining the architecture of the ANN.
-% - inputs [struct]
-%       Structure supposed to contain the variables pre-computed when the
-%       function is called without any argument. Its fields are:
-%       - DataSamplesRDM [struct]
-%               Structure defining the properties of the trials used to
-%               compute the RDM.
-%       - DataSamplesCCM [struct]
-%               Structure defining the properties of the trials used to
-%               compute the two CCMs.
-%       - select_option_samples [vector bool]
-%               Whether each sample belongs to an option trial.
-%       - select_attribute_samples [vector bool]
-%               Whether each sample belongs to an attribute trial.
-%       - CCM_regress_option [n x 6 num]
-%               Regression matrix used to compute the CCM on option trials.
-%       - CCM_regress_attribute [n x 6 num]
-%               Regression matrix used to compute the CCM on attribute
-%               trials.
-%       - expe_Franck_RDM [20 x 20 num]
-%               RDM of monkey Franck.
-%       - expe_Miles_RDM [20 x 20 num]
-%               RDM of monkey Miles.
-%       - expe_Franck_CPD [1 x 5 num]
-%               Vector of CPDs of the RDM of monkey Franck.
-%       - expe_Miles_CPD [1 x 5 num]
-%               Vector of CPDs of the RDM of monkey Miles.
-%       - expe_Franck_CCM_option [9 x 9 num]
-%               CCM of monkey Franck computed on option trials.
-%       - expe_Franck_CCM_attribute [9 x 9 num]
-%               CCM of monkey Franck computed on attribute trials.
-%       - expe_Miles_CCM_option [9 x 9 num]
-%               CCM of monkey Miles computed on option trials.
-%       - expe_Miles_CCM_attribute [9 x 9 num]
-%               CCM of monkey Miles computed on attribute trials.
+% As with all functions in the 'measures' folder, this function can be
+% called in two modes: when called without parameters, it performs any
+% required preprocessing and returns the corresponding inputs; when called
+% with parameters, it applies the measure to the RNN using these inputs.
 %
-% OUTPUTS -----
-% - RDM [20 x 20 num]
-%       RDM of the ANN.
-% - CPD [1 x 5 num]
-%       Vector of CPDs of the RDM of the ANN.
-% - CCM_option [9 x 9 num]
-%       CCM of the ANN computed on option trials.
-% - CCM_attribute [9 x 9 num]
-%       CCM of the ANN computed on attribute trials.
-% - dist_Franck_RDM [num]
-%       Distance (1 - Pearson correlation of half of the matrix, diagonal
-%       excluded) between the RDM of the model and of monkey Franck.
-% - dist_Miles_RDM [num]
-%       Same format as dist_Franck_RDM, but for monkey Miles.
-% - dist_Franck_CPD [num]
-%       Distance between the vectors of CPDs of the model and of monkey
-%       Franck.
-% - dist_Miles_CPD [num]
-%       Same format as dist_Franck_CPD, but for monkey Miles.
-% - dist_Franck_CCM [num]
-%       Distance between some selected cells of the CCMs of the model and
-%       of monkey Franck.
-% - dist_Miles_CCM [num]
-%       Same format as dist_Franck_CCM, but for monkey Miles.
+% INPUTS ------------------------------------------------------------------
+% params : <float Px1> | []
+%     Vector of RNN parameters. If empty, the function runs in
+%     preprocessing mode and returns the analysis inputs instead of
+%     computing measures.
+%
+% inputs : <struct 1x1>
+%     Structure containing all variables precomputed during preprocessing,
+%     as well as supplementary variables previsouly computed. Required only
+%     in analysis mode. Fields include:
+%       - RDM, CCM_option, CCM_attribute: neural geometry of the RNN
+%       - [monkey]_RDM_[area]: experimental RDM for each monkey (Franck,
+%       Miles) or pooled data (both) and each area (OFC, dlPFC, ACC)
+%       - [monkey]_CCM_option_[area], [monkey]_CCM_attribute_[area]:
+%       experimental CCMs for option and attribute trials
+%       - not_noise_CCM: logical mask selecting CCM cells that represent
+%        meaningful cue-step pairs
+%
+% OUTPUTS -----------------------------------------------------------------
+% analysis_output : <struct 1x1>
+%     - In preprocessing mode:
+%     Structure containing all precomputed datasets and regression matrices
+%     needed for the analysis.
+%     - In analysis mode:
+%      Structure containing the neural geometry measures:
+%           - dist_RDM_[monkey]_[area]: distance between RNN and monkey RDM
+%           - dist_CCM_[monkey]_[area]: distance between RNN and monkey CCM
 
-% --- CHECK INPUT ARGUMENTS --- %
 arguments
-    params (:,1) double {mustBeFinite} = [];
-    Config (1,1) struct = struct();
-    ~;
-    inputs (1,1) struct = struct();
+    params (:,1) double = []
+    ~
+    ~
+    inputs (1,1) struct = struct()
 end
 
-% ---------------------- %
-% --- Pre-processing --- %
-% ---------------------- %
 
-if nargin == 0
+if isempty(params)
 
-    % Create the RDM and CCM datasets
-    CueSamplesRDM = generateRDMcueSamples();
-    CueSamplesCCM = generateCCMcueSamples();
-    DataSamplesRDM = expandCueSamples(CueSamplesRDM);
-    DataSamplesCCM = expandCueSamples(CueSamplesCCM);
-    
-    % Prepare selection of trials depending on their type
-    select_option_samples = DataSamplesCCM.trial_type == "option";
-    select_attribute_samples = DataSamplesCCM.trial_type == "attribute";
-    select_option_trials = select_option_samples(1:3:end);
-    select_attribute_trials = select_attribute_samples(1:3:end);
-    
-    % Create the CCM regression matrices
-    CCM_regress_all = computeCCMregressionMatrix(DataSamplesCCM);
-    CCM_regress_option = CCM_regress_all(...
-        select_option_trials, :);
-    CCM_regress_attribute = CCM_regress_all(...
-        select_attribute_trials, :);
+    % --- Preprocessing mode: load experimental neural data --- %
 
-    % Load the experimental neural data
+    % Load experimental neural geometry for all monkeys, pooled data, and
+    % areas
     MonkeyNeuralGeometry = load(fullfile(getPath("MonkeyData"), "NeuralGeometry.mat"));
-
-    % Gather the result of the pre-processing into inputs for next function
-    % call
-    analysis_output = struct(...
-        "DataSamplesRDM", DataSamplesRDM, ...
-        "DataSamplesCCM", DataSamplesCCM, ...
-        "select_option_samples", select_option_samples, ...
-        "select_attribute_samples", select_attribute_samples, ...
-        "CCM_regress_option", CCM_regress_option, ...
-        "CCM_regress_attribute", CCM_regress_attribute);
-
-    % Select all CCM cells that can represent something other than noise
-    analysis_output.p_nonnoise = zeros(9);
-    analysis_output.p_nonnoise(4, :) = 1;
-    analysis_output.p_nonnoise(7, :) = 1;
-    analysis_output.p_nonnoise(8, :) = 1;
-    analysis_output.p_nonnoise(:, 4) = 1;
-    analysis_output.p_nonnoise(:, 7) = 1;
-    analysis_output.p_nonnoise(:, 8) = 1;
-
     for area = ["OFC", "dlPFC", "ACC"]
-        output_suffix = "_" + area;
-        for monkey = ["Franck", "Miles"]
-            for geometry = ["RDM", "CPD", "CCM_option", "CCM_option_p", ...
+        for monkey = ["Franck", "Miles", "both"]
+            for geometry = ["RDM", "CCM_option", "CCM_option_p", ...
                     "CCM_attribute", "CCM_attribute_p"]
-                analysis_output.("expe_" + monkey + "_" + geometry + output_suffix) = ...
+                analysis_output.(geometry + "_" + monkey + "_" + area) = ...
                     MonkeyNeuralGeometry.(area).(monkey).(geometry);
             end
         end
     end
 
-end
+    % Define CCM cells that represent meaningful cue-step pairs
+    analysis_output.not_noise_CCM = true(9);
+    analysis_output.not_noise_CCM([4, 7, 8], :) = false;
+    analysis_output.not_noise_CCM(:, [4, 7, 8]) = false;
 
-% ---------------------------------------- %
-% --- Analyze the vector of parameters --- %
-% ---------------------------------------- %
+else
 
-if nargin > 0
-    
-    % --- Compute the neural distances --- %
+    % --- Analysis mode: compute neural distances --- %
 
-    for area = ["OFC", "dlPFC", "ACC"]
-        if area == "OFC"
-            output_suffix = "";
-        else
-            output_suffix = "_" + area;
-        end
-        for monkey = ["Franck", "Miles"]
+    for monkey = ["Franck", "Miles", "both"]
+        for area = ["OFC", "dlPFC", "ACC"]
+        
+            % --- RDM distance --- %
 
-            % Compute the RDM distance
-            RDM_label = monkey + "_RDM" + output_suffix;
-            analysis_output.("dist_" + RDM_label) = computeRDMdistance(...
-                inputs.("expe_" + RDM_label), analysis_output.RDM);
+            % Select the experimental RDM
+            expe_RDM = inputs.("RDM_" + monkey + "_" + area);
+            
+            % Vectorize the upper half of each RDM, diagonal excluded
+            vec_expe_RDM = reshape(triu(expe_RDM, 1), [], 1);
+            vec_network_RDM = reshape(triu(inputs.RDM, 1), [], 1);
 
-            % Compute the CPD distance
-            CPD_label = monkey + "_CPD" + output_suffix;
-            analysis_output.("dist_" + CPD_label) = ...
-                norm(inputs.("expe_" + CPD_label) - analysis_output.CPD);
+            % Compute the correlation distance
+            analysis_output.("dist_RDM_" + monkey + "_" + area) = ...
+                1 - corr(vec_expe_RDM, vec_network_RDM, Type="Spearman");
 
-            % Compute the CCM distance
-            CCM_label = monkey + "_CCM" + output_suffix;
-            CCM_option_label = monkey + "_CCM_option" + output_suffix;
-            CCM_option_p_label = monkey + "_CCM_option_p" + output_suffix;
-            CCM_attribute_label = monkey + "_CCM_attribute" + output_suffix;
-            CCM_attribute_p_label = monkey + "_CCM_attribute_p" + output_suffix;
-            analysis_output.("dist_" + CCM_label) = computeCCMdistance(...
-                inputs.("expe_" + CCM_option_label), ...
-                inputs.("expe_" + CCM_option_p_label), ...
-                inputs.("expe_" + CCM_attribute_label), ...
-                inputs.("expe_" + CCM_attribute_p_label), ...
-                analysis_output.CCM_option, analysis_output.CCM_attribute);
-            analysis_output.("dist_" + CCM_label + "_full") = computeCCMdistance(...
-                inputs.("expe_" + CCM_option_label), ...
-                inputs.p_nonnoise, ...
-                inputs.("expe_" + CCM_attribute_label), ...
-                inputs.p_nonnoise, ...
-                analysis_output.CCM_option, analysis_output.CCM_attribute);
+            % --- CCM distance --- %            
+
+            % Select the experimental CCMs
+            expe_CCM_option = inputs.("CCM_option_" + monkey + "_" + area);
+            expe_CCM_attribute = inputs.("CCM_attribute_" + monkey + "_" + area);
+
+            % Create vectors of interpretable CCM cells
+            vec_expe_CCM = [expe_CCM_option(inputs.not_noise_CCM) ; ...
+                expe_CCM_attribute(inputs.not_noise_CCM)];
+            vec_network_CCM = [inputs.CCM_option(inputs.not_noise_CCM) ; ...
+                inputs.CCM_attribute(inputs.not_noise_CCM)];
+
+            % Compute the Euclidian distance
+            analysis_output.("dist_CCM_" + monkey + "_" + area) = ...
+                norm(vec_expe_CCM - vec_network_CCM);
+           
         end
     end
-
-end
-
 end

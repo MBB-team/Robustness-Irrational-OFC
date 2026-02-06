@@ -34,7 +34,6 @@ function output = observeANN(~, P, ~, in)
 % output : <float Nx1>
 %     Vectorized predictions produced by the RNN, optionally concatenated
 %     with constraint outputs.
-%
 
 arguments
     ~
