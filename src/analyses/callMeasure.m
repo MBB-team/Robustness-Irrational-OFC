@@ -1,4 +1,4 @@
-function [] = applyAnalysisFunctions(analysis_function, params_file_name, options)
+function [] = callMeasure(analysis_function, params_file_name, options)
 % Applies an analysis function to a set of RNN parameter vectors.
 %
 % This function loads stored RNN parameters together with their associated
