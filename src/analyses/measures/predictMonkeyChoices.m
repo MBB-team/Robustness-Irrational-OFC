@@ -1,12 +1,16 @@
 function analysis_output = predictMonkeyChoices(params, Config, ~, inputs)
-% Quantifies how well an RNN predicts monkey choices using balanced accuracy.
+% Quantifies how well an RNN predicts monkey choices using balanced 
+% accuracy.
 %
 % This measure evaluates whether the choices produced by an RNN match the
 % choices made by individual monkeys when exposed to the same cue
 % sequences. For each monkey, the RNN is run on the corresponding trials,
 % its outputs are converted into binary choices, and prediction performance
 % is assessed using balanced accuracy on the final decision step of each
-% trial.
+% trial. When the training condition of the RNN can be linked to a specific
+% monkey, prediction performance is additionally reframed in a
+% same-monkey / other-monkey reference frame, allowing direct comparison
+% between within-monkey and cross-monkey generalization.
 %
 % As with all functions in the 'measures' folder, this function can be
 % called in two modes: when called without parameters, it performs any
@@ -29,7 +33,7 @@ function analysis_output = predictMonkeyChoices(params, Config, ~, inputs)
 %       - DataSamplesFranck, DataSamplesMiles: cue-sampling datasets
 %       corresponding to trials experienced by each monkey, including their
 %       choices for each cue sequence
-%       - fit_label
+%       - fit_label: label of the RNN's: training phase
 %       
 % OUTPUTS -----------------------------------------------------------------
 % analysis_output : <struct 1x1>
@@ -37,8 +41,8 @@ function analysis_output = predictMonkeyChoices(params, Config, ~, inputs)
 %     Structure containing monkey-specific cue sequences datasets.
 %     - In analysis mode:
 %     Structure containing balanced accuracies:
-%       - bacc_Franck, bacc_Miles <1x1>: balanced accuracy for predicting the
-%       choices of each monkey
+%       - bacc_Franck, bacc_Miles <1x1>: balanced accuracy for predicting
+%       the choices of each monkey
 %       - bacc_same_monkey <1x1>: balanced accuracy for the monkey matching
 %       the RNN's training condition (if identifiable)
 %       - bacc_other_monkey <1x1>: balanced accuracy for the other monkey
@@ -93,8 +97,7 @@ else
         % --- Compare RNN and monkey choices --- %
 
         % Select monkey choices in the same reference frame as the RNN
-        monkey_choices = inputs.StrippedRecords.("choice_" + ...
-            Config.output_label)(select_test);
+        monkey_choices = inputs.StrippedRecords.("choice_" + Config.output_label);
         monkey_choices = monkey_choices';
 
         % Restrict evaluation to the final step of each trial
