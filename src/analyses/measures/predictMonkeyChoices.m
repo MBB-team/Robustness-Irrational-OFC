@@ -66,6 +66,7 @@ if isempty(params)
         % Select trials attended by this monkey
         ThisMonkeyRecords = selectStructFieldColumns(MonkeyRecords, ...
             MonkeyRecords.monkey == monkey);
+        ThisMonkeyRecords.i_trial = ThisMonkeyRecords.i_abs_trial;
 
         % Expand cue-sampling scenarios while preserving observed choices
         analysis_output.("DataSamples" + monkey) = expandCueSamples(...
