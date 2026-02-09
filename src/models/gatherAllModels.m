@@ -39,6 +39,7 @@ function AllNetworks = gatherAllModels(folder_name, last_step_only)
 %       "diff", "choice")
 %       - seed: random seed used to generate the datasets and initial state
 %       - config_ID: ID identifying the model's 'Config' structure
+%       - folder_name: name of the folder where the RNN .mat file is stored
 %       - fit_label: name of the training phase from which the parameters
 %       were extracted (e.g., "FitRational", "FitIrrationalFranck")
 %       - fit_step: index of the training step within the corresponding
@@ -110,6 +111,7 @@ AllNetworks.seed = NaN(1, n_states);
 AllNetworks.config_ID = NaN(1, n_states);
 
 % Training metadata
+AllNetworks.folder_name = strings(1, n_states);
 AllNetworks.fit_label = strings(1, n_states);
 AllNetworks.fit_step = NaN(1, n_states);
 AllNetworks.fit_train = NaN(1, n_states);
@@ -173,6 +175,7 @@ for i_network = 1:n_network
             AllNetworks.config_ID(i_state) = config_ID;
             
             % Save training metadata
+            AllNetworks.folder_name(i_state) = folder_name;
             AllNetworks.fit_label(i_state) = fit_label;
             AllNetworks.fit_step(i_state) = i_step;
             AllNetworks.fit_train(i_state) = Network.(fit_label).fit_train(i_step);
