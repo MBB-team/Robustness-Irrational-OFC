@@ -5,11 +5,11 @@ function analysis_output = generateNeuralGeometryMatrices(params, Config, ~, inp
 % This measure implements the neural geometry analyses presented in Hunt
 % et al. (2018). It characterizes how an RNN encodes cue information by
 % combining three complementary analyses:
-%   1) Representational Dissimilarity Matrices (RDMs) computed from
+%   (1) Representational Dissimilarity Matrices (RDMs) computed from
 %   population activity patterns,
-%   2) Coefficients of Partial Determination (CPDs) quantifying the
+%   (2) Coefficients of Partial Determination (CPDs) quantifying the
 %   contribution of task-relevant factors to the RDM,
-%   3) Cross-Correlation Matrices (CCMs) capturing the temporal structure
+%   (3) Cross-Correlation Matrices (CCMs) capturing the temporal structure
 %   of cue-rank encoding across the population.
 %
 % As with all functions in the 'measures' folder, this function can be
@@ -122,7 +122,7 @@ else
 
     [~, activity_RDM, ~] = propagateThroughANN(Weights, ...
         Config.f_activation, inputs_RDM, ones(1, size(inputs_RDM, 1)));
-    analysis_output.RDM = corr(zscore(activity_RDM)');
+    analysis_output.RDM = computeRDM(activity_RDM);
 
     % --- Coefficients of Partial Determination (CPD) --- %
 

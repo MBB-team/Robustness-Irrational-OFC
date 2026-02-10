@@ -30,9 +30,9 @@ function [] = extractMonkeyTrialsAndSpikesData(window_start, window_end)
 %   from cue presentation.
 %
 % OUTPUTS -----------------------------------------------------------------
-% None. Results are saved to disk in the 'data/processed/monkeys' folder:
-%   - UnitRecordings.mat
-%   - CueSequences.mat
+% None. Results are saved to disk in:
+%   data/processed/monkeys/UnitRecordings.mat
+%   data/processed/monkeys/CueSequences.mat
 
 arguments
     window_start (1,1) double = 100
