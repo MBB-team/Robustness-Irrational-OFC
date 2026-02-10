@@ -77,10 +77,10 @@ if isempty(params)
     analysis_output.DataSamples = expandCueSamples(CueSamples);
 
     % Load monkey datasets
-    MonkeyRecords = load(fullfile(getPath("MonkeyData"), "StrippedRecords.mat"));
+    MonkeyCueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
     for monkey = ["Franck", "Miles"]
-        ThisMonkeyRecords = selectStructFieldColumns(MonkeyRecords, ...
-            MonkeyRecords.monkey == monkey);
+        ThisMonkeyRecords = selectStructFieldColumns(MonkeyCueSequences, ...
+            MonkeyCueSequences.monkey == monkey);
         ThisMonkeyRecords.i_trial = ThisMonkeyRecords.i_abs_trial;
         DataSamples = expandCueSamples(ThisMonkeyRecords, ...
             monkey=monkey, override_choice=false);

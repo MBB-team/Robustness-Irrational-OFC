@@ -59,13 +59,13 @@ if isempty(params)
     % --- Preprocessing mode: load monkey trials and choices --- %
 
     % Load the experimental records
-    MonkeyRecords = load(fullfile(getPath("MonkeyData"), "StrippedRecords.mat"));
+    MonkeyCueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
 
     for monkey = ["Franck", "Miles"]
 
         % Select trials attended by this monkey
-        ThisMonkeyRecords = selectStructFieldColumns(MonkeyRecords, ...
-            MonkeyRecords.monkey == monkey);
+        ThisMonkeyRecords = selectStructFieldColumns(MonkeyCueSequences, ...
+            MonkeyCueSequences.monkey == monkey);
         ThisMonkeyRecords.i_trial = ThisMonkeyRecords.i_abs_trial;
 
         % Expand cue-sampling scenarios while preserving observed choices
@@ -98,7 +98,7 @@ else
         % --- Compare RNN and monkey choices --- %
 
         % Select monkey choices in the same reference frame as the RNN
-        monkey_choices = inputs.StrippedRecords.("choice_" + Config.output_label);
+        monkey_choices = inputs.(DataSamples + "monkey").("choice_" + Config.output_label);
         monkey_choices = monkey_choices';
 
         % Restrict evaluation to the final step of each trial
