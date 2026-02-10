@@ -2,11 +2,11 @@ function [] = setup()
 % SETUP() adds all the necessary folders to MATLAB's path.
 
 % Add folders to the path
-root = fileparts(pwd);
+root = pwd;
 addpath(genpath(root));
 
 % Check toolboxes
-requiredToolboxes = {'Statistics and Machine Learning Toolbox','Deep Learning Toolbox'};
+requiredToolboxes = {'Statistics and Machine Learning Toolbox','Parallel Computing Toolbox'};
 installedToolboxes = ver;
 installedToolboxes = {installedToolboxes.Name};
 missingToolboxes = setdiff(requiredToolboxes, installedToolboxes);
