@@ -84,8 +84,17 @@ for i_fit = 1:length(fit_label)
 
     disp(mean(fit_test{i_fit}(end, :)))
 
+    % Define the performance threshold
+    if contains(fit_label{i_fit}, "Irrational")
+        % Performance quantified through balanced accuracy
+        perf_threshold = 0.80;
+    else
+        % Performance quantified through R2
+        perf_threshold = 0.95;
+    end
+
     % Only save if the final test performance meets the threshold
-    save_network = save_network && (mean(fit_test{i_fit}(end, :)) >= 0.80);
+    save_network = save_network && (mean(fit_test{i_fit}(end, :)) >= perf_threshold);
 
     % Store parameters, fit history, and convergence info
     Network.(fit_label{i_fit}) = struct();

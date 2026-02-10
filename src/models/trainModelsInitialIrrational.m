@@ -66,6 +66,8 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
     % ~ Loop through configurations to train ~ %
     for i_config = [1, 2, 5, 6, 7, 8, 9, 10] % Exclude 3 and 4
+
+        fprintf("====== %d ========\n", i_config);
    
         Config = all_Config{i_config};
 
@@ -103,6 +105,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     end
 
     % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks);
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, [1, 2, 5, 6, 7, 8, 9, 10]);
 
 end
