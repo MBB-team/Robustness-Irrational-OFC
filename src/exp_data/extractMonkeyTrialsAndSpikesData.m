@@ -1,4 +1,4 @@
-function [] = processMonkeyTrialsAndSpikes(window_start, window_end)
+function [] = extractMonkeyTrialsAndSpikesData(window_start, window_end)
 % Extracts, formats, and saves behavioural and neural data from raw monkey
 % recording files.
 %
