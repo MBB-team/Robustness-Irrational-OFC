@@ -44,7 +44,8 @@ function analysis_output = computeCueOrderPollution(params, Config, ~, inputs)
 % OUTPUTS -----------------------------------------------------------------
 % analysis_output : <struct 1x1>
 %     - In preprocessing mode:
-%     Structure containing the precomputed dataset and VBA model.
+%     Structure containing the precomputed dataset of all admissible cue
+%     sequences and the vector of admissible option attributes.
 %     - In analysis mode:
 %     Structure containing the variance of the RNN outputs on different
 %     trial subsets:

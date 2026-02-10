@@ -48,7 +48,7 @@ function analysis_output = computeFrameworkInformationLoss(params, ...
 arguments
     params (:,1) double = []
     Config (1,1) struct = struct()
-    seed (1, 1) double = 0
+    seed (1,1) double = 0
     inputs (1,1) struct = struct()
 end
 

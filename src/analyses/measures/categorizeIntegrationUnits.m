@@ -36,7 +36,8 @@ function analysis_output = categorizeIntegrationUnits(params, Config, ~, inputs)
 % OUTPUTS -----------------------------------------------------------------
 % analysis_output : <struct 1x1>
 %     - In preprocessing mode:
-%     Structure containing the precomputed dataset and VBA model.
+%     Structure containing the precomputed dataset of all admissible cue
+%     sequences and cue sequences experienced by the monkeys.
 %     - In analysis mode:
 %     Structure containing unit-wise regression statistics and
 %     categorization results, separately for the rational optimal framework
