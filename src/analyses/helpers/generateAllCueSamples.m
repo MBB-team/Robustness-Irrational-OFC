@@ -33,15 +33,15 @@ POSSIBLE_CUE_RANKS = 1:5;
 POSSIBLE_CUE_POSITION = 1:4; 
 
 % Total number of distinct four-cue trials given the positional constraints
-n_trials = (len(POSSIBLE_CUE_RANKS) ^ 4) * ...
-    len(POSSIBLE_CUE_POSITION) * ...
-    (len(POSSIBLE_CUE_POSITION) - 2) * ...
-    (len(POSSIBLE_CUE_POSITION) - 2);
+n_trials = (length(POSSIBLE_CUE_RANKS) ^ 4) * ...
+    length(POSSIBLE_CUE_POSITION) * ...
+    (length(POSSIBLE_CUE_POSITION) - 2) * ...
+    (length(POSSIBLE_CUE_POSITION) - 2);
 
 % Initialize output structure
 CueSamples = struct();
-CueSamples.cue_pos = NaN(n_trials * 4);
-CueSamples.cue_rank = NaN(n_trials * 4);
+CueSamples.cue_pos = NaN(1, n_trials * 4);
+CueSamples.cue_rank = NaN(1, n_trials * 4);
 
 % Trial and step indices
 CueSamples.i_trial = repelem(1:n_trials, 4);
