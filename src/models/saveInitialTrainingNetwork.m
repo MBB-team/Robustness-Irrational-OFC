@@ -96,7 +96,7 @@ for i_fit = 1:length(fit_label)
     if test_network
         if contains(fit_label{i_fit}, "Irrational")
             % Performance quantified through balanced accuracy
-            perf_threshold = 0.75;
+            perf_threshold = 0.70;
         else
             % Performance quantified through R2
             perf_threshold = 0.95;

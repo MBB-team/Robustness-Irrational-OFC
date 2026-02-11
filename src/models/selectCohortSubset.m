@@ -65,7 +65,9 @@ end
 for i_network = 1:n_network
     seeds = regexp(all_path(i_network), all_patterns, "tokens");
     i_cohort = find(~ cellfun(@isempty, seeds), 1);
-    is_trained(str2double(seeds{i_cohort}{1}), i_cohort) = true;
+    if ~ isempty(i_cohort)
+        is_trained(str2double(seeds{i_cohort}{1}), i_cohort) = true;
+    end
 end
 
 % Identify seeds present in all cohorts
