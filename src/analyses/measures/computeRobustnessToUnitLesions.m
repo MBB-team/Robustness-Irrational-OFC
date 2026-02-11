@@ -39,9 +39,13 @@ function analysis_output = computeRobustnessToUnitLesions(params, ...
 %     Structure containing the measure results:
 %       - prop_optimal_impaired_units <Nx1>: mean proportion of optimal
 %       choices when 1, 2, ..., N integration-layer units are lesioned
+%       - avg_prop_optimal_impaired_units <1x1>: proportion of optimal
+%       choices averaged between 10 and 50% of lesioned units
 %       - prop_consistent_impaired_units <Nx1>: mean proportion of choices
 %       consistent with the unlesioned network when 1, 2, ..., N units are
 %       lesioned
+%       - avg_prop_optimal_impaired_units <1x1>: proportion of consistent
+%       choices averaged between 10 and 50% of lesioned units
 
 arguments
     params (:,1) double = []
@@ -119,4 +123,10 @@ else
         analysis_output.prop_optimal_impaired_units(n_impaired) = mean(prop_optimal);
         analysis_output.prop_consistent_impaired_units(n_impaired) = mean(prop_consistent);
     end
+
+    % Average between 10% and 50% of lesions
+    analysis_output.avg_prop_optimal_impaired_units = ...
+        mean(analysis_output.prop_optimal_impaired_units(1:5));
+    analysis_output.avg_prop_consistent_impaired_units = ...
+        mean(analysis_output.prop_consistent_impaired_units(1:5));
 end

@@ -38,9 +38,14 @@ function analysis_output = computeRobustnessToConnectionLesions(params, ...
 %     Structure containing the measure results:
 %       - prop_optimal_impaired_connec <Nx1>: mean proportion of optimal
 %       choices when 10%, 20%, ..., 100% recurrent connections are lesioned
+%       - avg_prop_optimal_impaired_connec <1>1: proportion of optimal
+%       choices averaged between 10 and 50% of lesioned connections
 %       - prop_consistent_impaired_connec <Nx1>: mean proportion of choices
 %       consistent with the unlesioned network when 10%, 20%, ..., 100% 
 %       recurrent connections are lesioned
+%       - avg_prop_consistent_impaired_connec <1>1: proportion of
+%       consistent choices averaged between 10 and 50% of lesioned
+%       connections
 
 arguments
     params (:,1) double = []
@@ -148,4 +153,10 @@ else
         analysis_output.prop_optimal_impaired_connec(i_lesion_level) = mean(prop_optimal);
         analysis_output.prop_consistent_impaired_connec(i_lesion_level) = mean(prop_consistent);
     end
+
+    % Average between 10% and 50% of lesions
+    analysis_output.avg_prop_optimal_impaired_connec = ...
+        mean(analysis_output.prop_optimal_impaired_connec(1:5));
+    analysis_output.avg_prop_consistent_impaired_connec = ...
+        mean(analysis_output.prop_consistent_impaired_connec(1:5));
 end
