@@ -35,14 +35,6 @@ CueSamplesRDM = generateRDMcueSamples();
 % Uniquely identify cue sequences through an absolute trial ID
 UnitRecordings.i_trial = UnitRecordings.i_abs_trial;
 
-% Expand cue sequence dataset for CCM analysis
-DataSamples = expandCueSamples(UnitRecordings, override_choice=false);
-
-% Identify trials containing at least three cue samples (required for CCMs)
-i_trials_three_cues = unique(UnitRecordings.i_trial);
-i_trials_three_cues = i_trials_three_cues(groupcounts(UnitRecordings.i_trial') >= 3);
-select_three_cues = ismember(UnitRecordings.i_trial, i_trials_three_cues);
-
 % ~ Loop over recorded brain areas ~ %
 for area = unique(UnitRecordings.area)
 
@@ -53,21 +45,23 @@ for area = unique(UnitRecordings.area)
     for monkey = [unique(UnitRecordings.monkey), "both"]
 
         NeuralGeometry.(area).(monkey) = struct();
-        fprintf("%s - %s ... ", area, monkey);
+        fprintf("%s - %s\n", area, monkey);
         
         % Select recordings for the current monkey (or pooled dataset)
-        if monkey == "all"
+        if monkey == "both"
             select_monkey = true(size(select_area));
         else
             select_monkey = (UnitRecordings.monkey == monkey);
         end
         select_area_monkey = select_area & select_monkey;
+        MonkeyUnitRecordings = selectStructFieldColumns(UnitRecordings, ...
+            select_area_monkey);
 
         % --- Representational Dissimilarity Matrix (RDM) --- %
 
         % Initialize the matrix of population activity
         % Each session contributes one population activity vector
-        all_session = unique(UnitRecordings.i_session(select_area_monkey));
+        all_session = unique(MonkeyUnitRecordings.i_session);
         n_sessions = length(all_session);
         n_RDM_samples = length(CueSamplesRDM.i_trial);
         RDM_activity = NaN(n_RDM_samples, n_sessions);
@@ -80,13 +74,14 @@ for area = unique(UnitRecordings.area)
 
                % Select recordings matching the current RDM condition
                is_RDM_sample = ...
-                    (UnitRecordings.i_step == CueSamplesRDM.i_step(i_sample)) & ...
-                    (UnitRecordings.cue_pos == CueSamplesRDM.cue_pos(i_sample)) & ...
-                    (UnitRecordings.cue_rank == CueSamplesRDM.cue_rank(i_sample));
+                    (MonkeyUnitRecordings.i_step == CueSamplesRDM.i_step(i_sample)) & ...
+                    (MonkeyUnitRecordings.cue_pos == CueSamplesRDM.cue_pos(i_sample)) & ...
+                    (MonkeyUnitRecordings.cue_rank == CueSamplesRDM.cue_rank(i_sample));
 
                % Average firing rate across matching cue samples
-               RDM_activity(i_sample, i_session) = mean(UnitRecordings.firing_rate(...
-                   is_RDM_sample & select_area_monkey & (UnitRecordings.i_session == id_session)));
+               RDM_activity(i_sample, i_session) = mean(...
+                   MonkeyUnitRecordings.firing_rate(...
+                   is_RDM_sample & (MonkeyUnitRecordings.i_session == id_session)));
             end
         end
 
@@ -98,25 +93,34 @@ for area = unique(UnitRecordings.area)
         CPD = computeCPD(RDM);
 
         % --- Cross-Correlation Matrices (CCM) --- %
-        
-        % Select cue sequences eligible for CCM analysis
-        select_CCM_sequences = select_area_monkey & select_three_cues;
-        i_CCM_samples = find(select_CCM_sequences);
+
+        % Expand cue sequence dataset for CCM analysis
+        DataSamples = expandCueSamples(MonkeyUnitRecordings, override_choice=false);
+
+        % Identify trials containing at least three cue samples (required for CCMs)
+        i_trials_three_cues = unique(MonkeyUnitRecordings.i_trial);
+        i_trials_three_cues = i_trials_three_cues(...
+            groupcounts(MonkeyUnitRecordings.i_trial') >= 3);
+        select_CCM_sequences = ismember(MonkeyUnitRecordings.i_trial, ...
+            i_trials_three_cues);
+        i_CCM_samples = find(select_CCM_sequences);        
 
         % Build regression matrices defining cue-rank relationships
         DataSamplesCCM = selectStructFieldColumns(DataSamples, select_CCM_sequences);
         CCM_regress_all = computeCCMregressionMatrix(DataSamplesCCM);
 
         % Separate option and attribute cue trials
-        select_option_trials = DataSamplesCCM.option_type == "option";
+        select_option_samples = DataSamplesCCM.trial_type == "option";
+        select_option_trials = select_option_samples(DataSamplesCCM.i_step < 4);
+        select_option_trials = select_option_trials(1:3:end);
         CCM_regress_option = CCM_regress_all(select_option_trials, :);
         CCM_regress_attribute = CCM_regress_all(~ select_option_trials, :);
 
         % Initialize unit-by-sample activity matrix
-        all_session = unique(UnitRecordings.i_session(select_CCM_sequences));
+        all_session = unique(MonkeyUnitRecordings.i_session(select_CCM_sequences));
         n_sessions = length(all_session);
         n_CCM_samples = sum(select_CCM_sequences);
-        CCM_activity = NaN(n_sessions, n_CCM_samples);
+        CCM_activity = NaN(n_CCM_samples, n_sessions);
 
         % ~ Loop over recorded units/sessions ~ %
         for i_session = 1:n_sessions
@@ -124,14 +128,14 @@ for area = unique(UnitRecordings.area)
             % Identify CCM samples observed by this unit
             id_session = all_session(i_session);
             i_CCM_samples_this_unit = find(...
-                UnitRecordings.i_session(select_CCM_sequences) == id_session);
+                MonkeyUnitRecordings.i_session(select_CCM_sequences) == id_session);
 
             % Map to global indices
             i_global_samples_this_unit = i_CCM_samples(i_CCM_samples_this_unit);
 
             % Store firing rates
-            CCM_activity(i_session, i_CCM_samples_this_unit) = ...
-                UnitRecordings.firing_rate(i_global_samples_this_unit);
+            CCM_activity(i_CCM_samples_this_unit, i_session) = ...
+                MonkeyUnitRecordings.firing_rate(i_global_samples_this_unit);
         end
 
         % Compute CCMs separately for option and attribute trials
@@ -142,7 +146,7 @@ for area = unique(UnitRecordings.area)
         [tstats_attribute, CCM_attribute, CCM_attribute_p] = ...
             computeCCM(CCM_activity(~ select_option_samples, :), ...
             CCM_regress_attribute, ...
-            CueSamples.i_step(~ select_option_samples));
+            DataSamplesCCM.i_step(~ select_option_samples));
     
         % --- Store neural geometry matrices --- %
 

@@ -33,7 +33,7 @@ POSSIBLE_CUE_POSITION = 1:4;
 CueSamples = struct();
 
 % Total number of cue samples (all combinations of position × rank)
-n_samples = len(POSSIBLE_CUE_RANKS) * len(POSSIBLE_CUE_POSITION);
+n_samples = length(POSSIBLE_CUE_RANKS) * length(POSSIBLE_CUE_POSITION);
 
 % Trial index (one cue sample per trial)
 CueSamples.i_trial = 1:n_samples;
