@@ -29,6 +29,9 @@ function analysis_output = computeEIbalance(params, Config, ~, ~)
 %       - EI_balance <1x1>: ratio of excitatory (positive) to inhibitory
 %       (negative) connections, computed over feedforward and recurrent
 %       connections
+%       - EI_balance_shifted <1x1>: 'EI_balance' shifted by 1, so that the
+%       function's output can readily be optimize toward 0 during RNN
+%       training with constraints (see also: trainModelsInitialRational).
 
 arguments
     params (:,1) double = []
@@ -63,4 +66,7 @@ else
         (sum(Weights.connect_x_to_z > 0, "all") + sum(recur_connect > 0, "all")) / ...
         (sum(Weights.connect_x_to_z < 0, "all") + sum(recur_connect < 0, "all"));
 
+    % Shift the result so that the desired state (E/I balance = 1) is
+    % obtained at 0
+    analysis_output.EI_balance_shifted = analysis_output.EI_balance - 1;
 end
