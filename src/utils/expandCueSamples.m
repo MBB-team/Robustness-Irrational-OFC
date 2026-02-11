@@ -243,18 +243,18 @@ end
 
 % --- Estimated values and choice --- %
 
-all_prob = load(fullfile(getPath("MonkeyData"), "all_prob.mat")).all_prob;
-all_mag = all_prob;
+ALL_PROB = [NaN, 0.1:0.2:0.9];
+ALL_MAG = ALL_PROB;
 % Chose the correct value function
 if monkey == ""
-    all_prob_default = all_prob;
+    all_prob_default = ALL_PROB;
     all_prob_default(isnan(all_prob_default)) = 0.5;
-    all_mag_default = all_mag;
+    all_mag_default = ALL_MAG;
     all_mag_default(isnan(all_mag_default)) = 0.5;
     value_function = all_prob_default' * all_mag_default;
 else
     value_function = load(fullfile(getPath("MonkeyData"), ...
-        "ValueFunction.mat")).(monkey);
+        "ValueProfile.mat")).(monkey);
 end
 % Map the value function onto attribute pairs for each option
 for output_label = ["loc", "order", "attention"]
@@ -271,10 +271,10 @@ for output_label = ["loc", "order", "attention"]
     % value function estimated forthe monkey
     for i_option = 1:2
         CueSamples.(field_values(i_option)) = NaN(1, n_samples);
-        for i_prob = 1:length(all_prob)
-            prob = round(all_prob(i_prob), 1);
-            for i_mag = 1:length(all_mag)
-                mag = round(all_mag(i_mag), 1);
+        for i_prob = 1:length(ALL_PROB)
+            prob = round(ALL_PROB(i_prob), 1);
+            for i_mag = 1:length(ALL_MAG)
+                mag = round(ALL_MAG(i_mag), 1);
                 if isnan(prob)
                     select_trial = isnan(...
                         CueSamples.("known_prob_" + ...

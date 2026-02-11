@@ -83,7 +83,7 @@ if isempty(params)
             MonkeyCueSequences.monkey == monkey);
         ThisMonkeyRecords.i_trial = ThisMonkeyRecords.i_abs_trial;
         DataSamples = expandCueSamples(ThisMonkeyRecords, ...
-            monkey=monkey, override_choice=false);
+            monkey, override_choice=false);
         analysis_output.("DataSamples" + monkey) = DataSamples;
     end
 
@@ -107,19 +107,18 @@ else
         % Map offer 1 / offer 2 onto the RNN's output frame
         switch Config.output_label
             case "loc"
-                option1 = "left";
-                option2 = "right";
+                option_1 = "left";
+                option_2 = "right";
             case "order"
-                option1 = "first";
-                option2 = "second";
+                option_1 = "first";
+                option_2 = "second";
             case "attention"
-                option1 = "attended";
-                option2 = "unattended";
+                option_1 = "attended";
+                option_2 = "unattended";
         end
-        offer1 = DataSamples.("value_" + option1);
-        offer2 = DataSamples.("value_" + option2);
-        % Enhance the dataset with the value of the ultimately chosen
-        % option
+        offer1 = DataSamples.("value_" + option_1);
+        offer2 = DataSamples.("value_" + option_2);
+        % Compute the value of the ultimately chosen option
         is_last_step = [...
             DataSamples.i_step(2:end) <= ...
             DataSamples.i_step(1:(end - 1)), true];
@@ -129,37 +128,44 @@ else
         chosen_value = offer1;
         chosen_value(chosen_offer) = offer2(chosen_offer);
 
-        % Initialize storage of regression results
+        % --- Compute integration-layer unit activity --- %
+    
+        if ~ isfield(inputs, "monkey_activity")
+            % Compute the RNN's integration-layer activity
+            all_inputs = selectDataInfo(DataSamples, Config.inputs);
+            Weights = shapeParametersIntoWeights(params, Config);
+            [~, activity, ~] = propagateThroughANN(Weights, ...
+                Config.f_activation, all_inputs, DataSamples.i_step);
+        else
+            % Select single unit recordings
+            activity = inputs.monkey_activity;
+        end
+        n_units = size(activity, 2);
+
+        % --- Initialize storage of regression results --- %
         if monkey == ""
             monkey_label = "";
         else
             monkey_label = "_" + monkey;
         end
         for variable = inputs.regression_variables
-            analysis_output.("R2_" + variable + monkey_label) = NaN(Config.n_units_z, 1);
-            analysis_output.("is_" + variable + monkey_label) = false(Config.n_units_z, 1);
-            analysis_output.("slope_" + variable + monkey_label) = NaN(Config.n_units_z, 1);
+            analysis_output.("R2_" + variable + monkey_label) = NaN(n_units, 1);
+            analysis_output.("is_" + variable + monkey_label) = false(n_units, 1);
+            analysis_output.("slope_" + variable + monkey_label) = NaN(n_units, 1);
         end
-        analysis_output.("is_none" + monkey_label) = false(Config.n_units_z, 1);
-
-        % --- Compute integration-layer unit activity --- %
-    
-        all_inputs = selectDataInfo(DataSamples, Config.inputs);
-        Weights = shapeParametersIntoWeights(params, Config);
-        [~, activity_z, ~] = propagateThroughANN(Weights, ...
-            Config.f_activation, all_inputs, DataSamples.i_step);
+        analysis_output.("is_none" + monkey_label) = false(n_units, 1);
 
         % --- Regress unit activity onto task variables --- %
 
         % ~ Loop over integration-layer units ~ %
-        for i_unit = 1:Config.n_units_z
+        for i_unit = 1:n_units
 
             % Fit linear models relating unit activity to each candidate
             % decision variable
-            mdl.chosen_value = fitlm(chosen_value', activity_z(:, i_unit));
-            mdl.offer1 = fitlm(offer1', activity_z(:, i_unit));
-            mdl.offer2 = fitlm(offer2', activity_z(:, i_unit));
-            mdl.chosen_offer = fitlm(chosen_offer', activity_z(:, i_unit));
+            mdl.chosen_value = fitlm(chosen_value', activity(:, i_unit));
+            mdl.offer1 = fitlm(offer1', activity(:, i_unit));
+            mdl.offer2 = fitlm(offer2', activity(:, i_unit));
+            mdl.chosen_offer = fitlm(chosen_offer', activity(:, i_unit));
 
             % Store regression slopes
             for variable = inputs.regression_variables
@@ -203,8 +209,7 @@ else
         % each category
         for variable = ["none", inputs.regression_variables]
             analysis_output.("prop_" + variable + monkey_label) = ...
-                100 * sum(analysis_output.("is_" + variable + monkey_label)) / ...
-                Config.n_units_z;
+                100 * sum(analysis_output.("is_" + variable + monkey_label)) / n_units;
         end
     end
 
