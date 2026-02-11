@@ -1,5 +1,6 @@
 function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
-    params, fit_train, fit_test, out, path_networks, i_select_configs)
+    params, fit_train, fit_test, out, path_networks, i_select_configs, ...
+    constraint_field, constraint_weight)
 % Saves a trained RNN if it achieves sufficient performance on the test
 % set.
 %
@@ -45,6 +46,14 @@ function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
 % i_select_configs (optional) : <logical 1xN>
 %     Vector of configuration IDs indicating which RNN configurations to
 %     test. By default, considers all existing configurations.
+%
+% constraint_field (optional) : <string 1x1>
+%     Name of the scalar field in the constraint function's output
+%     structure that is used as the constraint signal.
+%
+% constraint_weight (optional) : <float 1x1>
+%     Relative weight of the constraint term compared to the behavioural
+%     objective in the joint optimization.
 
 arguments
     Config (1, 1) struct
@@ -56,6 +65,8 @@ arguments
     out % Either a struct or a cell array of structs
     path_networks (1, 1) string
     i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
+    constraint_field (1, 1) string = ""
+    constraint_weight (1, 1) double = 0
 end
 
 % Initialize performance criterion
@@ -97,6 +108,9 @@ for i_fit = 1:length(fit_label)
         if contains(fit_label{i_fit}, "Irrational")
             % Performance quantified through balanced accuracy
             perf_threshold = 0.70;
+        elseif constraint_weight ~= 0
+            % Do not test RNN trained under constraints
+            perf_threshold = 0;
         else
             % Performance quantified through R2
             perf_threshold = 0.95;
@@ -114,7 +128,11 @@ for i_fit = 1:length(fit_label)
     Network.(fit_label{i_fit}).params = params{i_fit};
     Network.(fit_label{i_fit}).fit_train = fit_train{i_fit};
     Network.(fit_label{i_fit}).fit_test = fit_test{i_fit};
-    Network.(fit_label{i_fit}).i_end_GnLoop = out{i_fit}.suffStat.i_end_GnLoop;  
+    Network.(fit_label{i_fit}).i_end_GnLoop = out{i_fit}.suffStat.i_end_GnLoop;
+    if constraint_weight ~= 0
+        Network.(fit_label{i_fit}).constraint_label = constraint_field;
+        Network.(fit_label{i_fit}).constraint_weight = constraint_weight;
+    end
 end
 
 % Save the RNN if performance is sufficient

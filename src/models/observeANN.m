@@ -16,19 +16,19 @@ function output = observeANN(~, P, ~, in)
 %
 % in : <struct 1x1>
 %     Structure containing RNN configuration and inputs:
-%       - Config : defines the architecture, input-output mapping,
+%       - Config: defines the architecture, input-output mapping,
 %           activation function, and output format of the RNN (see also:
 %           getDesiredNetworkConfigs)
-%       - input : inputs provided to the RNN, where each row corresponds to
+%       - input: inputs provided to the RNN, where each row corresponds to
 %           one sample
-%       - Weights : structure containing weight matrices and bias vectors
+%       - Weights: structure containing weight matrices and bias vectors
 %           (see also: reshapeParametersIntoWeights)
-%       - i_step (optional) : index of the within-trial step at which each
+%       - i_step (optional): index of the within-trial step at which each
 %           input is sampled (if missing, all trials are assumed to last
 %           four steps)
-%       - function_constraint, target_constraint, weight_constraint,
-%         args_constraint (optional) : fields used to apply additional
-%           biological constraints
+%       - constraint, constraint_field, constraint_weight (optional):
+%           fields used to apply additional biological constraints (see
+%           also: trainModelsInitialRational)
 %
 % OUTPUTS -----------------------------------------------------------------
 % output : <float Nx1>
@@ -74,11 +74,19 @@ end
 output = reshape(output, [], 1);
 
 % Append biological constraints (optional)
-if isfield(in, "function_constraint") && isfield(in, "target_constraint")
-    [~, activity_z_all, output_all] = propagateThroughANN(Weights, ...
-        in.Config.f_activation, in.input_all, in.i_step_all);
-    model_constraint = in.weight_constraint * ...
-        in.function_constraint(Weights, activity_z_all, output_all, in.args_constraint);
-    model_constraint = repmat(model_constraint, size(output, 1), size(output, 2));
-    output = [output ; model_constraint];
+if isfield(in, "constraint") && isfield(in, "constraint_field") && ...
+        isfield(in, "constraint_weight")
+
+    % Initialize measure processing
+    preprocess_inputs = constraint();
+
+    % Process the vector of parameters
+    analysis_output = constraint(P, in.Config, 0, preprocess_inputs);
+
+    % Concatenate the behavioural output with the constraint's output
+    if in.constraint_field == "" 
+        in.constraint_field = string(fieldnames(analysis_output));
+    end
+    output = [output ; in.constraint_weight * ...
+        repmat(analysis.(in.constraint_field), length(output), 1)];
 end

@@ -1,5 +1,5 @@
 function [out] = performTraining(Config, input_train, output_train, ...
-    init_params, i_step, train_all_params)
+    init_params, i_step, train_all_params, constraint, constraint_field, constraint_weight)
 % Trains a single RNN from a specified initial parameter state.
 %
 % This function fits an RNN to a training dataset using variational
@@ -33,6 +33,19 @@ function [out] = performTraining(Config, input_train, output_train, ...
 % train_all_params (optional) : <logical 1x1>
 %     Whether to re-train all network parameters (true) or restrict
 %     optimization to recurrent connections only (false, default).
+%
+% constraint (optional) : <function_handle 1x1>
+%     Function from src/analyses/measures applied to the trained network.
+%     It must follow the standard two-mode interface of measure functions.
+%     Its selected scalar output is driven toward 0 during optimization.
+%
+% constraint_field (optional) : <string 1x1>
+%     Name of the scalar field in the constraint function's output
+%     structure that is used as the constraint signal.
+%
+% constraint_weight (optional) : <float 1x1>
+%     Relative weight of the constraint term compared to the behavioural
+%     objective in the joint optimization.
 % 
 % OUTPUTS -----------------------------------------------------------------
 % out : <struct 1x1>
@@ -46,6 +59,9 @@ arguments
     init_params (:, 1) double
     i_step (1, :) double {mustBeInteger} = []
     train_all_params (1, 1) logical = true
+    constraint (1, 1) function_handle = @sin
+    constraint_field (1, 1) string = ""
+    constraint_weight (1, 1) double = 0
 end
 
 % Easily toggle test mode
@@ -69,6 +85,18 @@ if ~ train_all_params
     % Send all parameters to the observation function
     Weights = shapeParametersIntoWeights(init_params, Config);
     options.inG.Weights = Weights;
+end
+if ~ isequal(constraint, @sin)
+    % Add another constraint to the RNN's fit
+    options.inG.constraint = constraint;
+    options.inG.constraint_field = constraint_field;
+    options.inG.constraint_weight = constraint_weight;
+end
+
+% Model observations
+if ~ isequal(constraint, @sin)
+    % The constraint's target is 0
+    output_train = [output_train ; zeros(size(output_train))];
 end
 
 % Model dimensions (no hidden states; parameters only)

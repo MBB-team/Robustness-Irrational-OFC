@@ -1,4 +1,4 @@
-function [] = trainModelsInitialRational()
+function [] = trainModelsInitialRational(constraint, constraint_field, constraint_weight)
 % Trains RNNs to exhibit rational decision-making behaviour.
 %
 % This function trains multiple cohorts of RNNs that implement slightly
@@ -6,15 +6,59 @@ function [] = trainModelsInitialRational()
 % A total of 10 cohorts are trained; each cohort contains a fixed number of
 % RNNs specified in the configuration file.
 %
+% -------------------------------------------------------------------------
+% OPTIONAL CONSTRAINT DURING TRAINING
+% -------------------------------------------------------------------------
+% In addition to fitting the network's behavioural outputs, training can
+% incorporate a constraint defined by a function from the
+% src/analyses/measures folder.
+%
+% When a constraint function is provided:
+%   - The function is applied to the full network (i.e., to its
+%     parameters).
+%   - One scalar field of its output structure (specified by
+%     'constraint_field') is selected.
+%   - During optimization, this quantity is encouraged to approach 0.
+%  
+% Concretely, the predicted behavioural outputs of the network are
+% concatenated with the selected constraint value, and the objective
+% function jointly minimizes:
+% (1) Behavioural prediction error (fit to rational targets), and
+% (2) The magnitude of the constraint term (weighted by 
+%     'constraint_weight').
+%
+% If no constraint is provided (default), training optimizes behaviour
+% only.
+%
+% -------------------------------------------------------------------------
+% TRAINING PROCEDURE
+% -------------------------------------------------------------------------
 % For each cohort, RNNs are trained from independently generated initial
 % states and datasets. Training and testing datasets, as well as initial
 % network states, are randomly generated using cohort-specific seeds. The
 % same set of seeds is used across all cohorts to enable direct comparison
 % between task variants.
 %
-% Networks are retained only if they generalize correctly to held-out test
-% data (R2 > 95%). If an RNN associated with a given seed fails this
-% criterion in any cohort, that seed is excluded from all cohorts.
+% Networks trained without constraint are retained only if they generalize
+% correctly to held-out test data (R2 > 95%). If an RNN associated with a
+% given seed fails this criterion in any cohort, that seed is excluded from
+% all cohorts.
+%
+% -------------------------------------------------------------------------
+% INPUTS
+% -------------------------------------------------------------------------
+% constraint (optional) : <function_handle 1x1>
+%     Function from src/analyses/measures applied to the trained network.
+%     It must follow the standard two-mode interface of measure functions.
+%     Its selected scalar output is driven toward 0 during optimization.
+%
+% constraint_field (optional) : <string 1x1>
+%     Name of the scalar field in the constraint function's output
+%     structure that is used as the constraint signal.
+%
+% constraint_weight (optional) : <float 1x1>
+%     Relative weight of the constraint term compared to the behavioural
+%     objective in the joint optimization.
 %
 % -------------------------------------------------------------------------
 % IMPLEMENTATION DETAILS
@@ -32,12 +76,28 @@ function [] = trainModelsInitialRational()
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 23/01/2026
+% Date: 11/02/2026
 
+
+arguments
+    constraint (1, 1) function_handle = @sin
+    constraint_field (1, 1) string = ""
+    constraint_weight (1, 1) double = 0
+end
+
+
+% Define output folder depending on whether training is constrained
+if isequal(constraint, @sin) % default dummy constraint = no constraint
+    folder_name = "rational";
+    fit_label = "FitRational";
+else
+    folder_name = "rational_constrained";
+    fit_label = "FitRationalConstrained";
+end
 
 % Initialize folders and training specifications
 [all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
-    prepareInitialTraining("rational");
+    prepareInitialTraining(folder_name);
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
 while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
@@ -59,15 +119,17 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
                 output_test] = selectTrainingData(DatasetSpecs, i_network, Config);
 
             % Train a single RNN
-            out = performTraining(Config, input_train, output_train, init_params);
+            out = performTraining(Config, input_train, output_train, ...
+                init_params, constraint, constraint_field, constraint_weight);
 
             % Evaluate RNN performance on training and test datasets
             [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...
                 Config, input_train, output_train, input_test, output_test);      
             
             % Save the RNN if it achieves sufficient performance on the test set
-            saveInitialTrainingNetwork(Config, i_network, "FitRational", ...
-                params, fit_train, fit_test, out, path_networks);
+            saveInitialTrainingNetwork(Config, i_network, fit_label, ...
+                params, fit_train, fit_test, out, path_networks, ...
+                constraint_field, constraint_weight);
         
             % Update the progress bar
             parfor_progress();
