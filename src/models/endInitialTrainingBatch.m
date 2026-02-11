@@ -1,4 +1,4 @@
-function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_trained_configs)
+function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_select_configs)
 % Finalizes a batch of initial RNN training by filtering unsuccessful
 % seeds.
 %
@@ -15,9 +15,9 @@ function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_t
 %     Path to the directory in which RNNs meeting the performance threshold
 %     are saved.
 %
-% i_trained_configs (optional) : <logical 1xN>
-%     Vector of configuration IDs indicating which RNN configurations were
-%     trained. By default, considers all existing configurations.
+% i_select_configs (optional) : <logical 1xN>
+%     Vector of configuration IDs indicating which RNN configurations to
+%     consider. By default, considers all existing configurations.
 %
 % OUTPUTS -----------------------------------------------------------------
 % DatasetSpecs : <struct 1x1>
@@ -29,7 +29,7 @@ function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_t
 arguments
     path_specs (1, 1) string
     path_networks (1, 1) string
-    i_trained_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
+    i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
 end
 
 % Load existing training specificities
@@ -37,7 +37,7 @@ DatasetSpecs = generateTrainTestDataset(path_specs);
 
 %  Exclude seeds that failed in any cohort
 [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
-    true, i_trained_configs);
+    true, i_select_configs);
 
 % Compute the number of successfully trained networks per cohort
 all_Config = getDesiredNetworkConfigs();

@@ -1,5 +1,5 @@
 function [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
-    delete_unshared_seeds, i_trained_configs)
+    delete_unshared_seeds, i_select_configs)
 % Identifies RNN seeds shared across all cohorts and optionally deletes
 % unshared ones.
 %
@@ -21,9 +21,9 @@ function [subset_included_paths] = selectCohortSubset(path_specs, path_networks,
 %     Whether seeds that are not shared across cohorts should be deleted.
 %     Defaults to false.
 %
-% i_trained_configs (optional) : <logical 1xN>
-%     Vector of configuration IDs indicating which RNN configurations were
-%     trained. By default, considers all existing configurations.
+% i_select_configs (optional) : <logical 1xN>
+%     Vector of configuration IDs indicating which RNN configurations to
+%     consider. By default, considers all existing configurations.
 %
 % OUTPUTS -----------------------------------------------------------------
 % subset_included_paths : <string 1xN>
@@ -34,7 +34,7 @@ arguments
     path_specs (1, 1) string
     path_networks (1, 1) string
     delete_unshared_seeds (1,1) {mustBeNumericOrLogical} = false
-    i_trained_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
+    i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
 end
 
 
@@ -45,7 +45,7 @@ n_trials_cohort = size(init_params, 2);
 
 % Load cohort configurations
 all_Config = getDesiredNetworkConfigs();
-n_trained_configs = length(i_trained_configs);
+n_trained_configs = length(i_select_configs);
 
 % --- Go through all trained RNNs --- %
 
@@ -57,7 +57,7 @@ n_network = length(all_path);
 % Define file patterns to match each cohort
 all_patterns = strings(1, n_trained_configs);
 for i_config = 1:n_trained_configs
-    all_patterns(i_config) = defineFilenamePattern(all_Config{i_trained_configs(i_config)});
+    all_patterns(i_config) = defineFilenamePattern(all_Config{i_select_configs(i_config)});
 end
 
 % ~ Loop through RNNs and identify their cohort ~ %

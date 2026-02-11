@@ -53,6 +53,12 @@ arguments
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
 end
 
+% List of indices indicating which configs to take into account when
+% selecting seeds successfully trained across cohorts.
+% Exclude cohorts 3 and 4, which never correctly generalize to a test
+% dataset.
+I_SELECT_CONFIG = [1, 2, 5, 6, 7, 8, 9, 10];
+
 % Initialize folders and training specifications
 [all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
     prepareInitialTraining("irrational_" + monkey);
@@ -65,7 +71,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         initializeNewInitialTrainingBatch(path_specs, n_config);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = [1, 2, 5, 6, 7, 8, 9, 10] % Exclude 3 and 4
+    for i_config = 1:n_config % Exclude 3 and 4
 
         fprintf("====== %d ========\n", i_config);
    
@@ -105,6 +111,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     end
 
     % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, [1, 2, 5, 6, 7, 8, 9, 10]);
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, I_SELECT_CONFIG);
 
 end
