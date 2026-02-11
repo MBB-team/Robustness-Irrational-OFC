@@ -1,6 +1,6 @@
 function analysis_output = computeCueAttentionPollution(params, Config, ~, inputs)
-% Quantifies attended and unattended cue information contribute differently
-% to the value of the currently attended option.
+% Quantifies how attended and unattended cue information contribute
+% differently to the value of the currently attended option.
 %
 % This measure characterizes how the RNN integrates attended and unattended
 % attributes when computing option values. It does so by fitting a
@@ -78,8 +78,7 @@ if isempty(params)
         [NaN, unique(round(analysis_output.DataSamples.prob_left, 2))];
     analysis_output.options.inG.all_mag = ...
         [NaN, unique(round(analysis_output.DataSamples.mag_left, 2))];
-    analysis_output.options.inG.exclude_sequences = ...
-        (analysis_output.DataSamples.i_step <= 1);
+    analysis_output.exclude_sequences = (analysis_output.DataSamples.i_step <= 1);
 
     % Define observation function output format
     analysis_output.options.inG.output_format_label = "choice";
@@ -93,11 +92,12 @@ if isempty(params)
         analysis_output.options.inG.all_prob(2:end)], ...
         [mean(analysis_output.options.inG.all_mag, "omitnan"), ...
         analysis_output.options.inG.all_mag(2:end)]);
-    analysis_output.options.priors.muPhi = reshape(mesh_mag .* mesh_prob, [], 1);
+    analysis_output.options.priors.muPhi = repmat(...
+        reshape(mesh_mag .* mesh_prob, [], 1), 2, 1);
 
     % Define VBA model dimensions
     analysis_output.dim = struct("n", 0, "n_theta", 0, "n_phi", ...
-        length(analysis_output.options.inG.all_prob) * ...
+        2 * length(analysis_output.options.inG.all_prob) * ...
         length(analysis_output.options.inG.all_mag));
 
     % Disable VBA verbosity and display
@@ -109,27 +109,35 @@ else
     % --- Analysis mode: fit the attended value profile and compute value
     % profile gradients --- %
 
-    % Compute RNN outputs over all cue-sampling scenarios
-    network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
-    Weights = shapeParametersIntoWeights(params, Config);
-    [~, ~, network_outputs] = propagateThroughANN(Weights, ...
-        Config.f_activation, network_inputs);
-    network_outputs = reshape(network_outputs, [], 1);
+    if ~ isfield(inputs, "monkey_choices")
 
-    % Transform RNN outputs to the attended/unattended choice frame
-    if size(network_outputs, 2) == 2
-        network_outputs = network_outputs(:, 1) - network_outputs(:, 2);
+        % Compute RNN outputs over all cue-sampling scenarios
+        network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
+        Weights = shapeParametersIntoWeights(params, Config);
+        [~, ~, network_outputs] = propagateThroughANN(Weights, ...
+            Config.f_activation, network_inputs);
+        network_outputs = reshape(network_outputs, [], 1);
+
+        % Transform RNN outputs to the attended/unattended choice frame
+        if size(network_outputs, 2) == 2
+            network_outputs = network_outputs(:, 1) - network_outputs(:, 2);
+        end
+        if Config.output_label ~= "attention"
+            switch_output = ...
+                (inputs.DataSamples.("option_" + Config.output_label) == 1);
+            network_outputs(switch_output) = - network_outputs(switch_output);
+        end
+        system_choices = ones(size(network_outputs));
+        system_choices(model_output >= 0) = 0;
+
+    else
+
+        % Fit monkey choices
+        system_choices = reshape(inputs.monkey_choices, [], 1);
     end
-    if Config.output_label ~= "attention"
-        switch_output = ...
-            (inputs.DataSamples.("option_" + Config.output_label) == 1);
-        network_outputs(switch_output) = - network_outputs(switch_output);
-    end
-    model_choices = ones(size(network_outputs));
-    model_choices(model_output >= 0) = 0;
 
     % Exclude choices at the trial step == 1
-    model_choices = model_choices(~ inputs.options.inG.exclude_sequences);
+    system_choices = system_choices(~ inputs.exclude_sequences);
 
     % ~ Loop through which attribute was attended last ~ %
     for last_attended_attribute = ["prob", "mag"]
@@ -144,18 +152,20 @@ else
 
         % Define VBA inputs
         inputs.options.inG.prob_1 = round(...
-            DataSamplesTrain.known_prob_unattended(select_trials), 2);
+            inputs.DataSamples.known_prob_unattended(select_trials), 2);
         inputs.options.inG.mag_1 = round(...
-            DataSamplesTrain.known_mag_unattended(select_trials), 2);
+            inputs.DataSamples.known_mag_unattended(select_trials), 2);
         inputs.options.inG.prob_2 = round( ...
-            DataSamplesTrain.known_prob_attended(select_trials), 2);
+            inputs.DataSamples.known_prob_attended(select_trials), 2);
         inputs.options.inG.mag_2 = round( ...
-            DataSamplesTrain.known_mag_attended(select_trials), 2);
+            inputs.DataSamples.known_mag_attended(select_trials), 2);
         inputs.options.inG.n_samples = sum(select_trials);
+        inputs.options.inG.exclude_sequences = inputs.exclude_sequences(select_trials);
+        
 
         % Fit VBA model
         [posterior, ~] = VBA_NLStateSpaceModel(...
-            model_choices(select_trials), [], ...
+            system_choices(select_trials), [], ...
             inputs.f_fname, inputs.g_fname, inputs.dim, inputs.options);
     
         % Store the value function for the attended option
@@ -173,7 +183,7 @@ else
     % Combine value functions
     analysis_output.value_function_attended = ...
         (analysis_output.value_function_attended_prob_att + ...
-        analysis_output.value_field_mag_att') / 2;
+        analysis_output.value_function_attended_prob_att') / 2;
 
     % Only select cases when both attributes are known
     analysis_output.value_function_attended = ...

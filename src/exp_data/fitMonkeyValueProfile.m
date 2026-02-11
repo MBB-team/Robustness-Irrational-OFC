@@ -10,6 +10,9 @@ function [] = fitMonkeyValueProfile()
 % OUTPUTS -----------------------------------------------------------------
 % None. Results are saved to disk in:
 %   data/processed/monkeys/ValueProfile.mat
+%
+% This saved structure contains, for each monkey, the fitted value profile
+% and the fit's proportion of explained variance.
 
 % Load cue sequences attended by the monkeys
 CueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
@@ -49,7 +52,7 @@ for monkey = ["Franck", "Miles"]
 
     % Fit the model
     analysis_output = fitOneValueProfile(NaN, struct(), [], preprocess_inputs);
-    ValueProfile.(monkey) = analysis_output.value_function;
+    ValueProfile.(monkey) = analysis_output;
 
 end
 
