@@ -1,4 +1,4 @@
-function [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
+ function [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
     delete_unshared_seeds, i_select_configs)
 % Identifies RNN seeds shared across all cohorts and optionally deletes
 % unshared ones.
@@ -45,6 +45,7 @@ n_trials_cohort = size(init_params, 2);
 
 % Load cohort configurations
 all_Config = getDesiredNetworkConfigs();
+n_configs = length(getDesiredNetworkConfigs());
 n_trained_configs = length(i_select_configs);
 
 % --- Go through all trained RNNs --- %
@@ -80,7 +81,7 @@ subset_seeds = subset_seeds(1:n_subset);
 % Create paths to all RNNs with a shared seed
 subset_included_paths = strings(1, n_subset * n_trained_configs);
 i_path = 1;
-for i_config = 1:n_trained_configs
+for i_config = 1:n_configs
     for seed = subset_seeds
         subset_included_paths(i_path) = fullfile(...
             path_networks, defineFilenamePattern(...
@@ -88,7 +89,6 @@ for i_config = 1:n_trained_configs
         i_path = i_path + 1;
     end
 end
-
 
 % --- Delete RNNs with unshared seeds (optional) --- %
 
