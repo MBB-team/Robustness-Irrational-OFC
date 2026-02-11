@@ -1,4 +1,4 @@
-function analysis_output = fitUniqueValueProfile(params, Config, ~, inputs)
+function analysis_output = fitOneValueProfile(params, Config, ~, inputs)
 % Fits a shared option value function V(p, m) to the behaviour of an RNN.
 %
 % This measure fits a value function that maps an option’s probability p
@@ -53,7 +53,7 @@ if isempty(params)
 
     % Define VBA evolution and observation functions
     analysis_output.f_fname = [];
-    analysis_output.g_fname = @VBA_fitUniqueValueProfile;
+    analysis_output.g_fname = @VBA_fitOneValueProfile;
 
     % Initialize VBA options
     analysis_output.options = struct();
@@ -87,25 +87,42 @@ else
 
     % --- Analysis mode: fit the value profile --- %
 
-    % Compute RNN outputs over all cue-sampling scenarios
-    network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
-    Weights = shapeParametersIntoWeights(params, Config);
-    [~, ~, network_outputs] = propagateThroughANN(Weights, ...
-        Config.f_activation, network_inputs);
-    network_outputs = reshape(network_outputs, [], 1);
+    % Define VBA model observations
+    if ~ isfield(inputs, "monkey_choices")
+        % Compute RNN outputs over all cue-sampling scenarios
+        network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
+        Weights = shapeParametersIntoWeights(params, Config);
+        [~, ~, network_outputs] = propagateThroughANN(Weights, ...
+            Config.f_activation, network_inputs);
+        system_outputs = reshape(network_outputs, [], 1);
+    else
+        % Fit monkey choices
+        system_outputs = reshape(inputs.monkey_choices, [], 1);
+    end
 
-    % Define VBA inputs based on the RNN output convention
-    inputs.options.inG.output_format_label = Config.output_format_label;
-    switch Config.output_label
-        case "loc"
-            option_1 = "left";
-            option_2 = "right";
-        case "order"
-            option_1 = "first";
-            option_2 = "second";
-        case "attention"
-            option_1 = "attended";
-            option_2 = "unattended";
+    % Define VBA model inputs
+    if ~ isfield(inputs, "monkey_choices")
+        % Define VBA inputs based on the RNN output convention
+        inputs.options.inG.output_format_label = Config.output_format_label;
+        switch Config.output_label
+            case "loc"
+                option_1 = "left";
+                option_2 = "right";
+            case "order"
+                option_1 = "first";
+                option_2 = "second";
+            case "attention"
+                option_1 = "attended";
+                option_2 = "unattended";
+        end
+    else
+        % Use the left/right convention
+        option_1 = "left";
+        option_2 = "right";
+        % Predict binary outputs
+        inputs.options.inG.output_format_label = "choice";
+        inputs.options.sources = struct("type", 1);
+        inputs.options.updateHP = false;
     end
     inputs.options.inG.prob_1 = inputs.DataSamples.("known_prob_" + option_1);
     inputs.options.inG.mag_1 = inputs.DataSamples.("known_mag_" + option_1);
@@ -113,12 +130,13 @@ else
     inputs.options.inG.mag_2 = inputs.DataSamples.("known_mag_" + option_2);
 
     % Fit the value profile
-    [posterior, out] = VBA_NLStateSpaceModel(network_outputs, [], ...
+    [posterior, out] = VBA_NLStateSpaceModel(system_outputs, [], ...
         inputs.f_fname, inputs.g_fname, inputs.dim, inputs.options);
 
     % Store fitted value profile and explained variance
     analysis_output.value_function = reshape(posterior.muPhi, ...
-        length(inputs.all_prob), length(inputs.all_mag));
+        length(inputs.options.inG.all_prob), ...
+        length(inputs.options.inG.all_mag));
     analysis_output.value_function_R2 = out.fit.R2;
 
 end

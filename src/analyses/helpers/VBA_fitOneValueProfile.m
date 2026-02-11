@@ -34,6 +34,11 @@ n_mag = length(in.all_mag);
 % Shape the value function
 value_function = reshape(P, n_prob, n_mag);
 
+% Round all attributes to ensure proper comparison
+for attribute = ["prob_1", "prob_2", "mag_1", "mag_2", "all_prob", "all_mag"]
+    in.(attribute) = round(in.(attribute), 2);
+end
+
 value_1 = NaN(length(in.prob_1), 1);
 value_2 = NaN(length(in.prob_1), 1);
 
