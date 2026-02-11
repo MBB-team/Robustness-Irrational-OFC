@@ -254,7 +254,7 @@ if monkey == ""
     value_function = all_prob_default' * all_mag_default;
 else
     value_function = load(fullfile(getPath("MonkeyData"), ...
-        "ValueProfile.mat")).(monkey);
+        "ValueProfile.mat")).(monkey).value_function;
 end
 % Map the value function onto attribute pairs for each option
 for output_label = ["loc", "order", "attention"]
