@@ -23,7 +23,10 @@ function analysis_output = computeRobustnessToUnitLesions(params, ...
 %     computing measures.
 %
 % Config : <struct 1x1>
-%     Configuration structure defining the RNN architecture.
+%     Configuration structure defining the RNN architecture. Can have an
+%     optional additional field, n_units_z_lesion, which defines the
+%     maximum number of integration-layer units to lesion. If non-existent,
+%     n_units_z_lesion = n_units_z.
 %
 % inputs : <struct 1x1>
 %     Structure containing variables precomputed during preprocessing.
@@ -82,12 +85,17 @@ else
     unimpaired_choice(unimpaired_choice >= 0) = 0;
     unimpaired_choice(unimpaired_choice < 0) = 1;
 
+    % Define the maximum number of units to lesion
+    if ~ isfield(Config, "n_units_z_lesion")
+        Config.n_units_z_lesion = Config.n_units_z;
+    end
+
     % Initialize results storage
-    analysis_output.prop_optimal_impaired_units = NaN(Config.n_units_z, 1);
-    analysis_output.prop_consistent_impaired_units = NaN(Config.n_units_z, 1);
+    analysis_output.prop_optimal_impaired_units = NaN(Config.n_units_z_lesion, 1);
+    analysis_output.prop_consistent_impaired_units = NaN(Config.n_units_z_lesion, 1);
 
     % ~ Loop over the number of impaired units ~ %
-    for n_impaired = 1:Config.n_units_z
+    for n_impaired = 1:Config.n_units_z_lesion
 
         % Generate all possible combinations of n impaired units
         all_impaired = nchoosek(1:Config.n_units_z, n_impaired);
@@ -124,9 +132,15 @@ else
         analysis_output.prop_consistent_impaired_units(n_impaired) = mean(prop_consistent);
     end
 
-    % Average between 10% and 50% of lesions
-    analysis_output.avg_prop_optimal_impaired_units = ...
-        mean(analysis_output.prop_optimal_impaired_units(1:5));
-    analysis_output.avg_prop_consistent_impaired_units = ...
-        mean(analysis_output.prop_consistent_impaired_units(1:5));
+    try
+        % Average between 10% and 50% of lesions
+        analysis_output.avg_prop_optimal_impaired_units = ...
+            mean(analysis_output.prop_optimal_impaired_units(1:5));
+        analysis_output.avg_prop_consistent_impaired_units = ...
+            mean(analysis_output.prop_consistent_impaired_units(1:5));
+    catch
+        % Impossible because there were not enough lesion levels (typically
+        % only 1, which happens when training rational models with
+        % constraints; see also trainModelsInitialRational).
+    end
 end

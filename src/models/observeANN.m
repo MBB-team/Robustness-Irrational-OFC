@@ -78,10 +78,16 @@ if isfield(in, "constraint") && isfield(in, "constraint_field") && ...
         isfield(in, "constraint_weight")
 
     % Initialize measure processing
-    preprocess_inputs = constraint();
+    preprocess_inputs = in.constraint();
+
+    % Modify the function behaviour if necessary
+    if isequal(in.constraint, @computeRobustnessToUnitLesions)
+        % Compute robustness to 1-unit lesions only
+        in.Config.n_units_z_lesion = 1;
+    end
 
     % Process the vector of parameters
-    analysis_output = constraint(P, in.Config, 0, preprocess_inputs);
+    analysis_output = in.constraint(P, in.Config, 0, preprocess_inputs);
 
     % Concatenate the behavioural output with the constraint's output
     if in.constraint_field == "" 
