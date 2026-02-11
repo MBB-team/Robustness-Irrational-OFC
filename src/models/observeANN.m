@@ -26,9 +26,9 @@ function output = observeANN(~, P, ~, in)
 %       - i_step (optional): index of the within-trial step at which each
 %           input is sampled (if missing, all trials are assumed to last
 %           four steps)
-%       - constraint, constraint_field, constraint_weight (optional):
-%           fields used to apply additional biological constraints (see
-%           also: trainModelsInitialRational)
+%       - constraint, constraint_field, constraint_weight, 
+%           constraint_inputs (optional): fields used to apply additional
+%           biological constraints (see also: trainModelsInitialRational)
 %
 % OUTPUTS -----------------------------------------------------------------
 % output : <float Nx1>
@@ -75,10 +75,7 @@ output = reshape(output, [], 1);
 
 % Append biological constraints (optional)
 if isfield(in, "constraint") && isfield(in, "constraint_field") && ...
-        isfield(in, "constraint_weight")
-
-    % Initialize measure processing
-    preprocess_inputs = in.constraint();
+        isfield(in, "constraint_weight") && isfield(in, "constraint_inputs")
 
     % Modify the function behaviour if necessary
     if isequal(in.constraint, @computeRobustnessToUnitLesions)
@@ -87,12 +84,12 @@ if isfield(in, "constraint") && isfield(in, "constraint_field") && ...
     end
 
     % Process the vector of parameters
-    analysis_output = in.constraint(P, in.Config, 0, preprocess_inputs);
+    analysis_output = in.constraint(P, in.Config, 0, in.constraint_inputs);
 
     % Concatenate the behavioural output with the constraint's output
     if in.constraint_field == "" 
         in.constraint_field = string(fieldnames(analysis_output));
     end
     output = [output ; in.constraint_weight * ...
-        repmat(analysis.(in.constraint_field), length(output), 1)];
+        repmat(analysis_output.(in.constraint_field), length(output), 1)];
 end

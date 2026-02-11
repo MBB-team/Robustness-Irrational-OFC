@@ -56,9 +56,9 @@ function [] = trainModelsInitialRational(constraint, constraint_field, constrain
 %     Name of the scalar field in the constraint function's output
 %     structure that is used as the constraint signal.
 %
-% constraint_weight (optional) : <float 1x1>
-%     Relative weight of the constraint term compared to the behavioural
-%     objective in the joint optimization.
+% constraint_weight (optional) : <float 1xN>
+%     Vector of relative weight of the constraint term compared to the
+%     behavioural objective in the joint optimization.
 %
 % -------------------------------------------------------------------------
 % IMPLEMENTATION DETAILS
@@ -82,7 +82,7 @@ function [] = trainModelsInitialRational(constraint, constraint_field, constrain
 arguments
     constraint (1, 1) function_handle = @sin
     constraint_field (1, 1) string = ""
-    constraint_weight (1, 1) double = 0
+    constraint_weight (1, :) double = [0]
 end
 
 
@@ -91,13 +91,19 @@ if isequal(constraint, @sin) % default dummy constraint = no constraint
     folder_name = "rational";
     fit_label = "FitRational";
 else
-    folder_name = "rational_constrained";
+    folder_name = "rational_" + string(functions(constraint).function);
     fit_label = "FitRationalConstrained";
 end
 
 % Initialize folders and training specifications
 [all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
     prepareInitialTraining(folder_name);
+
+% Adapt the number of desired networks per cohort
+if any(constraint_weight ~= 0)
+    DatasetSpecs.n_target_network_cohort = ...
+        DatasetSpecs.n_target_networks_cohort * length(constraint_weight);
+end
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
 while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
@@ -106,21 +112,32 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     [DatasetSpecs, shift_i_network] = ...
         initializeNewInitialTrainingBatch(path_specs, n_config);
 
+    % Adapt the number of desired networks per cohort
+    if any(constraint_weight ~= 0)
+        DatasetSpecs.n_target_network_cohort = ...
+            DatasetSpecs.n_target_networks_cohort * length(constraint_weight);
+    end
+
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config
    
         Config = all_Config{i_config};
     
         % ~ Loop through RNNs to train ~ %
-        parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network  
+        for i_network = (1:DatasetSpecs.batch_size) + shift_i_network  
+
+            % ~ Loop constraint weights to apply ~ %
+            for weight = constraint_weight
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
                 output_test] = selectTrainingData(DatasetSpecs, i_network, Config);
 
             % Train a single RNN
-            out = performTraining(Config, input_train, output_train, ...
-                init_params, constraint, constraint_field, constraint_weight);
+            out = performTraining(Config, input_train, output_train, init_params, ...
+                constraint=constraint, ...
+                constraint_field=constraint_field, ...
+                constraint_weight=weight);
 
             % Evaluate RNN performance on training and test datasets
             [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...
@@ -129,12 +146,12 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
             % Save the RNN if it achieves sufficient performance on the test set
             saveInitialTrainingNetwork(Config, i_network, fit_label, ...
                 params, fit_train, fit_test, out, path_networks, ...
-                constraint_field, constraint_weight);
-        
-            % Update the progress bar
-            parfor_progress();
-            
+                constraint_field, weight);
+            end
         end
+        
+        % Update the progress bar
+        parfor_progress();
     end
 
     % Filter unsuccessful seeds from this batch

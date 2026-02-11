@@ -138,5 +138,13 @@ end
 % Save the RNN if performance is sufficient
 if save_network
     filename = defineFilenamePattern(Network.Config, Network.seed);
+    if constraint_weight ~= 0
+        % Remove file extension
+        filename = char(filename);
+        filename = filename(1:(end-4));
+        filename = string(filename);
+        % Add constraint weight information and extension
+        filename = filename + "_weight_" + string(constraint_weight) + ".mat";
+    end
     save(fullfile(path_networks, filename), "-struct", "Network");
 end

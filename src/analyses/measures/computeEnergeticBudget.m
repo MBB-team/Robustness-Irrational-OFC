@@ -65,6 +65,6 @@ else
     % Compute step-wise energetic budget (averaged across units and trials)
     analysis_output.energetic_budget = NaN(4, 1);
     for step = 1:4
-        analysis_output.energetic_budget(step) = mean(abs(activity_z(step:4:end, :)));
+        analysis_output.energetic_budget(step) = mean(abs(activity_z(step:4:end, :)), "all");
     end
 end

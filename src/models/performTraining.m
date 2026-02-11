@@ -1,5 +1,5 @@
 function [out] = performTraining(Config, input_train, output_train, ...
-    init_params, i_step, train_all_params, constraint, constraint_field, constraint_weight)
+    init_params, i_step, train_all_params, constraint_options)
 % Trains a single RNN from a specified initial parameter state.
 %
 % This function fits an RNN to a training dataset using variational
@@ -59,9 +59,9 @@ arguments
     init_params (:, 1) double
     i_step (1, :) double {mustBeInteger} = []
     train_all_params (1, 1) logical = true
-    constraint (1, 1) function_handle = @sin
-    constraint_field (1, 1) string = ""
-    constraint_weight (1, 1) double = 0
+    constraint_options.constraint (1, 1) function_handle = @sin
+    constraint_options.constraint_field (1, 1) string = ""
+    constraint_options.constraint_weight (1, 1) double = 0
 end
 
 % Easily toggle test mode
@@ -86,15 +86,16 @@ if ~ train_all_params
     Weights = shapeParametersIntoWeights(init_params, Config);
     options.inG.Weights = Weights;
 end
-if ~ isequal(constraint, @sin)
+if ~ isequal(constraint_options.constraint, @sin)
     % Add another constraint to the RNN's fit
-    options.inG.constraint = constraint;
-    options.inG.constraint_field = constraint_field;
-    options.inG.constraint_weight = constraint_weight;
+    options.inG.constraint = constraint_options.constraint;
+    options.inG.constraint_field = constraint_options.constraint_field;
+    options.inG.constraint_weight = constraint_options.constraint_weight;
+    options.inG.constraint_inputs = constraint_options.constraint();
 end
 
 % Model observations
-if ~ isequal(constraint, @sin)
+if ~ isequal(constraint_options.constraint, @sin)
     % The constraint's target is 0
     output_train = [output_train ; zeros(size(output_train))];
 end
