@@ -1,5 +1,5 @@
 function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
-    params, fit_train, fit_test, out, path_networks)
+    params, fit_train, fit_test, out, path_networks, i_select_configs)
 % Saves a trained RNN if it achieves sufficient performance on the test
 % set.
 %
@@ -42,6 +42,9 @@ function [] = saveInitialTrainingNetwork(Config, i_network, fit_label, ...
 %     Path to the directory in which RNNs meeting the performance threshold
 %     are saved.
 %
+% i_select_configs (optional) : <logical 1xN>
+%     Vector of configuration IDs indicating which RNN configurations to
+%     test. By default, considers all existing configurations.
 
 arguments
     Config (1, 1) struct
@@ -52,6 +55,7 @@ arguments
     fit_test % Either a double matrix or a cell array of double matrices
     out % Either a struct or a cell array of structs
     path_networks (1, 1) string
+    i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
 end
 
 % Initialize performance criterion
@@ -61,6 +65,9 @@ save_network = true;
 Network = struct();
 Network.Config = Config;
 Network.seed = i_network;
+
+% Generate all possible configurations
+all_Config = getDesiredNetworkConfigs();
 
 % Ensure all inputs are cell arrays for uniform processing
 if ~ iscell(fit_label)
@@ -85,12 +92,18 @@ for i_fit = 1:length(fit_label)
     disp(mean(fit_test{i_fit}(end, :)))
 
     % Define the performance threshold
-    if contains(fit_label{i_fit}, "Irrational")
-        % Performance quantified through balanced accuracy
-        perf_threshold = 0.80;
+    test_network = any(cellfun(@(x) isequaln(x, Config), all_Config(i_select_configs)));
+    if test_network
+        if contains(fit_label{i_fit}, "Irrational")
+            % Performance quantified through balanced accuracy
+            perf_threshold = 0.75;
+        else
+            % Performance quantified through R2
+            perf_threshold = 0.95;
+        end
     else
-        % Performance quantified through R2
-        perf_threshold = 0.95;
+        % Do not apply any threshold to save the RNN
+        perf_threshold = 0;
     end
 
     % Only save if the final test performance meets the threshold

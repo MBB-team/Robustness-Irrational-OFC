@@ -102,7 +102,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
             
             % Save the RNN if it achieves sufficient performance on the test set
             saveInitialTrainingNetwork(Config, i_network, "FitIrrational" + monkey, ...
-                params, fit_train, fit_test, out, path_networks);
+                params, fit_train, fit_test, out, path_networks, I_SELECT_CONFIG);
         
             % Update the progress bar
             % parfor_progress();
