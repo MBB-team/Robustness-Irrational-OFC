@@ -84,7 +84,7 @@ function [] = trainModelsInitialRationalConstrained(constraint, ...
 arguments
     constraint (1, 1) function_handle
     constraint_weight (1, :) doublemode
-    constraint_field (1, 1) string 
+    constraint_field (1, 1) string = ""
 end
 
 
