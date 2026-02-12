@@ -73,6 +73,6 @@ else
     deriv_z = exp_i_b ./ ((1 + exp_i_b) .^ 2);
 
     % Average log-derivative across all units and cue sequences
-    analysis_output.info_transfer_rate = mean(log(deriv_z));
+    analysis_output.info_transfer_rate = mean(log(deriv_z), "all");
 
 end
