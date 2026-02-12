@@ -58,13 +58,11 @@ for i_network = 1:n_network
         TargetNetwork = load(path_networks_target{i_network});
     catch
         warning("Impossible to load network n°%d", i_network);
-        parfor_progress();
         continue;
     end
 
     % Skip networks that have already been re-trained under this condition
     if isfield(DistortNetwork, train_label)
-        parfor_progress();
         continue;
     end
 
@@ -97,6 +95,4 @@ for i_network = 1:n_network
     saveDistortTrainingNetwork(DistortNetwork, distort_fit_label, ...
         params, fit_train, fit_test, out, path_networks_distort{i_network});
 
-    % Update the progress bar
-    parfor_progress();
 end

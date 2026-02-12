@@ -72,8 +72,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config % Exclude 3 and 4
-
-        fprintf("====== %d ========\n", i_config);
    
         Config = all_Config{i_config};
 
@@ -103,9 +101,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
             % Save the RNN if it achieves sufficient performance on the test set
             saveInitialTrainingNetwork(Config, i_network, "FitIrrational" + monkey, ...
                 params, fit_train, fit_test, out, path_networks, I_SELECT_CONFIG);
-        
-            % Update the progress bar
-            % parfor_progress();
             
         end
     end

@@ -95,9 +95,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
         end
 
-        % Update the progress bar
-        parfor_progress();
-
     end
 
     % Filter unsuccessful seeds from this batch
