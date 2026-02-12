@@ -25,11 +25,11 @@ function [] = callMeasure(analysis_function, params_file_name, options)
 %     Name of the .mat file containing stored parameter vectors and
 %     associated metadata.
 %
-% supp_variable (optional) : <string 1xN>
+% supp_variable (optional, named) : <string 1xN>
 %     Names of supplementary variables stored in the parameter file that
 %     should be passed to the analysis function for each network.
 %
-% select_data (optional) : <logical 1xM>
+% select_data (optional, named) : <logical 1xM>
 %     Logical mask selecting which parameter vectors should be analyzed.
 %     If empty, all parameter vectors are processed.
 %
@@ -91,12 +91,12 @@ end
 
 analysis_output = analysis_function(params, Config, seed, preprocess_inputs_with_supp);
 
-all_output_names = string(fieldnames(analysis_output));
+all_output_names = string(fieldnames(analysis_output))';
 
 % Preallocate final storage
 AnalysisOutputs = struct();
 for output_name = all_output_names
-    AnalysisOutputs.(output_name) = NaN(size(analysis_output.(output_name), 1), n_data_selected);
+    AnalysisOutputs.(output_name) = NaN(numel(analysis_output.(output_name)), n_data_selected);
 end
 
 % Temporary storage for parallel loop (parfor-safe)
@@ -104,13 +104,19 @@ TempOutputs = cell(1, n_data_selected);
 
 % --- Parallel analysis over parameter vectors --- %
 
-% Initialize parallel pool
-delete(gcp("nocreate"));
-cluster = parcluster("local");
-parpool(cluster, cluster.NumWorkers);
+if isempty(gcp("nocreate"))
+    % Initialize parallel pool
+    delete(gcp("nocreate"));
+    % Define number of workers on a Slurm cluster
+    num_workers = str2double(getenv("SLURM_CPUS_PER_TASK"));
+    % Define number of workers when ran locally
+    if isnan(num_workers) || num_workers < 1
+        num_workers = feature('numcores');
+    end
+    % Activate the parallel pool
+    parpool("local", num_workers);
+end
 
-% Initialize progress bar
-parfor_progress(sum(options.select_data));
 
 % ~ Loop through parameter vectors ~ %
 parfor i_data = 1:n_data_selected
@@ -134,16 +140,13 @@ parfor i_data = 1:n_data_selected
     TempOutputs{i_data} = analysis_function( ...
         params, Config, seed, preprocess_inputs_with_supp);
 
-    % Update progress bar
-    parfor_progress();
-
 end
 
 % --- Aggregate analysis outputs --- %
 
 for i_data = 1:n_data_selected
     for output_name = all_output_names
-        AnalysisOutputs.(output_name)(:, i_data) = TempOutputs{i_data}.(output_name);
+        AnalysisOutputs.(output_name)(:, i_data) = reshape(TempOutputs{i_data}.(output_name), [], 1);
     end
 end
 

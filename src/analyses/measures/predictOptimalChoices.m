@@ -63,7 +63,7 @@ else
     % Get RNN outputs
     Weights = shapeParametersIntoWeights(params, Config);
     [~, ~, network_output] = propagateThroughANN(Weights, ...
-        Config.f_activation, input_test, CueSamplesTest.i_step);
+        Config.f_activation, input_test, inputs.DataSamplesAll.i_step);
 
     % Convert RNN outputs to choice probabilities
     if size(network_output, 2) == 2

@@ -128,16 +128,13 @@ else
             network_outputs(switch_output) = - network_outputs(switch_output);
         end
         system_choices = ones(size(network_outputs));
-        system_choices(model_output >= 0) = 0;
+        system_choices(network_outputs >= 0) = 0;
 
     else
 
         % Fit monkey choices
         system_choices = reshape(inputs.monkey_choices, [], 1);
     end
-
-    % Exclude choices at the trial step == 1
-    system_choices = system_choices(~ inputs.exclude_sequences);
 
     % ~ Loop through which attribute was attended last ~ %
     for last_attended_attribute = ["prob", "mag"]
@@ -148,7 +145,8 @@ else
         else
             attended_cue_pos = [2, 4];
         end
-        select_trials = ismember(inputs.DataSamples.cue_pos, attended_cue_pos);
+        select_trials = ismember(inputs.DataSamples.cue_pos, attended_cue_pos) & ...
+            ~ inputs.exclude_sequences;
 
         % Define VBA inputs
         inputs.options.inG.prob_1 = round(...
@@ -170,7 +168,6 @@ else
     
         % Store the value function for the attended option
         value_function_attended = reshape(posterior.muPhi(37:end), 6, 6);
-        value_function_attended = value_function_attended(2:end, 2:end);
 
         % Store it
         analysis_output.("value_function_attended_" + last_attended_attribute + "_att") = ...

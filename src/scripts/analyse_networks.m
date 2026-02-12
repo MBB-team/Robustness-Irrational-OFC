@@ -31,34 +31,34 @@ FLAGS.analyse_last_step_only                      = true;
 
 % Which networks to analyse (identified by their initial training procedure)
 FLAGS.analyse_rational_networks                   = true;
-FLAGS.analyse_irrational_networks                 = true;
-FLAGS.analyse_rational_subj_networks              = true;
-FLAGS.analyse_rational_constrained_networks       = true;
+FLAGS.analyse_irrational_networks                 = false;
+FLAGS.analyse_rational_subj_networks              = false;
+FLAGS.analyse_rational_constrained_networks       = false;
 
 % --- Which analysis functions to run -------------------------------------
 
 % Characterization of choice behaviour
-FLAGS.fit_one_value_profile                       = true;
-FLAGS.predictMonkeyChoices                        = true;
-FLAGS.predictOptimalChoices                       = true;
+FLAGS.fit_one_value_profile                       = false;
+FLAGS.predictMonkeyChoices                        = false;
+FLAGS.predictOptimalChoices                       = false;
 
 % Characterization of neural coding
-FLAGS.compute_framework_information_loss          = true;
+FLAGS.compute_framework_information_loss          = false;
 
 % Interference effects
-FLAGS.compute_cue_attention_pollution             = true;
-FLAGS.compute_cue_order_pollution                 = true;
+FLAGS.compute_cue_attention_pollution             = false;
+FLAGS.compute_cue_order_pollution                 = false;
 
 % Neural properties
-FLAGS.generate_neural_geometry_matrices              = true;
-FLAGS.compute_neural_distance                     = true;
-FLAGS.categorize_integration_units                = true;
+FLAGS.categorize_integration_units                = false;
+FLAGS.generate_neural_geometry_matrices           = false;
+FLAGS.compute_neural_distance                     = false;
 
 % Biological constraints
-FLAGS.compute_EI_balance                          = true;
-FLAGS.compute_info_transfer_rate                  = true;
-FLAGS.compute_energetic_budget                    = true;
-FLAGS.compute_code_redundancy                     = true;
+FLAGS.compute_EI_balance                          = false;
+FLAGS.compute_info_transfer_rate                  = false;
+FLAGS.compute_energetic_budget                    = false;
+FLAGS.compute_code_redundancy                     = false;
 FLAGS.compute_robustness_to_unit_lesions          = true;
 FLAGS.compute_robustness_to_connection_lesions    = true;
 
@@ -97,10 +97,10 @@ for folder_name = all_folder_names
     else
         file_name = folder_name + "_full";
     end 
-    params_file = fullfile(getPath("Models"), file_name + ".mat");
+    file_name = file_name + ".mat";
 
     % Generate storing file if necessary
-    if ~ isfile(params_file)
+    if ~ isfile(fullfile(getPath("Models"), file_name))
         gatherAllModels(folder_name, FLAGS.analyse_last_step_only);
     end
 
@@ -108,20 +108,20 @@ for folder_name = all_folder_names
 
     if FLAGS.fit_one_value_profile
         fprintf("\n Fit one value profile...\n");
-        callMeasure(@fitOneValueProfile, params_file);
+        callMeasure(@fitOneValueProfile, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.predictMonkeyChoices
         fprintf("\n Predict monkey choices...\n");
-        callMeasure(@predictMonkeyChoices, params_file, ...
+        callMeasure(@predictMonkeyChoices, file_name, ...
             supp_variable="fit_label");
         fprintf("Done.\n");
     end
 
     if FLAGS.predictOptimalChoices
         fprintf("\n Predict optimal choices...\n");
-        callMeasure(@predictMonkeyChoices, params_file);
+        callMeasure(@predictOptimalChoices, file_name);
         fprintf("Done.\n");
     end
 
@@ -129,7 +129,8 @@ for folder_name = all_folder_names
 
     if FLAGS.compute_framework_information_loss
         fprintf("\n Compute framework information loss...\n");
-        callMeasure(@computeFrameworkInformationLoss, params_file);
+        callMeasure(@computeFrameworkInformationLoss, file_name, ...
+            supp_variable="folder_name");
         fprintf("Done.\n");
     end
 
@@ -137,13 +138,13 @@ for folder_name = all_folder_names
 
     if FLAGS.compute_cue_attention_pollution
         fprintf("\n Compute cue attention pollution...\n");
-        callMeasure(@computeCueAttentionPollution, params_file);
+        callMeasure(@computeCueAttentionPollution, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_cue_order_pollution
         fprintf("\n Compute cue order pollution...\n");
-        callMeasure(@computeCueOrderPollution, params_file);
+        callMeasure(@computeCueOrderPollution, file_name);
         fprintf("Done.\n");
     end
 
@@ -151,19 +152,19 @@ for folder_name = all_folder_names
     
     if FLAGS.categorize_integration_units
         fprintf("\n Categorize integration units...\n");
-        callMeasure(@categorizeIntegrationUnits, params_file);
+        callMeasure(@categorizeIntegrationUnits, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.generate_neural_geometry_matrices
         fprintf("\n Generate neural geometry matrices...\n");
-        callMeasure(@generateNeuralGeometryMatrices, params_file);
+        callMeasure(@generateNeuralGeometryMatrices, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_neural_distance
         fprintf("\n Compute neural distances...\n");
-        callMeasure(@computeNeuralDistance, params_file, ...
+        callMeasure(@computeNeuralDistance, file_name, ...
             supp_variable=["RDM", "CCM_option", "CCM_attribute"]);
         fprintf("Done.\n");
     end
@@ -172,37 +173,37 @@ for folder_name = all_folder_names
 
     if FLAGS.compute_EI_balance
         fprintf("\n Compute E/I balance...\n");
-        callMeasure(@computeEIbalance, params_file);
+        callMeasure(@computeEIbalance, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_info_transfer_rate
         fprintf("\n Compute information transfer rate...\n");
-        callMeasure(@computeInfoTransferRate, params_file);
+        callMeasure(@computeInfoTransferRate, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_energetic_budget
         fprintf("\n Compute energetic budget...\n");
-        callMeasure(@computeEnergeticBudget, params_file);
+        callMeasure(@computeEnergeticBudget, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_code_redundancy
         fprintf("\n Compute code redundancy...\n");
-        callMeasure(@computeCodeRedundancy, params_file);
+        callMeasure(@computeCodeRedundancy, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_robustness_to_unit_lesions
         fprintf("\n Compute robustness to unit lesions...\n");
-        callMeasure(@computeRobustnessToUnitLesions, params_file);
+        callMeasure(@computeRobustnessToUnitLesions, file_name);
         fprintf("Done.\n");
     end
 
     if FLAGS.compute_robustness_to_connection_lesions
         fprintf("\n Compute robustness to connection lesions...\n");
-        callMeasure(@computeRobustnessToConnectionLesions, params_file);
+        callMeasure(@computeRobustnessToConnectionLesions, file_name);
         fprintf("Done.\n");
     end
 

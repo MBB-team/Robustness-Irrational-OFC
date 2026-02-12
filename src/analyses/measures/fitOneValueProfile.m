@@ -43,6 +43,8 @@ arguments
     inputs (1,1) struct = struct()
 end
 
+warning("Cannot fit on the entire dataset, too big for VBA !!");
+
 if isempty(params)
 
     % --- Preprocessing mode: define datasets and VBA model --- %

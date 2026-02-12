@@ -87,7 +87,7 @@ else
         % Get RNN outputs
         Weights = shapeParametersIntoWeights(params, Config);
         [~, ~, network_output] = propagateThroughANN(Weights, ...
-            Config.f_activation, input_test, CueSamplesTest.i_step);
+            Config.f_activation, input_test, inputs.("DataSamples" + monkey).i_step);
 
         % Convert RNN outputs to choice probabilities
         if size(network_output, 2) == 2
@@ -98,12 +98,12 @@ else
         % --- Compare RNN and monkey choices --- %
 
         % Select monkey choices in the same reference frame as the RNN
-        monkey_choices = inputs.(DataSamples + "monkey").("choice_" + Config.output_label);
+        monkey_choices = inputs.("DataSamples" + monkey).("choice_" + Config.output_label);
         monkey_choices = monkey_choices';
 
         % Restrict evaluation to the final step of each trial
-        is_last_step = [CueSamplesTest.i_step(1:(end - 1)) >= ...
-            CueSamplesTest.i_step(2:end), true]';
+        is_last_step = [inputs.("DataSamples" + monkey).i_step(1:(end - 1)) >= ...
+            inputs.("DataSamples" + monkey).i_step(2:end), true]';
 
         % Compute balanced accuracy
         analysis_output.("bacc_" + monkey) = computeBalancedAccuracy(...

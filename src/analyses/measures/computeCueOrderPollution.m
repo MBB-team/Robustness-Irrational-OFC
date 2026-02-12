@@ -71,39 +71,24 @@ end
 
 if isempty(params)
 
-    % --- Preprocessing mode: define dataset --- %
+    % --- Preprocessing mode: define cue sequence datasets --- %
+
+    % --- All possible cue sequences --- %
 
     % Generate all possible cue-sampling scenarii
     CueSamples = generateAllCueSamples();
     analysis_output.DataSamples = expandCueSamples(CueSamples);
 
     % Number of cue sequences per sampling step
-    analysis_output.n_sequences_per_step = ...
-        round(length(CueSamples.i_step) / max(CueSamples.i_step));
+    n_sequences_per_step = round(length(CueSamples.i_step) / max(CueSamples.i_step));
 
     % Define all possible attribute values (probability and magnitude)
-    all_prob = [NaN, unique(DataSamples.prob_left)];
-    all_mag = [NaN, unique(DataSamples.mag_left)];
-    analysis_output.n_att = length(all_mag);
+    all_prob = [NaN, unique(analysis_output.DataSamples.prob_left)];
+    all_mag = [NaN, unique(analysis_output.DataSamples.mag_left)];
+    n_att = length(all_mag);
 
     % Group attribute values for the four option attribues
-    analysis_output.all_att_values = {all_prob, all_mag, all_prob, all_mag};
-
-else
-
-    % --- Analysis mode: compute cue order pollution metrics --- %
-
-    % Define attribute fields according to the RNN output format
-    switch Config.output_format
-        case "loc"
-            option_labels = ["left", "right"];
-        case "order"
-            option_labels = ["first", "second"];
-        case "attention"
-            option_labels = ["attended", "unattended"];
-    end
-    all_att_fields = "known_" + ...
-        reshape(compose(["prob_%s", "mag_%s"], repelem(option_labels, 2, 1)')', 1, []);
+    all_att_values = {all_prob, all_mag, all_prob, all_mag};
 
     % --- Group cue sequences that differ only in order --- %
 
@@ -111,72 +96,99 @@ else
     %   (i) the same option attributes,
     %   (ii) the same trial type,
     %   (iii) the same sampling step
-    cue_sequence_IDs = NaN(inputs.n_sequences_per_step, ...
-        2 * (inputs.n_att ^ 4) *sum(factorial(2:4)));
-    trial_type_col = strings(1, 2 * (inputs.n_att ^ 4) *sum(factorial(2:4)));
-    i_step_col = NaN(1, 2 * (inputs.n_att ^ 4) *sum(factorial(2:4)));
 
-    i_sequence = 1;
+    analysis_output.CuePermutations = struct();
 
-    % ~ Loop over trial types ~ %
-    for trial_type = ["option", "attribute"]
+    for output_label = ["loc", "order", "attention"]
 
-        select_trial_type = (inputs.DataSamples.trial_type == trial_type);
-
-        % ~ Loop over sampling steps ~ %
-        for trial_step = 2:4
-
-            select_step = inputs.DataSamples.i_step == trial_step;
-
-            % ~ Loop over all combinations of option attributes ~ %
-            for i_prob = 1:inputs.n_att
-                for i_mag = 1:inputs.n_att
-                    for j_prob = 1:inputs.n_att
-                        for j_mag = 1:inputs.n_att
-
-                            all_i_att = [i_prob, i_mag, j_prob, j_mag];
-
-                            % Select trials matching this attribute configuration
-                            select_attribute_pair = true(size(inputs.DataSamples.i_step));
-                            for i_att = 1:length(all_i_att)
-                                if ~ isnan(all_i_att(i_att))
-                                    select_attribute_pair = select_attribute_pair & ...
-                                        (inputs.DataSamples.(all_att_fields(i_att)) == ...
-                                        inputs.all_att_values{i_att}(all_i_att(i_att)));
-                                else
-                                    select_attribute_pair = select_attribute_pair & ...
-                                        isnan(inputs.DataSamples.(all_att_fields(i_att)));
+        % Define attribute fields according to the output format
+        switch output_label
+            case "loc"
+                option_labels = ["left", "right"];
+            case "order"
+                option_labels = ["first", "second"];
+            case "attention"
+                option_labels = ["attended", "unattended"];
+        end
+        all_att_fields = "known_" + ...
+            reshape(compose(["prob_%s", "mag_%s"], repelem(option_labels, 2, 1)')', 1, []);
+    
+        cue_sequence_IDs = NaN(n_sequences_per_step, ...
+            2 * (n_att ^ 4) *sum(factorial(2:4)));
+        trial_type_col = strings(1, 2 * (n_att ^ 4) *sum(factorial(2:4)));
+        i_step_col = NaN(1, 2 * (n_att ^ 4) *sum(factorial(2:4)));
+    
+        i_sequence = 1;
+    
+        % ~ Loop over trial types ~ %
+        for trial_type = ["option", "attribute"]
+    
+            select_trial_type = (analysis_output.DataSamples.trial_type == trial_type);
+    
+            % ~ Loop over sampling steps ~ %
+            for trial_step = 2:4
+    
+                select_step = analysis_output.DataSamples.i_step == trial_step;
+    
+                % ~ Loop over all combinations of option attributes ~ %
+                for i_prob = 1:n_att
+                    for i_mag = 1:n_att
+                        for j_prob = 1:n_att
+                            for j_mag = 1:n_att
+    
+                                all_i_att = [i_prob, i_mag, j_prob, j_mag];
+    
+                                % Select trials matching this attribute configuration
+                                select_attribute_pair = true(size(analysis_output.DataSamples.i_step));
+                                for i_att = 1:length(all_i_att)
+                                    if ~ isnan(all_i_att(i_att))
+                                        select_attribute_pair = select_attribute_pair & ...
+                                            (analysis_output.DataSamples.(all_att_fields(i_att)) == ...
+                                            all_att_values{i_att}(all_i_att(i_att)));
+                                    else
+                                        select_attribute_pair = select_attribute_pair & ...
+                                            isnan(analysis_output.DataSamples.(all_att_fields(i_att)));
+                                    end
                                 end
+    
+                                % Select all cue permutations for this configuration
+                                all_i_perm = find(select_trial_type & select_step & select_attribute_pair);
+    
+                                % Store the cue sequences and their information
+                                if ~ isempty(all_i_perm) && length(all_i_perm) > 1
+    
+                                    cue_sequence_IDs(1:length(all_i_perm), i_sequence) = all_i_perm;
+                                    trial_type_col(i_sequence) = trial_type;
+                                    i_step_col(i_sequence) = trial_step;
+    
+                                    % Update the sequence index
+                                    i_sequence = i_sequence + 1;
+                                end
+    
                             end
-
-                            % Select all cue permutations for this configuration
-                            all_i_perm = find(select_trial_type & select_step & select_attribute_pair);
-
-                            % Store the cue sequences and their information
-                            if ~ isempty(all_i_perm) && length(all_i_perm) > 1
-
-                                cue_sequence_IDs(1:length(all_i_perm), i_sequence) = all_i_perm;
-                                trial_type_col(i_sequence) = trial_type;
-                                i_step_col(i_sequence) = trial_step;
-
-                                % Update the sequence index
-                                i_sequence = i_sequence + 1;
-                            end
-
                         end
                     end
                 end
+    
+                % Remove empty rows and columns
+                is_nan_row = ~ any(~ isnan(cue_sequence_IDs), 2);
+                is_nan_col = ~ any(~ isnan(cue_sequence_IDs), 1);
+                cue_sequence_IDs(is_nan_row, :) = [];
+                cue_sequence_IDs(:, is_nan_col) = [];
+                trial_type_col(is_nan_col) = [];
+                i_step_col(is_nan_col) = [];
             end
-
-            % Remove empty rows and columns
-            is_nan_row = ~ any(~ isnan(cue_sequence_IDs), 2);
-            is_nan_col = ~ any(~ isnan(cue_sequence_IDs), 1);
-            cue_sequence_IDs(is_nan_row, :) = [];
-            cue_sequence_IDs(:, is_nan_col) = [];
-            trial_type_col(is_nan_col) = [];
-            i_step_col(is_nan_col) = [];
         end
+
+        analysis_output.CuePermutations.(output_label) = struct();
+        analysis_output.CuePermutations.(output_label).cue_sequence_IDs = cue_sequence_IDs;
+        analysis_output.CuePermutations.(output_label).trial_type_col = trial_type_col;
+        analysis_output.CuePermutations.(output_label).i_step_col = i_step_col;
     end
+
+else
+
+    % --- Analysis mode: compute cue order pollution metrics --- %
 
     % --- Compute RNN outputs in a decision-variable frame --- %
 
@@ -193,16 +205,17 @@ else
 
     % --- Compute output variability across cue order permutations --- %
 
-    std_per_cue_sequence_config = NaN(size(cue_sequence_IDs, 2));
+    n_cue_set = size(inputs.CuePermutations.(Config.output_label).cue_sequence_IDs, 2);
+    std_per_cue_sequence_config = NaN(n_cue_set, 1);
 
-    for i_col = 1:size(cue_sequence_IDs, 2)
+    for i_cue_set = 1:n_cue_set
 
         % Select all cue sequence permutations
-        cue_sequence_perm_IDs = cue_sequence_IDs(:, i_col);
+        cue_sequence_perm_IDs = inputs.CuePermutations.(Config.output_label).cue_sequence_IDs(:, i_cue_set);
         cue_sequence_perm_IDs = cue_sequence_perm_IDs(~ isnan(cue_sequence_perm_IDs));
 
         % Compute the standard deviation of the RNN output across sequence order
-        std_per_cue_sequence_config(i_col) = std(network_output(cue_sequence_perm_IDs), 1);
+        std_per_cue_sequence_config(i_cue_set) = std(network_output(cue_sequence_perm_IDs), 1);
     end
     
 
@@ -214,10 +227,12 @@ else
     for trial_type = ["option", "attribute", "both"]
 
         if trial_type == "both"
-            select_trial_type = true(size(trial_type_col));
+            select_trial_type = ...
+                true(size(inputs.CuePermutations.(Config.output_label).trial_type_col));
             output_field = "std_order";
         else
-            select_trial_type = (trial_type_col == trial_type);
+            select_trial_type = ...
+                (inputs.CuePermutations.(Config.output_label).trial_type_col == trial_type);
             output_field = "std_order_" + trial_type;
         end
 
@@ -225,10 +240,12 @@ else
 
             % Initialize output storage
             if trial_step == 0
-                select_step = true(size(i_step_col));
+                select_step = ...
+                    true(size(inputs.CuePermutations.(Config.output_label).i_step_col));
                 analysis_output.(output_field) = NaN();
             else
-                select_step = (i_step_col == trial_step);
+                select_step = ...
+                    (inputs.CuePermutations.(Config.output_label).i_step_col == trial_step);
                 if ~ contains(output_field, "_per_step")
                     output_field = output_field + "_per_step";
                     analysis_output.(output_field) = NaN(3, 1);
