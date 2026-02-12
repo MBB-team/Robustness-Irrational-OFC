@@ -1,4 +1,4 @@
-function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_select_configs)
+function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_select_configs, constraint_weight)
 % Finalizes a batch of initial RNN training by filtering unsuccessful
 % seeds.
 %
@@ -19,6 +19,10 @@ function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_s
 %     Vector of configuration IDs indicating which RNN configurations to
 %     consider. By default, considers all existing configurations.
 %
+% constraint_weight (optional) : <float 1xN>
+%     Vector of relative weight of the biological constraint term compared
+%     to the behavioural objective in the joint optimization.
+%
 % OUTPUTS -----------------------------------------------------------------
 % DatasetSpecs : <struct 1x1>
 %     Structure containing all training-specific elements for the current
@@ -30,12 +34,18 @@ arguments
     path_specs (1, 1) string
     path_networks (1, 1) string
     i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
+    constraint_weight (1, :) double = []
 end
 
 % Load existing training specificities
 DatasetSpecs = generateTrainTestDataset(path_specs);
 
 %  Exclude seeds that failed in any cohort
+if ~ isempty(constraint_weight)
+    % Do not trim unsuccessful seeds if the training was performed under
+    % biological constraints
+    i_select_configs = [];
+end
 [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
     true, i_select_configs);
 
@@ -43,6 +53,11 @@ DatasetSpecs = generateTrainTestDataset(path_specs);
 all_Config = getDesiredNetworkConfigs();
 n_config = length(all_Config);
 DatasetSpecs.n_networks_cohort = length(subset_included_paths) / n_config;
+if ~ isempty(constraint_weight)
+    % Consider that each cohort is defined by a pair (configuration,
+    % constraint weight)
+    DatasetSpecs.n_networks_cohort = DatasetSpecs.n_networks_cohort / length(constraint_weight);
+end
 
 % Mark this batch as fully trained
 DatasetSpecs.last_batch_trained = true;

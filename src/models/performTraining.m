@@ -65,7 +65,7 @@ arguments
 end
 
 % Easily toggle test mode
-TEST_MODE = false;
+TEST_MODE = true;
 
 % --- Initialize the VBA model --- %
         
@@ -163,7 +163,7 @@ if TEST_MODE
     warning("Running in TEST_MODE: early stopping enabled.");
     out.options.GnMaxIter = 2;
     out.options.MinIter = 1;
-    out.options.MaxIter = 2;
+    out.options.MaxIter = 1;
     out.options.TolFun = 1e1;
 else
     out.options.GnMaxIter = 32;

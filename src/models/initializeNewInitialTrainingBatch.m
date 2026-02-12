@@ -1,5 +1,5 @@
 function [DatasetSpecs, shift_i_network] = ...
-    initializeNewInitialTrainingBatch(path_specs, n_config, monkey)
+    initializeNewInitialTrainingBatch(path_specs, monkey)
 % Loads or initializes a new batch of training specifications for RNNs.
 %
 % This function retrieves the training specifications corresponding to the
@@ -10,9 +10,6 @@ function [DatasetSpecs, shift_i_network] = ...
 % INPUTS ------------------------------------------------------------------
 % path_specs : <string 1x1>
 %     Path to the file where training specifications are stored.
-%
-% n_config : <int 1x1>
-%     Number of RNN configurations (i.e., number of cohorts).
 %
 % monkey (optional) : <string 1x1>
 %     If specified, training datasets are selected to match the behavioural
@@ -32,7 +29,6 @@ function [DatasetSpecs, shift_i_network] = ...
 
 arguments
     path_specs (1, 1) string
-    n_config (1, 1) double {mustBeInteger}
     monkey (1, 1) string {mustBeMember(monkey, ["", "Franck", "Miles"])} = ""
 end
 
@@ -47,8 +43,5 @@ end
 % (used to shift the network index in the main training loop)
 shift_i_network = length(DatasetSpecs.CueDatasetTrain) - ...
     DatasetSpecs.batch_size;
-
-% Initialize progress bar for parallel training
-% parfor_progress(n_config * DatasetSpecs.batch_size);
 
 end

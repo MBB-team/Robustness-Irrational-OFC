@@ -100,8 +100,6 @@ end
 % ~ Loop through fit phases ~ %
 for i_fit = 1:length(fit_label)
 
-    disp(mean(fit_test{i_fit}(end, :)))
-
     % Define the performance threshold
     test_network = any(cellfun(@(x) isequaln(x, Config), all_Config(i_select_configs)));
     if test_network
@@ -110,14 +108,14 @@ for i_fit = 1:length(fit_label)
             perf_threshold = 0.70;
         elseif constraint_weight ~= 0
             % Do not test RNN trained under constraints
-            perf_threshold = 0;
+            perf_threshold = - Inf;
         else
             % Performance quantified through R2
             perf_threshold = 0.95;
         end
     else
         % Do not apply any threshold to save the RNN
-        perf_threshold = 0;
+        perf_threshold = - Inf;
     end
 
     % Only save if the final test performance meets the threshold
@@ -136,15 +134,18 @@ for i_fit = 1:length(fit_label)
 end
 
 % Save the RNN if performance is sufficient
+filename = defineFilenamePattern(Network.Config, Network.seed, constraint_weight);
 if save_network
-    filename = defineFilenamePattern(Network.Config, Network.seed);
-    if constraint_weight ~= 0
-        % Remove file extension
-        filename = char(filename);
-        filename = filename(1:(end-4));
-        filename = string(filename);
-        % Add constraint weight information and extension
-        filename = filename + "_weight_" + string(constraint_weight) + ".mat";
-    end
     save(fullfile(path_networks, filename), "-struct", "Network");
+end
+
+% Display network performance
+if save_network
+    save_string = "v";
+else
+    save_string = "x";
+end
+for i_fit = 1:length(fit_label)
+    fprintf("%s: %0.2f (%s)\n", ...
+        filename, mean(fit_test{i_fit}(end, :)), save_string);
 end
