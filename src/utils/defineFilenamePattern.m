@@ -38,7 +38,7 @@ if isequaln(Config, struct())
         + "_TO_(loc|order|attention)-(both|diff|choice)" ... output info
         + "_ARCH_(gauss|sig)_(x|z)" ... architecture
         + "_(\d+)" ... seed
-        + "(_\d)?" ... % constraint weight
+        + "(_\d+(\.)?(\d)*)?" ... % constraint weight
     ;
 
 % Match a given RNN variant

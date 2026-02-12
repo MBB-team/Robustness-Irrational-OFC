@@ -120,6 +120,18 @@ AllNetworks.is_initial_fit = false(1, n_states);
 AllNetworks.is_rational = false(1, n_states);
 AllNetworks.is_irrational = false(1, n_states);
 
+% Biological constraints
+Network = load(all_path{1});
+fit_fields = string(fieldnames(Network))';
+fit_fields = fit_fields(contains(fit_fields, "Fit"));
+if isfield(Network.(fit_fields(1)), "constraint_label")
+    save_constraint = true;
+    AllNetworks.constraint_label = strings(1, n_states);
+    AllNetworks.constraint_weight = NaN(1, n_states);
+else
+    save_constraint = false;
+end
+
 % Parameters
 AllNetworks.params = NaN(220, n_states);
 
@@ -184,7 +196,10 @@ for i_network = 1:n_network
             AllNetworks.is_initial_fit(i_state) = checkIfIsInitialTraining(folder_name, fit_label);
             AllNetworks.is_rational(i_state) = (fit_label == "FitRational");
             AllNetworks.is_irrational(i_state) = contains(fit_label, "FitIrrational");
-
+            if save_constraint
+                AllNetworks.constraint_label(i_state) = Network.(fit_label).constraint_label;
+                AllNetworks.constraint_weight(i_state) = Network.(fit_label).constraint_weight;
+            end
 
             i_state = i_state + 1;
         end
