@@ -92,7 +92,7 @@ if new_batch && DatasetSpecs.last_batch_trained
         % Select trials experienced by the monkey
         shuffled_trial_ID = all_trial_ID(randperm(length(all_trial_ID)));
         NewTrialIDTrain{i_network} = shuffled_trial_ID(1:GlobalConfig.n_trials_train_irrational);
-        NewTrialIDTest{i_network} = shuffled_trial_ID(GlobalConfig.n_trials_train_irrational + ...
+        NewTrialIDTest{i_network} = shuffled_trial_ID(GlobalConfig.n_trials_train_irrational + 1 + ...
             (1:GlobalConfig.n_trials_test_irrational));
         % Select cue sequences and monkey choices corresponding to these
         % trials
@@ -131,7 +131,4 @@ if new_batch && DatasetSpecs.last_batch_trained
 
     % Save updated training specifications
     save(path_specs, "-struct", "DatasetSpecs");
-end
-
-
 end

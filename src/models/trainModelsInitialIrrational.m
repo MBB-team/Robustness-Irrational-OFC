@@ -64,11 +64,11 @@ I_SELECT_CONFIG = [1, 2, 5, 6, 7, 8, 9, 10];
     prepareInitialTraining("irrational_" + monkey);
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
-while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
+while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
 
     % Load or initialize a new batch of training specifications for RNNs
     [DatasetSpecs, shift_i_network] = ...
-        initializeNewInitialTrainingBatch(path_specs, n_config);
+        initializeNewInitialTrainingBatch(path_specs, monkey);
 
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config % Exclude 3 and 4

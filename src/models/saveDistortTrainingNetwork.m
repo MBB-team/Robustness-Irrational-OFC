@@ -53,6 +53,4 @@ Network.(fit_label).fit_test = fit_test;
 Network.(fit_label).i_end_GnLoop = out.suffStat.i_end_GnLoop;
 
 % Save the RNN
-if save_network
-    save(path_network, "-struct", "Network");
-end
+save(path_network, "-struct", "Network", "-append");

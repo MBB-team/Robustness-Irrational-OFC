@@ -1,6 +1,6 @@
 function [fit_train, fit_test, params] = testTrainingGeneralizability(...
     out, Config, input_train, output_train, input_test, output_test, ...
-    i_step_train, i_step_test)
+    i_step_train, i_step_test, distort_params)
 % Evaluates RNN performance on training and held-out test datasets.
 %
 % This function computes prediction quality throughout training, using both
@@ -38,6 +38,10 @@ function [fit_train, fit_test, params] = testTrainingGeneralizability(...
 %
 % i_step_test (optional) : <int Nx1>
 %     Same as i_step_train, but for the test dataset.
+%
+% distort_params (optional) : <float Px1>
+%     Vector of initial network parameters (connection weights and unit
+%     biases) used to initialize RNN distortion training.
 % 
 % OUTPUTS -----------------------------------------------------------------
 % fit_train : <float TxR>
@@ -61,10 +65,19 @@ arguments
     output_test (:, :) double
     i_step_train (:, 1) double {mustBeInteger} = []
     i_step_test (:, 1) double {mustBeInteger} = []
+    distort_params (:, 1) double = []
 end
 
 % Retrieve parameter trajectories across training
 params = out.suffStat.params_history;
+
+% If the initial vector of parameters was longer, replace initial recurrent
+% connection parameters with new fitted ones
+if length(distort_params) > size(params, 1)
+    inserted_params = repmat(distort_params, 1, size(params, 2));
+    inserted_params(Config.ParamRange.("connect_z_" + Config.recur_connect), :) = params;
+    params = inserted_params;
+end
 
 % Initialize fit quality matrices
 n_outputs = length(Config.outputs);

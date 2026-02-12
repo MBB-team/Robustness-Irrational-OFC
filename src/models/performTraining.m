@@ -68,11 +68,7 @@ end
         
 % Evolution and observation functions (static dynamics)
 f_fname = [];
-if train_all_params
-    g_fname = @observeANN;
-else
-    g_fname = @observeANNTuneRecurrent;
-end
+g_fname = @observeANN;
 
 % Parameters of the observation function
 options = struct();
@@ -103,8 +99,7 @@ if train_all_params
 else
     % Re-train recurrent connections only
     i_recur_connect = Config.ParamRange.("connect_z_" + Config.recur_connect);
-    dim = struct('n', 0, 'n_theta', 0, 'n_phi', ...
-        length(i_recur_connect) + 1);
+    dim = struct('n', 0, 'n_theta', 0, 'n_phi', length(i_recur_connect));
 end
 % Prior mean different from 0
 options.priors.muPhi = 1e-1 * ones(dim.n_phi, 1);

@@ -41,15 +41,15 @@ arguments
     target_folder (1, 1) string
     distort_monkey (1, 1) string {mustBeMember(distort_monkey, ["", "Franck", "Miles"])} = ""
     target_monkey (1, 1) string {mustBeMember(target_monkey, ["", "Franck", "Miles"])} = ""
-    train_all_params (1, 1) logical = False
+    train_all_params (1, 1) logical = false
 end
 
 % Load training specifications and initialize parallel processing
-[path_networks_distort, path_networks_target, DatasetSpecs, distort_fit_label] = ...
+[path_networks_distort, path_networks_target, DatasetSpecs, distort_fit_label, target_fit_label] = ...
     prepareDistortTraining(distort_folder, target_folder, distort_monkey, target_monkey);
 
 % ~ Re-train all RNNs in the specified folder ~ %
-for i_network = 1:n_network
+for i_network = 1:length(path_networks_distort)
 
     try
         % Load the RNN to be re-trained and the corresponding RNN trained
@@ -61,17 +61,12 @@ for i_network = 1:n_network
         continue;
     end
 
-    % Skip networks that have already been re-trained under this condition
-    if isfield(DistortNetwork, train_label)
-        continue;
-    end
-
     % Copy the Config structure to store the actual outputs used for
     % re-training
     TrainingConfig = DistortNetwork.Config;
     if contains(target_folder, "irrational")
         TrainingConfig.output_format_label = "choice";
-        TrainingConfig.outputs = "choice_" + Config.output_label;
+        TrainingConfig.outputs = "choice_" + DistortNetwork.Config.output_label;
     end
 
     % Select the datasets successfully used for initial training of the
@@ -89,10 +84,11 @@ for i_network = 1:n_network
     [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...
         TrainingConfig, input_train, output_train, input_test, output_test, ...
         DatasetSpecs.CueDatasetTrain{i_network}.i_step, ...
-        DatasetSpecs.CueDatasetTest{i_network}.i_step);
+        DatasetSpecs.CueDatasetTest{i_network}.i_step, ...
+        DistortNetwork.(distort_fit_label).params(:, end));
 
     % Save the RNN
-    saveDistortTrainingNetwork(DistortNetwork, distort_fit_label, ...
+    saveDistortTrainingNetwork(DistortNetwork, target_fit_label, ...
         params, fit_train, fit_test, out, path_networks_distort{i_network});
 
 end

@@ -1,4 +1,4 @@
-function [path_networks_distort, path_networks_target, DatasetSpecs, distort_fit_label] = ...
+function [path_networks_distort, path_networks_target, DatasetSpecs, distort_fit_label, target_fit_label] = ...
     prepareDistortTraining(distort_folder, target_folder, distort_monkey, target_monkey)
 % Prepares datasets and paths for RNN re-training under distorted
 % conditions.
@@ -42,6 +42,9 @@ function [path_networks_distort, path_networks_target, DatasetSpecs, distort_fit
 %     selectMonkeyTrainTestDataset.
 %
 % distort_fit_label : <string 1<1>
+%     Name of the 'Network' sub-structure which will be re-trained.
+%
+% target_fit_label : <string 1<1>
 %     Name of the 'Network' sub-structure in which re-training information
 %     will be stored.
 
@@ -53,13 +56,15 @@ arguments
 end
 
 % Path to RNNs that will be re-trained
-path_networks_distort = fullfile(getPath("ModelsRaw"), distort_folder);
+path_networks_distort = getAllNetworkPaths(fullfile(getPath("ModelsRaw"), distort_folder));
+
 % Path to reference RNNs and their associated dataset specifications
-path_networks_target = fullfile(getPath("ModelsRaw"), target_folder);
+path_folder_networks_target = fullfile(getPath("ModelsRaw"), target_folder);
+path_networks_target = getAllNetworkPaths(path_folder_networks_target);
 
 % Prepare loading of the dataset specifications from the reference (target)
 % folder
-path_specs = fullfile(path_networks_target, "_DatasetSpecs.mat");
+path_specs = fullfile(path_folder_networks_target, "_DatasetSpecs.mat");
 
 % If applicable, extract monkey name from folder name
 target_monkey_match = regexp(target_folder, ".*(Franck|Miles).*", "tokens");
@@ -73,12 +78,12 @@ end
 
 % Select monkey-specific datasets when applicable
 if contains(target_folder, "irrational")
-    DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, target_monkey, False);
+    DatasetSpecs = selectMonkeyTrainTestDataset(path_specs, target_monkey, false);
 else
-    DatasetSpecs = generateTrainTestDataset(path_specs, False);
+    DatasetSpecs = generateTrainTestDataset(path_specs, false);
 end
 
-% Define sub-structure name
+% Define sub-structure names
 if contains(distort_folder, "irrational")
     distort_fit_label = "FitIrrational" + distort_monkey;
 elseif contains(distort_folder, "rational_subj")
@@ -86,13 +91,11 @@ elseif contains(distort_folder, "rational_subj")
 else
     distort_fit_label = "FitRational";
 end
-
-% Initialize the parallel pools
-delete(gcp("nocreate"));
-cluster = parcluster("local");
-parpool(cluster, cluster.NumWorkers);
-
-% Initialize progress bar
-parfor_progress(len(path_networks_distort));
-
+if contains(target_folder, "irrational")
+    target_fit_label = "FitIrrational" + target_monkey;
+elseif contains(target_folder, "rational_subj")
+    target_fit_label = "FitRationalSubj" + target_monkey;
+else
+    target_fit_label = "FitRational";
 end
+
