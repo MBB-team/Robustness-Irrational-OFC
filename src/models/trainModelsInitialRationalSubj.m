@@ -47,7 +47,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
     % Loads or initializes a new batch of training specifications for RNNs
     [DatasetSpecs, shift_i_network] = ...
-        initializeNewInitialTrainingBatch(path_specs, n_config);
+        initializeNewInitialTrainingBatch(path_specs);
 
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config
