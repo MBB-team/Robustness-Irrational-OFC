@@ -1,0 +1,153 @@
+% =========================================================================
+% MASTER TRAINING PIPELINE
+% =========================================================================
+%
+% OVERVIEW
+% -------------------------------------------------------------------------
+% This script orchestrates the full model-training pipeline used in the
+% paper. It controls:
+%
+%   • Initial training
+%   • Re-training / distortion procedures
+%   • Training under biological constraints
+%
+% across multiple rationality regimes (rational, irrational, subjectively
+% rational).
+%
+% -------------------------------------------------------------------------
+% ADDITIONAL TRAINING PROCEDURES (NOT INCLUDED IN THIS SCRIPT)
+% -------------------------------------------------------------------------
+% The following procedures are available in the codebase but are not
+% executed here. They can be launched manually if needed.
+%
+% 1) Rational  → Subjectively rational
+%    trainModelsDistort("rational", "rational_subj", "", "Franck");
+%    trainModelsDistort("rational", "rational_subj", "", "Miles");
+%
+% 2) Subjectively rational → Optimal rational
+%    trainModelsDistort("rational_subj", "rational", "Franck", "");
+%    trainModelsDistort("rational_subj", "rational", "Miles", "");
+%
+% 3) Irrational → Subjectively rational
+%    trainModelsDistort("irrational_Franck", "rational_subj", "Franck", "Franck");
+%    trainModelsDistort("irrational_Miles", "rational_subj", "Miles", "Miles");
+%
+% 4) Subjectively rational → Irrational
+%    trainModelsDistort("rational_subj", "irrational_Franck", "Franck", "Franck");
+%    trainModelsDistort("rational_subj", "irrational_Miles", "Miles", "Miles");
+%
+% 5) Training under additional biological constraints
+%    (see trainModelsInitialRationalConstrained)
+%
+% -------------------------------------------------------------------------
+% USAGE
+% -------------------------------------------------------------------------
+% Activate or deactivate sections of the pipeline using the flags defined
+% below.
+%
+% -------------------------------------------------------------------------
+% AUTHOR & VERSION
+% -------------------------------------------------------------------------
+% Author: Juliette Bénon
+% Date: 12/02/2026
+
+
+%% === Environment set-up =================================================
+setup;
+clear variables;
+close all hidden;
+
+
+%% === Flags (toggle sections on/off) =====================================
+
+FLAGS = struct();
+
+% Main paper training pipeline
+FLAGS.train_rational_networks                 = true;
+FLAGS.train_irrational_networks               = true;
+FLAGS.distort_rational_networks_to_irrational = true;
+
+% For supplementary material only
+FLAGS.train_rational_subj_networks            = true;
+FLAGS.distort_irrational_networks_to_rational = true;
+
+% For figure 1 only: training with biological constraints
+FLAGS.constraint_energetic_budget             = true;
+FLAGS.constraint_info_transfer_rate           = true;
+FLAGS.constraint_robustness                   = true;
+FLAGS.constraint_EI_balance                   = true;
+FLAGS.constraint_weights                      = [0.01, 0.1, 1, 10, 100];
+FLAGS.train_rational_constrained_networks = any([...
+    FLAGS.constraint_energetic_budget, ...
+    FLAGS.constraint_info_transfer_rate, ...
+    FLAGS.constraint_robutsness, ...
+    FLAGS.constraint_EI_balance]);
+
+
+%% === Call model training functions ======================================
+
+% --- Initial training ----------------------------------------------------
+
+if FLAGS.train_rational_networks
+    fprintf("\n Initial training of rational models...\n");
+    trainModelsInitialRational();
+    fprintf("Done.\n");
+end
+
+if FLAGS.train_irrational_networks
+    fprintf("\n Initial training of irrational models...\n");
+    trainModelsInitialIrrational("Franck");
+    trainModelsInitialIrrational("Miles");
+    fprintf("Done.\n");
+end
+
+if FLAGS.train_rational_subj_networks
+    fprintf("\n Initial training of subjectively rational models...\n");
+    trainModelsInitialRationalSubj();
+    fprintf("Done.\n");
+end
+
+% --- Re-training ---------------------------------------------------------
+
+if FLAGS.distort_rational_networks_to_irrational
+    fprintf("\n Distortion of rational models into irrational models...\n");
+    trainModelsDistort("rational", "irrational_Franck", "", "Franck");
+    trainModelsDistort("rational", "irrational_Miles", "", "Miles");
+    fprintf("Done.\n");
+end
+if FLAGS.distort_irrational_networks_to_rational
+    fprintf("\n Distortion of irrational models into rational models...\n");
+    trainModelsDistort("irrational_Franck", "rational", "Franck", "");
+    trainModelsDistort("irrational_Miles", "rational", "Miles", "");
+    fprintf("Done.\n");
+end
+
+% --- Initial constrained training ----------------------------------------
+
+if FLAGS.train_rational_constrained_networks
+    fprintf("\n Initial training of rational models under biological constraints:");
+    if FLAGS.constraint_energetic_budget
+        fprintf("\nConstraint on the energetic budget...\n");
+        trainModelsInitialRationalConstrained(@computeEnergeticBudget, FLAGS.constraint_weights);
+        fprintf("Done.\n");
+    end
+    if FLAGS.constraint_info_transfer_rate
+        fprintf("\nConstraint on the information transfer rate...\n");
+        trainModelsInitialRationalConstrained(@computeInfoTransferRate, FLAGS.constraint_weights);
+        fprintf("Done.\n");
+    end
+    if FLAGS.constraint_robustness
+        fprintf("\nConstraint on the robustness to unit lesions...\n");
+        trainModelsInitialRationalConstrained(@computeRobustnessToUnitLesions, FLAGS.constraint_weights);
+        fprintf("Done.\n");
+    end
+    if FLAGS.constraint_robustness
+        fprintf("\nConstraint on the E/I balance...\n");
+        trainModelsInitialRationalConstrained(@computeEIbalance, FLAGS.constraint_weights);
+        fprintf("Done.\n");
+    end
+end
+
+% --- End -----------------------------------------------------------------
+
+fprintf("\n === End of the script. === \n");
