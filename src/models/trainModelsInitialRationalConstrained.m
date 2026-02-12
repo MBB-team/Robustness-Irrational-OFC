@@ -82,9 +82,9 @@ function [] = trainModelsInitialRationalConstrained(constraint, ...
 
 
 arguments
-    constraint (1, 1) function_handle = @computeEnergeticBudget
-    constraint_weight (1, :) double = [0.1, 1]
-    constraint_field (1, 1) string = ""
+    constraint (1, 1) function_handle
+    constraint_weight (1, :) double
+    constraint_field (1, 1) string 
 end
 
 
@@ -124,7 +124,10 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
                     output_test] = selectTrainingData(DatasetSpecs, i_network, Config);
                 
                 % Train a single RNN
-                out = performTraining(Config, input_train, output_train, init_params);
+                out = performTraining(Config, input_train, output_train, init_params, ...
+                    constraint=constraint, ...
+                    constraint_field=constraint_field, ...
+                    constraint_weight=constraint_weight(i_weight));
     
                 % Evaluate RNN performance on training and test datasets
                 [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...

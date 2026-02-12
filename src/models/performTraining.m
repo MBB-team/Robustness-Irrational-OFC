@@ -64,9 +64,6 @@ arguments
     constraint_options.constraint_weight (1, 1) double = 0
 end
 
-% Easily toggle test mode
-TEST_MODE = true;
-
 % --- Initialize the VBA model --- %
         
 % Evolution and observation functions (static dynamics)
@@ -159,18 +156,10 @@ end
 out.it = 0;
 
 % Set stopping criteria
-if TEST_MODE
-    warning("Running in TEST_MODE: early stopping enabled.");
-    out.options.GnMaxIter = 2;
-    out.options.MinIter = 1;
-    out.options.MaxIter = 1;
-    out.options.TolFun = 1e1;
-else
-    out.options.GnMaxIter = 32;
-    out.options.MinIter = 5;
-    out.options.MaxIter = 32;
-    out.options.TolFun = 1e1;
-end
+out.options.GnMaxIter = 32;
+out.options.MinIter = 5;
+out.options.MaxIter = 32;
+out.options.TolFun = 1e1;
 
 % Set desired verbosity settings
 out.options.verbose = false;
