@@ -1,4 +1,4 @@
-function filename_pattern = defineFilenamePattern(Config, seed)
+function filename_pattern = defineFilenamePattern(Config, seed, constraint_weight)
 % Returns a regular-expression pattern identifying RNN model files.
 %
 % This function generates a regexp pattern matching filenames of saved
@@ -17,6 +17,10 @@ function filename_pattern = defineFilenamePattern(Config, seed)
 %     Random seed used to generate the initial state and associated
 %     training and test datasets for the RNN.
 %
+% constraint_weight (optional) : <float 1x1>
+%     Relative weight of the constraint term compared to the behavioural
+%     objective in the joint optimization.
+%
 % OUTPUTS -----------------------------------------------------------------
 % filename_pattern : <string 1x1>
 %     Regular-expression pattern matching the corresponding RNN filename.
@@ -24,15 +28,17 @@ function filename_pattern = defineFilenamePattern(Config, seed)
 arguments
     Config (1, 1) struct = struct()
     seed (1, 1) double = NaN
+    constraint_weight (1, 1) double = 0
 end
 
 % Match any RNN
-if nargin == 0
+if isequaln(Config, struct())
     filename_pattern = ...
         "(loc|order)" ... input info
         + "_TO_(loc|order|attention)-(both|diff|choice)" ... output info
         + "_ARCH_(gauss|sig)_(x|z)" ... architecture
-        + "_(\d+).mat" ... seed and extension
+        + "_(\d+)" ... seed
+        + "(_\d)?" ... % constraint weight
     ;
 
 % Match a given RNN variant
@@ -53,11 +59,20 @@ else
     else
         error("Unknown recurrent connection");
     end
-    % Seed and extension
-    if nargin == 2
-        filename_pattern = filename_pattern + "_" + num2str(seed) + ".mat";
+
+    % Seed
+    if ~ isnan(seed)
+        filename_pattern = filename_pattern + "_" + num2str(seed);
     else
-        filename_pattern = filename_pattern + "_(\d+).mat";
+        filename_pattern = filename_pattern + "_(\d+)";
+    end
+
+    % Constraint weight
+    if constraint_weight ~= 0
+        filename_pattern = filename_pattern + "_" + num2str(constraint_weight);
     end
 
 end
+
+% Add file extension
+filename_pattern = filename_pattern + ".mat";
