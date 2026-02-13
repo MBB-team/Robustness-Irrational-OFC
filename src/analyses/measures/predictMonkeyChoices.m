@@ -38,7 +38,8 @@ function analysis_output = predictMonkeyChoices(params, Config, ~, inputs)
 % OUTPUTS -----------------------------------------------------------------
 % analysis_output : <struct 1x1>
 %     - In preprocessing mode:
-%     Structure containing monkey-specific cue sequences datasets.
+%     Structure containing monkey-specific cue sequences datasets, as well
+%     as the label of the fit session undergone by the RNN.
 %     - In analysis mode:
 %     Structure containing balanced accuracies:
 %       - bacc_Franck, bacc_Miles <1x1>: balanced accuracy for predicting

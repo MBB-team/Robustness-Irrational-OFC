@@ -66,9 +66,9 @@ else
     % Load training and test datasets
     path_specs = fullfile(getPath("ModelsRaw"), inputs.folder_name, ...
         "_DatasetSpecs.mat");
-    Specs = generateTrainTestDataset(path_specs, false);
-    DataSamplesTrain = expandCueSamples(Specs.CueDatasetTrain{seed});
-    DataSamplesTest = expandCueSamples(Specs.CueDatasetTest{seed});
+    DatasetSpecs = generateTrainTestDataset(path_specs, false);
+    DataSamplesTrain = expandCueSamples(DatasetSpecs.CueDatasetTrain{seed});
+    DataSamplesTest = expandCueSamples(DatasetSpecs.CueDatasetTest{seed});
 
     % Compute RNN activity on training and test datasets
     input_train = selectDataInfo(DataSamplesTrain, Config.inputs);
