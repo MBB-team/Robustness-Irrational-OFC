@@ -110,4 +110,47 @@ else
            
         end
     end
+
+    % --- Convert distances to same-monkey / other-monkey frame --- %
+
+    % Identify which monkey (if any) matches the RNN training condition
+    monkey_match = regexp(inputs.fit_label, ".*(Franck|Miles).*", "tokens");
+    if ~ isempty(monkey_match)
+
+        % Define the "same" and "other" monkey
+        monkey_match = monkey_match{1};
+        if monkey_match == "Franck"
+            other_monkey = "Miles";
+        else
+            other_monkey = "Franck";
+        end
+
+        % Convert all distances
+        for distance_type = ["RDM", "CCM"]
+            for area = ["OFC", "dlPFC", "ACC"]
+                analysis_output.("dist_" + distance_type + "_same_" + area) = ...
+                    analysis_output.("dist_" + distance_type + "_" + monkey_match + "_" + area);
+                analysis_output.("dist_" + distance_type + "_other_" + area) = ...
+                    analysis_output.("dist_" + distance_type + "_" + other_monkey + "_" + area);
+            end
+        end
+    else
+        % Do not define distances in the same-monkey / other-monkey frame
+        for distance_type = ["RDM", "CCM"]
+            for area = ["OFC", "dlPFC", "ACC"]
+                analysis_output.("dist_" + distance_type + "_same_" + area) = NaN;
+                analysis_output.("dist_" + distance_type + "_other_" + area) = NaN;
+            end
+        end
+    end
+
+    % Additionally, average distances across monkeys
+    for distance_type = ["RDM", "CCM"]
+        for area = ["OFC", "dlPFC", "ACC"]
+            analysis_output.("dist_" + distance_type + "_avg_" + area) = ...
+                (analysis_output.("dist_" + distance_type + "_Franck_" + area) + ...
+                analysis_output.("dist_" + distance_type + "_Miles_" + area)) / 2;
+        end
+    end
+
 end
