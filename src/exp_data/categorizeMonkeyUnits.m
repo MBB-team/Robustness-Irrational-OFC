@@ -89,10 +89,19 @@ for area = ["ACC", "OFC", "dlPFC"]
         end
 
         % Compute the proportion of units of each type
-        for variable = preprocess_inputs.regression_variables
+        for variable = [preprocess_inputs.regression_variables, "none"]
             PadoaSchioppaCells.(area).(monkey).("prop_" + variable) = ...
                 mean(PadoaSchioppaCells.(area).(monkey).("is_" + variable));
         end
+
+        % Normalize by the total proportion of categorized units
+        for variable = preprocess_inputs.regression_variables
+            PadoaSchioppaCells.(area).(monkey).("prop_" + variable) = ...
+                100 * PadoaSchioppaCells.(area).(monkey).("prop_" + variable) / ...
+                (1 - PadoaSchioppaCells.(area).(monkey).prop_none);
+        end
+        PadoaSchioppaCells.(area).(monkey).prop_none = ...
+            100 * PadoaSchioppaCells.(area).(monkey).prop_none;
     end
 end
 
