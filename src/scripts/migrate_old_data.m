@@ -108,7 +108,7 @@ for i_network = 1:n_old_networks
             if isfield(OldNetwork.(old_fit_label), "fit_test")
                 Network.(fit_label).fit_test = OldNetwork.(old_fit_label).fit_test;
             else
-                Network.(fit_label).fit_test = NaN;
+                Network.(fit_label).fit_test = NaN(size(OldNetwork.(old_fit_label).fit_train));
                 % warning("no fit test: %s %s", old_fit_label, old_file_name);
             end
             Network.(fit_label).i_end_GnLoop = OldNetwork.(old_fit_label).i_end_GnLoop;
