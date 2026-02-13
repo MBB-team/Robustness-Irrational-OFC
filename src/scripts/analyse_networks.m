@@ -52,15 +52,15 @@ FLAGS.compute_cue_order_pollution                 = false;
 % Neural properties
 FLAGS.categorize_integration_units                = false;
 FLAGS.generate_neural_geometry_matrices           = false;
-FLAGS.compute_neural_distance                     = false;
+FLAGS.compute_neural_distance                     = true;
 
 % Biological constraints
 FLAGS.compute_EI_balance                          = false;
 FLAGS.compute_info_transfer_rate                  = false;
 FLAGS.compute_energetic_budget                    = false;
 FLAGS.compute_code_redundancy                     = false;
-FLAGS.compute_robustness_to_unit_lesions          = true;
-FLAGS.compute_robustness_to_connection_lesions    = true;
+FLAGS.compute_robustness_to_unit_lesions          = false;
+FLAGS.compute_robustness_to_connection_lesions    = false;
 
 
 %% === Call measure functions =============================================
@@ -165,7 +165,7 @@ for folder_name = all_folder_names
     if FLAGS.compute_neural_distance
         fprintf("\n Compute neural distances...\n");
         callMeasure(@computeNeuralDistance, file_name, ...
-            supp_variable=["RDM", "CCM_option", "CCM_attribute"]);
+            supp_variable=["RDM", "CCM_option", "CCM_attribute", "fit_label"]);
         fprintf("Done.\n");
     end
 
