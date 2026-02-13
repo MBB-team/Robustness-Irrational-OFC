@@ -223,4 +223,11 @@ else
     file_name = file_name + "_full";
 end 
 file_name = file_name + ".mat";
-save(fullfile(getPath("Models"), file_name), "-struct", "AllNetworks");
+
+try
+    save(fullfile(getPath("Models"), file_name), "-struct", "AllNetworks");
+catch
+    % The 'params' field is too heavy
+    save(fullfile(getPath("Models"), file_name), "-struct", "AllNetworks", "-v7.3");
+end
+
