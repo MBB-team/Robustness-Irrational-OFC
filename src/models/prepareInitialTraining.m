@@ -58,14 +58,15 @@ end
 
 % --- Initialize the parallel pools --- %
 
-delete(gcp("nocreate"));
-
-% Define number of workers on a Slurm cluster
-num_workers = str2double(getenv("SLURM_CPUS_PER_TASK"));
-% Define number of workers when ran locally
-if isnan(num_workers) || num_workers < 1
-    num_workers = feature('numcores');
+if isempty(gcp("nocreate"))
+    % Initialize parallel pool
+    delete(gcp("nocreate"));
+    % Define number of workers on a Slurm cluster
+    num_workers = str2double(getenv("SLURM_CPUS_PER_TASK"));
+    % Define number of workers when ran locally
+    if isnan(num_workers) || num_workers < 1
+        num_workers = feature('numcores');
+    end
+    % Activate the parallel pool
+    parpool("local", num_workers);
 end
-
-% Activate the parallel pool
-parpool("local", num_workers);
