@@ -3,8 +3,7 @@
 clear variables;
 
 % Load old specs structures
-path_folder_old_specs = fullfile("C:", "Users", "jbenon", "OneDrive - Universität Zürich UZH", ...
-    "Code projects", "Hunt2018_ANN", "Data", "Models", "Sig_1000");
+path_folder_old_specs = fullfile("C:", "Users", "jbenon", "Documents", "Hunt2018_ANN", "Data", "Models", "Sig_1000");
 TrainingSpecs = load(fullfile(path_folder_old_specs, "_TrainingSpecs.mat"));
 FittingSpecs = load(fullfile(path_folder_old_specs, "_FittingSpecs.mat"));
 
@@ -35,6 +34,17 @@ save(fullfile(getPath("ModelsRaw"), "rational", "_DatasetSpecs.mat"), "-struct",
 %% Create new irrational initial training datasets
 
 MonkeyCueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
+
+% Select seeds that were successfully trained for initial irrational
+% training
+warning("Temporary piece of code: select seeds for successful rational models");
+path_rational_networks = getAllNetworkPaths(fullfile(getPath("ModelsRaw"), "rational"));
+seed_rational = NaN(1, length(path_rational_networks));
+pattern_catch_seed = ".*loc_TO_attention-both_ARCH_sig_z_(\d+).mat";
+for i_network = 1:length(path_rational_networks)
+    seed_token = regexp(path_rational_networks(i_network), pattern_catch_seed, "tokens");
+    seed_rational(i_network) = str2double(seed_token{1});
+end
 
 for monkey = ["Franck", "Miles"]
     DatasetSpecs = struct();
@@ -79,6 +89,10 @@ for monkey = ["Franck", "Miles"]
 
     DatasetSpecs.CueDatasetTrain = CueDatasetTrain;
     DatasetSpecs.CueDatasetTest = CueDatasetTest;
+
+    DatasetSpecs.batch_size = 1000;
+    DatasetSpecs.seed_rational = seed_rational;
+    DatasetSpecs.n_networks_cohort = 0;
 
     % Save it
     save(fullfile(getPath("ModelsRaw"), "irrational_" + monkey, "_DatasetSpecs.mat"), "-struct", "DatasetSpecs");
