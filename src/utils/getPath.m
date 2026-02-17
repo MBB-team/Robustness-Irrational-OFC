@@ -31,13 +31,13 @@ root_path = pwd;
 % Define the subdirectory sequence associated with each path label
 switch path_name
     case "ModelsRaw"
-        list_folder = ["data", "raw", "models"];
+        list_folder = ["data", "models", "raw"];
     case "Models"
-        list_folder = ["data", "processed", "models"];
+        list_folder = ["data", "models", "processed"];
     case "MonkeyRawData"
-        list_folder = ["data", "raw", "monkeys"];
+        list_folder = ["data", "monkeys", "raw"];
     case "MonkeyData"
-        list_folder = ["data", "processed", "monkeys"];
+        list_folder = ["data", "monkeys", "processed"];
     case "VBA_toolbox"
         list_folder = ["utils", "VBA_dep"];
     case "Figures"
