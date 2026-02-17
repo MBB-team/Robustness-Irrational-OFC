@@ -63,6 +63,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
     % Load or initialize a new batch of training specifications for RNNs
     [DatasetSpecs, shift_i_network] = ...
         initializeNewInitialTrainingBatch(path_specs, monkey);
+    shift_i_network = 0;
 
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config
@@ -76,7 +77,9 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         TrainingConfig.outputs = "choice_" + Config.output_label;
     
         % ~ Loop through RNNs to train ~ %
-        parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network
+        parfor i_network_seed = (1:DatasetSpecs.batch_size) + shift_i_network
+
+            i_network = DatasetSpecs.seed_rational(i_network_seed);
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
