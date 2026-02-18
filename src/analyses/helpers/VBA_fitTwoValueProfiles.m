@@ -77,7 +77,7 @@ switch in.output_format_label
     case "diff"
         output = value_1 - value_2;
     case "choice"
-        output = sigANN(value_1 - value_2, 0);
+        output = sigANN(value_2 - value_1, 0);
 end
 
 % Exclude sequences

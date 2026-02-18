@@ -1,4 +1,4 @@
-function analysis_output = fitOneValueProfile(params, Config, ~, inputs)
+function analysis_output = fitOneValueProfile(params, Config, seed, inputs)
 % Fits a shared option value function V(p, m) to the behaviour of an RNN.
 %
 % This measure fits a value function that maps an option’s probability p
@@ -21,16 +21,17 @@ function analysis_output = fitOneValueProfile(params, Config, ~, inputs)
 %     Configuration structure defining the RNN architecture.
 %
 % inputs : <struct 1x1>
-%     Structure containing variables precomputed during preprocessing.
-%     Required only in analysis mode. Fields include:
-%       - DataSamples: all possible cue-sampling scenarios
+%     Structure containing variables precomputed during preprocessing and
+%     additional metadata. Required only in analysis mode. Fields include:
+%       - folder_name: name of the folder containing initial training 
+%       specifications, such as the test dataset
 %       - f_fname, g_fname: VBA evolution and observation functions
 %       - options: VBA options, priors, and observation parameters
 %       
 % OUTPUTS -----------------------------------------------------------------
 % analysis_output : <struct 1x1>
 %     - In preprocessing mode:
-%     Structure containing the precomputed dataset and VBA model.
+%     Structure containing the VBA model.
 %     - In analysis mode:
 %     Structure containing the result of the value profile fit:
 %       - value_function <6x6>: fitted option value profile
@@ -39,19 +40,13 @@ function analysis_output = fitOneValueProfile(params, Config, ~, inputs)
 arguments
     params (:,1) double = []
     Config (1,1) struct = struct()
-    ~
+    seed (1,1) double = 0
     inputs (1,1) struct = struct()
 end
-
-warning("Cannot fit on the entire dataset, too big for VBA !!");
 
 if isempty(params)
 
     % --- Preprocessing mode: define datasets and VBA model --- %
-
-    % Generate all possible cue-sampling scenarii
-    CueSamples = generateAllCueSamples();
-    analysis_output.DataSamples = expandCueSamples(CueSamples);
 
     % Define VBA evolution and observation functions
     analysis_output.f_fname = [];
@@ -63,9 +58,9 @@ if isempty(params)
     % Define observation function parameters
     analysis_output.options.inG = struct();
     analysis_output.options.inG.all_prob = ...
-        [NaN, unique(round(analysis_output.DataSamples.prob_left, 2))];
+        [NaN, unique(round(0.1:0.2:0.9, 2))];
     analysis_output.options.inG.all_mag = ...
-        [NaN, unique(round(analysis_output.DataSamples.mag_left, 2))];
+        [NaN, unique(round(0.1:0.2:0.9, 2))];
 
     % Define VBA priors
     analysis_output.options.priors = struct();
@@ -89,10 +84,20 @@ else
 
     % --- Analysis mode: fit the value profile --- %
 
+    if ~ isfield(inputs, "monkey_choices")
+        % Load a subset of possible cue sequences
+        path_specs = fullfile(getPath("ModelsRaw"), inputs.folder_name, ...
+            "_DatasetSpecs.mat");
+        DatasetSpecs = generateTrainTestDataset(path_specs, false);
+        DataSamples = expandCueSamples(DatasetSpecs.CueDatasetTest{seed});
+    end
+
+    % --- Define the VBA model --- %
+
     % Define VBA model observations
     if ~ isfield(inputs, "monkey_choices")
         % Compute RNN outputs over all cue-sampling scenarios
-        network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
+        network_inputs = selectDataInfo(DataSamples, Config.inputs);
         Weights = shapeParametersIntoWeights(params, Config);
         [~, ~, network_outputs] = propagateThroughANN(Weights, ...
             Config.f_activation, network_inputs);
@@ -126,10 +131,10 @@ else
         inputs.options.sources = struct("type", 1);
         inputs.options.updateHP = false;
     end
-    inputs.options.inG.prob_1 = inputs.DataSamples.("known_prob_" + option_1);
-    inputs.options.inG.mag_1 = inputs.DataSamples.("known_mag_" + option_1);
-    inputs.options.inG.prob_2 = inputs.DataSamples.("known_prob_" + option_2);
-    inputs.options.inG.mag_2 = inputs.DataSamples.("known_mag_" + option_2);
+    inputs.options.inG.prob_1 = DataSamples.("known_prob_" + option_1);
+    inputs.options.inG.mag_1 = DataSamples.("known_mag_" + option_1);
+    inputs.options.inG.prob_2 = DataSamples.("known_prob_" + option_2);
+    inputs.options.inG.mag_2 = DataSamples.("known_mag_" + option_2);
 
     % Fit the value profile
     [posterior, out] = VBA_NLStateSpaceModel(system_outputs, [], ...

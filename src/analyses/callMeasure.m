@@ -119,7 +119,7 @@ end
 
 
 % ~ Loop through parameter vectors ~ %
-parfor i_data = 1:n_data_selected
+for i_data = 1:n_data_selected
 
     i_network = all_i_selected(i_data);
 

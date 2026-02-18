@@ -38,7 +38,7 @@ FLAGS.analyse_rational_constrained_networks       = false;
 % --- Which analysis functions to run -------------------------------------
 
 % Characterization of choice behaviour
-FLAGS.fit_one_value_profile                       = false;
+FLAGS.fit_one_value_profile                       = true;
 FLAGS.predictMonkeyChoices                        = false;
 FLAGS.predictOptimalChoices                       = false;
 
@@ -46,13 +46,13 @@ FLAGS.predictOptimalChoices                       = false;
 FLAGS.compute_framework_information_loss          = false;
 
 % Interference effects
-FLAGS.compute_cue_attention_pollution             = false;
+FLAGS.compute_cue_attention_pollution             = true;
 FLAGS.compute_cue_order_pollution                 = false;
 
 % Neural properties
 FLAGS.categorize_integration_units                = false;
 FLAGS.generate_neural_geometry_matrices           = false;
-FLAGS.compute_neural_distance                     = true;
+FLAGS.compute_neural_distance                     = false;
 
 % Biological constraints
 FLAGS.compute_EI_balance                          = false;
@@ -108,7 +108,8 @@ for folder_name = all_folder_names
 
     if FLAGS.fit_one_value_profile
         fprintf("\n Fit one value profile...\n");
-        callMeasure(@fitOneValueProfile, file_name);
+        callMeasure(@fitOneValueProfile, file_name, ...
+            supp_variable="folder_name");
         fprintf("Done.\n");
     end
 
@@ -138,7 +139,8 @@ for folder_name = all_folder_names
 
     if FLAGS.compute_cue_attention_pollution
         fprintf("\n Compute cue attention pollution...\n");
-        callMeasure(@computeCueAttentionPollution, file_name);
+        callMeasure(@computeCueAttentionPollution, file_name, ...
+            supp_variable="folder_name");
         fprintf("Done.\n");
     end
 
