@@ -101,7 +101,7 @@ end
 for i_fit = 1:length(fit_label)
 
     % Define the performance threshold
-    test_network = any(cellfun(@(x) isequaln(x, Config), all_Config(i_select_configs)));
+    test_network = ~ any(cellfun(@(x) isequaln(x, Config), all_Config(i_select_configs)));
     if test_network
         if contains(fit_label{i_fit}, "Irrational")
             % Performance quantified through balanced accuracy

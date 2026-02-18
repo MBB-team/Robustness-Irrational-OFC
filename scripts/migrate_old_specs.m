@@ -8,14 +8,11 @@ TrainingSpecs = load(fullfile(path_folder_old_specs, "_TrainingSpecs.mat"));
 FittingSpecs = load(fullfile(path_folder_old_specs, "_FittingSpecs.mat"));
 
 % Load new spec structure for initial rational training
-path_example_new_specs = fullfile("C:", "Users", "jbenon", ...
-    "OneDrive - Universität Zürich UZH", ...
-    "Code projects", "Biological-profits-of-irrational-computations-in-the-OFC", ...
-    "data_backup", "raw", "models", "rational", "_DatasetSpecs.mat");
+path_example_new_specs = fullfile(getPath("ModelsRaw"), "rational", "_DatasetSpecs.mat");
 DatasetSpecsRational = load(path_example_new_specs);
 
 % Generate new spec structure for initial irrational training
-DatasetSpecsIrrational = selectMonkeyTrainTestDataset(fullfile(getPath("ModelsRaw"), "irrational_Franck", "_DatasetSpecs.mat"), "Franck", true);
+% DatasetSpecsIrrational = selectMonkeyTrainTestDataset(fullfile(getPath("ModelsRaw"), "irrational_Franck", "_DatasetSpecs.mat"), "Franck", true);
 
 %% Create new rational initial training dataset
 DatasetSpecs = struct();
@@ -49,7 +46,7 @@ end
 for monkey = ["Franck", "Miles"]
     DatasetSpecs = struct();
     DatasetSpecs.batch_size = TrainingSpecs.n_networks_per_batch;
-    DatasetSpecs.init_params = NaN(size(TrainingSpecs.init_weights));
+    DatasetSpecs.init_params = DatasetSpecsRational.init_params;
     DatasetSpecs.last_batch_trained = TrainingSpecs.last_batch_trained;
     DatasetSpecs.n_networks_cohort = TrainingSpecs.n_networks_cohort;
     DatasetSpecs.n_target_networks_cohort = TrainingSpecs.n_target_networks_cohort;
