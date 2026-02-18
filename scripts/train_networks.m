@@ -6,11 +6,9 @@
 % -------------------------------------------------------------------------
 % This script orchestrates the full model-training pipeline used in the
 % paper. It controls:
-%
-%   • Initial training
-%   • Re-training / distortion procedures
-%   • Training under biological constraints
-%
+%   - Initial training
+%   - Re-training / distortion procedures
+%   - Training under biological constraints
 % across multiple rationality regimes (rational, irrational, subjectively
 % rational).
 %
@@ -53,6 +51,7 @@
 
 
 %% === Environment set-up =================================================
+
 setup;
 clear variables;
 close all hidden;

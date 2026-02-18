@@ -1,14 +1,19 @@
 function [] = plotNeuralDistanceTrajectory(ax, plot_options)
 % Code for figure 2c.
 %
-% This function plots the trajectory of RDM and CCM neural distance between
-% RNNs and monkey neural recordings in the OFC, throughout the initial
-% rational training of the RNNs (see also: generateNeuralGeometryMatrices,
-% computeNeuralDistance).
-%
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
 %     Axes handle where the plot should be drawn.
+%
+% Data : <struct 1x1>
+%     Structure containing model analysis results. Must include:
+%       - config_ID: see gatherAllModels
+%       - dist_CCM_avg_OFC, dist_CCM_same_OFC, dist_CCM_other_OFC: see
+%       computeNeuralDistance
+%
+% line_width, marker_size, marker_face_color, marker_end_edge_color, 
+% marker_priors, marker_priors_edge_color, marker_priors_size:
+%     Name-value parameters controlling visual properties of the plot.
 %
 % OUTPUTS -----------------------------------------------------------------
 % None. The function draws into the provided axes.
@@ -56,9 +61,9 @@ for i_config = 1:10
         % Linearly interpolate neural distance trajectories during fit with
         % a fixed 100-step scale
         config_RDM_dist(i_network, :) = interp1(1:n_fit_steps, ...
-            Data.dist_RDM_OFC(select_network_dist), linspace(1, n_fit_steps, 100));
+            Data.dist_RDM_avg_OFC(select_network_dist), linspace(1, n_fit_steps, 100));
         config_CCM_dist(i_network, :) = interp1(1:n_fit_steps, ...
-            Data.dist_CCM_OFC(select_network_dist), linspace(1, n_fit_steps, 100));
+            Data.dist_CCM_avg_OFC(select_network_dist), linspace(1, n_fit_steps, 100));
 
     end
 
@@ -145,3 +150,6 @@ xscale(ax, "log");
 yscale(ax, "log");
 xlabel(ax, "Neural RDM distance (a.u.)");
 ylabel(ax, "Neural CCM distance (a.u.)");
+setAxFontSize(ax);
+
+hold(ax, "off");
