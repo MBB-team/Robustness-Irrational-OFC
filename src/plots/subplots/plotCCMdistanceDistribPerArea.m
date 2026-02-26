@@ -100,5 +100,4 @@ for i_config = 9:10
 
 end
 
-
 hold(ax, "off");
