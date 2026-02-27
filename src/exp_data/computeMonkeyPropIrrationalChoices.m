@@ -1,4 +1,4 @@
-function [] = computeMonkeyIrrationalChoices()
+function [] = computeMonkeyPropIrrationalChoices()
 % Computes the proportion of irrational choices across decision steps and
 % trial types.
 %
