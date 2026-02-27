@@ -47,18 +47,22 @@ close all;
 
 Data = loadMeasureResults([...
         "config_ID", "is_rational", "is_irrational", ...
-        "constraint_label", "constraint_weight", ...
-        all_constraint_label(i_constraint), "bacc_optimal_avg"], ...
+        "std_order_option_per_step", "std_order_attribute_per_step", ...
+        "std_order_per_step", ...
+        "value_function_attended", "value_function_attended_gradient_diff"], ...
         "rational_last");
+
+MonkeyPropData = load(fullfile(getPath("MonkeyData"), "PropIrrational.mat"));
+MonkeyResidualsData = load(fullfile(getPath("MonkeyData"), "DecisionResiduals.mat"));
 
 
 %% === Generate figure ====================================================
 
 % Initialize the figure
 f = figure(...
-    Name = "Figure 1: decision task, neural net design, option values and impact of constraints", ...
+    Name = "Figure 4: interference mechanisms in irrational models and monkeys", ...
     Units = "centimeters", ...
-    Position = [0, 0, 18, 11], ...
+    Position = [0, 0, 18, 13], ...
     Color = "w");
 movegui(f, "center");
 
@@ -66,21 +70,53 @@ movegui(f, "center");
 t = tiledlayout(f, 3, 4, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[0, 0, 16.5, 10.5]);
+    Position=[1, 1, 16, 11]);
 
 % Subplots
-plotImageInAx(nexttile(1, [1, 3]), fullfile(getPath("Figures"), "fig1a.png"));
-plotImageInAx(nexttile(5, [2, 3]), fullfile(getPath("Figures"), "fig1b.png"));
-plotConstraintsVsRationality(nexttile(4, [1, 1]), all_Data{1}, ...
-    "info_transfer_rate", "Information transfer rate (a.u.)");
-plotConstraintsVsRationality(nexttile(8, [1, 1]), all_Data{2}, ...
-    "energetic_budget_avg", "Energetic budget (a.u.)");
+plotImageInAx(nexttile(1, [1, 2]), fullfile(getPath("Figures"), "fig4a.png"));
+plotCueOrderPollutionDistrib(nexttile(5, [1, 1]), Data, 9);
+plotCueOrderPollutionDistrib(nexttile(6, [1, 1]), Data, 10);
+plotMonkeyIrrationalChoices(nexttile(9, [1, 1]), MonkeyPropData, false);
+plotMonkeyIrrationalChoices(nexttile(10, [1, 1]), MonkeyResidualsData, true);
+% plotAttendedValueProfile(nexttile(3, [1, 1]), Data, ...
+%     Data.config_ID == 9 & Data.is_rational, "Rational synthesis");
+% plotAttendedValueProfile(nexttile(4, [1, 1]), Data, ...
+%     Data.config_ID == 10 & Data.is_rational, "Rational comparison");
+% plotAttendedValueProfile(nexttile(7, [1, 1]), Data, ...
+%     Data.config_ID == 9 & Data.is_irrational, "Irrational synthesis");
+% plotAttendedValueProfile(nexttile(8, [1, 1]), Data, ...
+%     Data.config_ID == 10 & Data.is_irrational, "Irrational comparison");
+% plotCueAttentionPollutionDistrib(nexttile(11, [1, 1]), Data, 9);
+% plotCueAttentionPollutionDistrib(nexttile(12, [1, 1]), Data, 10);
+
+% Colorbar
+ax_top_right = nexttile(4, [1, 1]);
+ax_middle_right = nexttile(8, [1, 1]);
+cbar = colorbar();
+cbar.Position = [...
+    ax_top_right.Position(1) + ax_top_right.Position(3) + 0.05, ...
+    ax_middle_right.Position(2) - 0.038, ...
+    cbar.Position(3), ...
+    ax_top_right.Position(2) + ax_top_right.Position(4) - ax_middle_right.Position(2) + 0.09];
+cbar.Label.String = "Value (a.u.)";
+cbar.Label.Position(1) = cbar.Label.Position(1) - 0.5;
+cbar.Ticks = [0, 1];
+cbar.TickLabels = ["min", "max"];
+set(cbar, YAxisLocation="right"),
+fontsize(cbar, 8, "points");
 
 % Subplot letters
-writePanelLetter(nexttile(1, [1, 3]), "a", -0.4, -0.1);
-writePanelLetter(nexttile(5, [2, 3]), "b", 0.4, -0.1);
-writePanelLetter(nexttile(4, [1, 1]), "c", -0.4, -0.1);
-writePanelLetter(nexttile(8, [1, 1]), "d", -0.4, -0.1);
+writePanelLetter(nexttile(1, [1, 2]), "a", -0.2, -0.1);
+writePanelLetter(nexttile(5, [1, 1]), "b", -0.5, -0.1);
+writePanelLetter(nexttile(6, [1, 1]), "c", -0.5, -0.1);
+writePanelLetter(nexttile(9, [1, 1]), "d", -0.4, 0);
+writePanelLetter(nexttile(10, [1, 1]), "e", -0.4, 0);
+writePanelLetter(nexttile(3, [1, 1]), "f", -0.4, -0.1);
+writePanelLetter(nexttile(4, [1, 1]), "g", -0.4, -0.1);
+writePanelLetter(nexttile(7, [1, 1]), "h", -0.4, -0.1);
+writePanelLetter(nexttile(8, [1, 1]), "i", -0.4, -0.1);
+writePanelLetter(nexttile(11, [1, 1]), "j", -0.4, -0.1);
+writePanelLetter(nexttile(12, [1, 1]), "k", -0.4, -0.1);
 
 % Set font globally
 fontname(f, "arial");

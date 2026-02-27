@@ -39,6 +39,7 @@ arguments
 end
 
 hold(ax, "on");
+
 % --- Bin data by constraint weight --- %
 
 % Initialize constraint adequacy and rationality storage
