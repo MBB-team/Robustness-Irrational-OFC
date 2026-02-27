@@ -8,6 +8,7 @@ function [] = plotCCMdistanceDistribPerFit(ax, Data, plot_options)
 % Data : <struct 1x1>
 %     Structure containing model analysis results. Must include:
 %       - config_ID: see gatherAllModels
+%       - is_rational, is_irrational: see gatherAllModels
 %       - dist_CCM_avg_OFC, dist_CCM_same_OFC, dist_CCM_other_OFC: see
 %       computeNeuralDistance
 %
