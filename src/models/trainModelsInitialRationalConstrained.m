@@ -93,8 +93,8 @@ if isequal(constraint, @computeEnergeticBudget)
     constraint_field = "energetic_budget_avg";
 elseif isequal(constraint, @computeInfoTransferRate) 
     constraint_field = "info_transfer_rate";
-elseif isequal(constraint, @computeRobustnessToUnitLesions) 
-    constraint_field = "prop_optimal_impaired_units";
+elseif isequal(constraint, @computeSimpleRobustnessToUnitLesions) 
+    constraint_field = "prop_optimal_impaired_one_unit_reversed";
 elseif isequal(constraint, @computeCodeRedundancy) 
     constraint_field = "code_redundancy";
 end

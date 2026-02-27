@@ -31,7 +31,8 @@ function analysis_output = computeEIbalance(params, Config, ~, ~)
 %       connections
 %       - EI_balance_shifted <1x1>: 'EI_balance' shifted by 1, so that the
 %       function's output can readily be optimize toward 0 during RNN
-%       training with constraints (see also: trainModelsInitialRational).
+%       training with constraints (see also:
+%       trainModelsInitialRationalConstrained).
 
 arguments
     params (:,1) double = []
