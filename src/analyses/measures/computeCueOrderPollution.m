@@ -141,7 +141,7 @@ if isempty(params)
                                 % Select trials matching this attribute configuration
                                 select_attribute_pair = true(size(analysis_output.DataSamples.i_step));
                                 for i_att = 1:length(all_i_att)
-                                    if ~ isnan(all_i_att(i_att))
+                                    if ~ isnan(all_att_values{i_att}(all_i_att(i_att)))
                                         select_attribute_pair = select_attribute_pair & ...
                                             (analysis_output.DataSamples.(all_att_fields(i_att)) == ...
                                             all_att_values{i_att}(all_i_att(i_att)));
