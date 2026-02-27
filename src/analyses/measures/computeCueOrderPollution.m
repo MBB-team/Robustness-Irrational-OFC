@@ -170,16 +170,18 @@ if isempty(params)
                     end
                 end
     
-                % Remove empty rows and columns
-                is_nan_row = ~ any(~ isnan(cue_sequence_IDs), 2);
-                is_nan_col = ~ any(~ isnan(cue_sequence_IDs), 1);
-                cue_sequence_IDs(is_nan_row, :) = [];
-                cue_sequence_IDs(:, is_nan_col) = [];
-                trial_type_col(is_nan_col) = [];
-                i_step_col(is_nan_col) = [];
             end
         end
 
+        % Remove empty rows and columns
+        is_nan_row = ~ any(~ isnan(cue_sequence_IDs), 2);
+        is_nan_col = ~ any(~ isnan(cue_sequence_IDs), 1);
+        cue_sequence_IDs(is_nan_row, :) = [];
+        cue_sequence_IDs(:, is_nan_col) = [];
+        trial_type_col(is_nan_col) = [];
+        i_step_col(is_nan_col) = [];
+
+        % Store cue permutations
         analysis_output.CuePermutations.(output_label) = struct();
         analysis_output.CuePermutations.(output_label).cue_sequence_IDs = cue_sequence_IDs;
         analysis_output.CuePermutations.(output_label).trial_type_col = trial_type_col;
