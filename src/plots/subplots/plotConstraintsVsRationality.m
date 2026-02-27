@@ -76,6 +76,7 @@ for i_weight = 1:n_weights
         CapSize=plot_options.cap_size, ...
         Marker=plot_options.marker, ...
         MarkerFaceColor=color_map(i_weight, :), ...
+        Color=color_map(i_weight, :), ...
         MarkerEdgeColor=plot_options.marker_edge_color);
 end
 
@@ -92,6 +93,7 @@ ylim(ax, [0.45,  1]);
 xlabel(ax, x_label);
 ylabel(ax, "P(rational choice)");
 xticks(ax, []);
+yticks(ax, 0.5:0.1:1);
 setAxFontSize(ax);
 
 hold(ax, "off");

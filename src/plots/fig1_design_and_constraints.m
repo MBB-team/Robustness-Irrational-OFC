@@ -43,7 +43,8 @@ close all;
 
 %% === Load data ==========================================================
 
-all_constraint_label = ["info_transfer_rate", "energetic_budget_avg"];
+all_constraint_label = ["info_transfer_rate", "energetic_budget_avg", ...
+    "prop_optimal_impaired_units"];
 n_constraint = length(all_constraint_label);
 all_Data = cell(1, n_constraint);
 
@@ -53,6 +54,11 @@ for i_constraint = 1:n_constraint
         "constraint_label", "constraint_weight", ...
         all_constraint_label(i_constraint), "bacc_optimal_avg"], ...
         "rational_" + all_constraint_label(i_constraint) + "_last");
+    % Only consider the tolerance to damage of one unit
+    if all_constraint_label(i_constraint) == "prop_optimal_impaired_units"
+        all_Data{i_constraint}.prop_optimal_impaired_units = ...
+            all_Data{i_constraint}.prop_optimal_impaired_units(1, :);
+    end
 end
 
 
@@ -62,7 +68,7 @@ end
 f = figure(...
     Name = "Figure 1: decision task, neural net design, option values and impact of constraints", ...
     Units = "centimeters", ...
-    Position = [0, 0, 18, 11], ...
+    Position = [0, 0, 18, 11.5], ...
     Color = "w");
 movegui(f, "center");
 
@@ -70,7 +76,7 @@ movegui(f, "center");
 t = tiledlayout(f, 3, 4, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[0, 0, 16.5, 10.5]);
+    Position=[0, 0.5, 16.5, 10.5]);
 
 % Subplots
 plotImageInAx(nexttile(1, [1, 3]), fullfile(getPath("Figures"), "fig1a.png"));
@@ -79,12 +85,15 @@ plotConstraintsVsRationality(nexttile(4, [1, 1]), all_Data{1}, ...
     "info_transfer_rate", "Information transfer rate (a.u.)");
 plotConstraintsVsRationality(nexttile(8, [1, 1]), all_Data{2}, ...
     "energetic_budget_avg", "Energetic budget (a.u.)");
+plotConstraintsVsRationality(nexttile(12, [1, 1]), all_Data{3}, ...
+    "prop_optimal_impaired_units", "Tolerance to damage (a.u.)");
 
 % Subplot letters
 writePanelLetter(nexttile(1, [1, 3]), "a", -0.4, -0.1);
 writePanelLetter(nexttile(5, [2, 3]), "b", 0.4, -0.1);
 writePanelLetter(nexttile(4, [1, 1]), "c", -0.4, -0.1);
 writePanelLetter(nexttile(8, [1, 1]), "d", -0.4, -0.1);
+writePanelLetter(nexttile(12, [1, 1]), "e", -0.4, -0.1);
 
 % Set font globally
 fontname(f, "arial");
