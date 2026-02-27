@@ -165,7 +165,6 @@ else
         inputs.options.inG.n_samples = sum(select_trials);
         inputs.options.inG.exclude_sequences = exclude_sequences(select_trials);
         
-
         % Fit VBA model
         [posterior, ~] = VBA_NLStateSpaceModel(...
             system_choices(select_trials), [], ...
