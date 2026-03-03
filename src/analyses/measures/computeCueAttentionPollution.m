@@ -121,7 +121,6 @@ else
         Weights = shapeParametersIntoWeights(params, Config);
         [~, ~, network_outputs] = propagateThroughANN(Weights, ...
             Config.f_activation, network_inputs);
-        network_outputs = reshape(network_outputs, [], 1);
 
         % Transform RNN outputs to the attended/unattended choice frame
         if size(network_outputs, 2) == 2
@@ -155,13 +154,13 @@ else
 
         % Define VBA inputs
         inputs.options.inG.prob_1 = round(...
-            DataSamples.known_prob_unattended(select_trials), 2);
-        inputs.options.inG.mag_1 = round(...
-            DataSamples.known_mag_unattended(select_trials), 2);
-        inputs.options.inG.prob_2 = round( ...
             DataSamples.known_prob_attended(select_trials), 2);
-        inputs.options.inG.mag_2 = round( ...
+        inputs.options.inG.mag_1 = round(...
             DataSamples.known_mag_attended(select_trials), 2);
+        inputs.options.inG.prob_2 = round( ...
+            DataSamples.known_prob_unattended(select_trials), 2);
+        inputs.options.inG.mag_2 = round( ...
+            DataSamples.known_mag_unattended(select_trials), 2);
         inputs.options.inG.n_samples = sum(select_trials);
         inputs.options.inG.exclude_sequences = exclude_sequences(select_trials);
         
@@ -171,7 +170,7 @@ else
             inputs.f_fname, inputs.g_fname, inputs.dim, inputs.options);
     
         % Store the value function for the attended option
-        value_function_attended = reshape(posterior.muPhi(37:end), 6, 6);
+        value_function_attended = reshape(posterior.muPhi(1:36), 6, 6);
 
         % Store it
         analysis_output.("value_function_attended_" + last_attended_attribute + "_att") = ...
