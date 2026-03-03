@@ -1,0 +1,116 @@
+% Statistical analysis for Figure 5 and section "Comparing biological
+% constraint compliance in rational and irrational RNNs". 
+%
+% This script performs all required statistical comparisons. It operates on
+% precomputed measures and evaluates predefined contrasts across model
+% configurations and experimental factors.
+%
+% OUTPUTS -----------------------------------------------------------------
+% A structured statistics table saved to:
+%   results/metrics/biological_benefits.mat
+%   results/metrics/biological_benefits.csv
+%
+% Each row of the table corresponds to a single statistical test and
+% includes test metadata, summary statistics, and inferential results.
+
+%% === Environment set-up =================================================
+
+setup;
+clear variables;
+close all;
+
+
+%% === Load data ==========================================================
+
+Data = loadMeasureResults([...
+        "config_ID", "is_rational", "is_irrational", ...
+        "energetic_budget_avg", "code_redundancy", "info_transfer_rate", ...
+        "EI_balance", ...
+        "avg_prop_optimal_impaired_units"], ...
+        "rational_last");
+
+
+%% === Test and store results =============================================
+
+stats_table = initializeStatsTable();
+
+for config_ID = 1:10
+
+    select_config = (Data.config_ID == config_ID);
+
+    % --- Compare energetic budget between rational and irrational models --- %
+
+    group1 = Data.energetic_budget_avg(select_config & Data.is_rational)';
+    group1 = repmat(group1, 2, 1);
+    group2 = Data.energetic_budget_avg(select_config & Data.is_irrational)';
+    stats_table = addPairedTtestStatsTableRow(stats_table, group1, group2, ...
+        0.05 / 10, ...
+        dependent_variable="energetic_budget_avg", ...
+        independent_variable="fit_phase", ...
+        independent_variable_levels=["rational", "irrational"], ...
+        subset_factors="model_config", ...
+        subset_levels=config_ID);
+
+    % --- Compare code redundancy between rational and irrational models --- %
+
+    group1 = Data.code_redundancy(select_config & Data.is_rational)';
+    group1 = repmat(group1, 2, 1);
+    group2 = Data.code_redundancy(select_config & Data.is_irrational)';
+    stats_table = addPairedTtestStatsTableRow(stats_table, group1, group2, ...
+        0.05 / 10, ...
+        dependent_variable="code_redundancy", ...
+        independent_variable="fit_phase", ...
+        independent_variable_levels=["rational", "irrational"], ...
+        subset_factors="model_config", ...
+        subset_levels=config_ID);
+
+    % --- Compare information transfer rate between rational and irrational models --- %
+
+    group1 = Data.info_transfer_rate(select_config & Data.is_rational)';
+    group1 = repmat(group1, 2, 1);
+    group2 = Data.info_transfer_rate(select_config & Data.is_irrational)';
+    stats_table = addPairedTtestStatsTableRow(stats_table, group1, group2, ...
+        0.05 / 10, ...
+        dependent_variable="info_transfer_rate", ...
+        independent_variable="fit_phase", ...
+        independent_variable_levels=["rational", "irrational"], ...
+        subset_factors="model_config", ...
+        subset_levels=config_ID);
+
+    % --- Compare E/I balance between rational and irrational models --- %
+
+    group1 = Data.EI_balance(select_config & Data.is_rational)';
+    group1 = repmat(group1, 2, 1);
+    group2 = Data.EI_balance(select_config & Data.is_irrational)';
+    stats_table = addPairedTtestStatsTableRow(stats_table, group1, group2, ...
+        0.05 / 10, ...
+        dependent_variable="EI_balance", ...
+        independent_variable="fit_phase", ...
+        independent_variable_levels=["rational", "irrational"], ...
+        subset_factors="model_config", ...
+        subset_levels=config_ID);
+
+    % --- Compare tolerance to lesions between rational and irrational models --- %
+
+    % group1 = Data.avg_prop_optimal_impaired_units(select_config & Data.is_rational)';
+    % group1 = repmat(group1, 2, 1);
+    % group2 = Data.avg_prop_optimal_impaired_units(select_config & Data.is_irrational)';
+    % stats_table = addPairedTtestStatsTableRow(stats_table, group1, group2, ...
+    %     0.05 / 10, ...
+    %     dependent_variable="avg_prop_optimal_impaired_units", ...
+    %     independent_variable="fit_phase", ...
+    %     independent_variable_levels=["rational", "irrational"], ...
+    %     subset_factors="model_config", ...
+    %     subset_levels=config_ID);
+
+end
+
+
+%% === Save ===============================================================
+
+% Save as .mat file
+save(fullfile(getPath("Metrics"), "biological_benefits.mat"), "stats_table");
+
+% Export to .csv (except raw data)
+stats_table.raw_data = [];
+writetable(stats_table, fullfile(getPath("Metrics"), "biological_benefits.csv"));
