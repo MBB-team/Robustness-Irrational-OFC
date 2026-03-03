@@ -42,6 +42,8 @@ switch path_name
         list_folder = ["utils", "VBA_dep"];
     case "Figures"
         list_folder = ["results", "figures"];
+    case "Metrics"
+        list_folder = ["results", "metrics"];
     otherwise
         error("Unknown path name.");
 end
