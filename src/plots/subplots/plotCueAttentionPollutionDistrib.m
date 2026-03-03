@@ -37,6 +37,12 @@ arguments
     plot_options.line_width (1, 1) double = 0.5
     plot_options.monkey_line_style (1, 1) string = ":"
     plot_options.marker_size (1, 1) double = 3
+    plot_options.y_lim (1, 2) double = [-1, 0.2]
+    plot_options.line_y_coord (1, 1) double = 0.199
+    plot_options.line_x_shift (1, 1) double = - 0.15
+    plot_options.star_y_shift (1, 1) double = -0.09
+    plot_options.star_size (1, 1) double = 14
+    plot_options.p_threshold (1, 1) double = 0.01
 end
 
 hold(ax, "on");
@@ -49,22 +55,32 @@ Data = selectStructFieldColumns(Data, Data.config_ID == i_config);
 
 % Plot rational stage distribution
 customViolinplot(ax, ...
-    1, Data.value_function_attended_gradient_diff(Data.is_rational), ...
+    1, Data.value_function_attended_gradient_diff(Data.is_rational)', ...
     Color=defineModelColor(i_config), ...
-    FaceAlpha=0.2, ...
+    FaceAlpha=0.1, ...
     LineStyle=defineModelLineStyle(i_config), ...
     LineWidth=plot_options.line_width);
 
 % Plot irrational stage distribution
 customViolinplot(ax, ...
-    2, Data.value_function_attended_gradient_diff(Data.is_irrational), ...
+    2, Data.value_function_attended_gradient_diff(Data.is_irrational)', ...
     Color=defineModelColor(i_config), ...
-    FaceAlpha=0.2, ...
+    FaceAlpha=0.5, ...
     LineStyle=defineModelLineStyle(i_config), ...
     LineWidth=plot_options.line_width);
 
+% Aesthetics
+yline(ax, 0, "k:", LineWidth=0.1);
+ylabel(ax, "\DeltaGradient (att. - unatt.)");
+xlim(ax, [0.2, 2.3]);
+ylim(ax, plot_options.y_lim);
+xticks(ax, 1:2);
+xticklabels(ax, ["Rational", "Irrational"]);
+setAxFontSize(ax);
+
 % Plot monkey data
-x_monkey = linspace(0.3, 3.1, 8);
+x_lim = xlim(ax);
+x_monkey = linspace(x_lim(1), x_lim(2), 8);
 for monkey = ["Franck", "Miles"]
     plot(ax, x_monkey, ...
         MonkeyData.(monkey).value_function_attended_gradient_diff * ones(1, length(x_monkey)), ...
@@ -77,13 +93,26 @@ for monkey = ["Franck", "Miles"]
         LineStyle=plot_options.monkey_line_style);
 end
 
-% Aesthetics
-ylabel(ax, "\DeltaGradient (att. - unatt.)");
-xlim(ax, [0.2, 2.2]);
-xticks(ax, 1:2);
-xticklabels(ax, ["Rational", "Irrational"]);
-setAxFontSize(ax);
-
 % --- Stats --- %
+
+grad_diff_rational = Data.value_function_attended_gradient_diff(Data.is_rational)';
+grad_diff_rational = repmat(grad_diff_rational, 2, 1);
+grad_diff_irrational = Data.value_function_attended_gradient_diff(Data.is_irrational)';
+[~, p] = ttest(grad_diff_rational, grad_diff_irrational);
+% Horizontal line
+line_y_coord = plot_options.line_y_coord;
+x_coord = plot_options.line_x_shift + [1, 2];
+plot(ax, x_coord, line_y_coord * ones(1, 2), ...
+    Color=defineModelColor(i_config), ...
+    LineWidth=plot_options.line_width);
+% Star
+x_star = 1.5 + plot_options.line_x_shift;
+y_star = line_y_coord + plot_options.star_y_shift;
+if p < plot_options.p_threshold
+    text(ax, x_star, y_star, "*", ...
+        HorizontalAlignment="center", ...
+        FontSize=plot_options.star_size, ...
+        Color=defineModelColor(i_config));
+end
 
 hold(ax, "off");

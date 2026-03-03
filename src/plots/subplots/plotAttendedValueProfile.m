@@ -32,7 +32,7 @@ arguments
 end
 
 % Heatmap
-imagesc(ax, flipud(reshape(Data.value_function_attended(:, select_data), 5, 5)));
+imagesc(ax, flipud(reshape(mean(Data.value_function_attended(:, select_data), 2), 5, 5)));
 
 % Colormap
 colormap(ax, plot_options.color_map);
@@ -43,7 +43,7 @@ axis(ax, "square");
 xticks(ax, 1:5);
 yticks(ax, 1:5);
 xticklabels(ax, string(1:5));
-yticklabels(ax, string(1:5));
+yticklabels(ax, string(5:-1:1));
 xlabel(ax, "Previous cue rank");
 ylabel(ax, "Current cue rank");
 setAxFontSize(ax);
