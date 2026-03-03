@@ -54,7 +54,7 @@ for monkey = ["Franck", "Miles"]
     preprocess_inputs.monkey_choices = DataSamples.choice_attention;
 
     % Fit the model
-    analysis_output = computeCueAttentionPollution(NaN, struct(), [], ...
+    analysis_output = computeCueAttentionPollution(NaN, struct(), NaN, ...
         preprocess_inputs);
 
     % Store the result

@@ -105,19 +105,16 @@ else
     % --- Analysis mode: fit the attended value profile and compute value
     % profile gradients --- %
 
-    % Load a subset of possible cue sequences
-    path_specs = fullfile(getPath("ModelsRaw"), inputs.folder_name, ...
-        "_DatasetSpecs.mat");
-    DatasetSpecs = generateTrainTestDataset(path_specs, false);
-    DataSamples = expandCueSamples(DatasetSpecs.CueDatasetTest{seed});
-
-    % Exclude steps where only was cue was sampled
-    exclude_sequences = DataSamples.i_step <= 1;
-
     if ~ isfield(inputs, "monkey_choices")
 
+        % Load a subset of possible cue sequences
+        path_specs = fullfile(getPath("ModelsRaw"), inputs.folder_name, ...
+            "_DatasetSpecs.mat");
+        DatasetSpecs = generateTrainTestDataset(path_specs, false);
+        inputs.DataSamples = expandCueSamples(DatasetSpecs.CueDatasetTest{seed});
+
         % Compute RNN outputs over all cue-sampling scenarios
-        network_inputs = selectDataInfo(DataSamples, Config.inputs);
+        network_inputs = selectDataInfo(inputs.DataSamples, Config.inputs);
         Weights = shapeParametersIntoWeights(params, Config);
         [~, ~, network_outputs] = propagateThroughANN(Weights, ...
             Config.f_activation, network_inputs);
@@ -128,7 +125,7 @@ else
         end
         if Config.output_label ~= "attention"
             switch_output = ...
-                (DataSamples.("option_" + Config.output_label) == 1);
+                (inputs.DataSamples.("option_" + Config.output_label) == 1);
             network_outputs(switch_output) = - network_outputs(switch_output);
         end
         system_choices = ones(size(network_outputs));
@@ -140,6 +137,9 @@ else
         system_choices = reshape(inputs.monkey_choices, [], 1);
     end
 
+    % Exclude steps where only was cue was sampled
+    exclude_sequences = inputs.DataSamples.i_step <= 1;
+
     % ~ Loop through which attribute was attended last ~ %
     for last_attended_attribute = ["prob", "mag"]
 
@@ -149,18 +149,18 @@ else
         else
             attended_cue_pos = [2, 4];
         end
-        select_trials = ismember(DataSamples.cue_pos, attended_cue_pos) & ...
+        select_trials = ismember(inputs.DataSamples.cue_pos, attended_cue_pos) & ...
             ~ exclude_sequences;
 
         % Define VBA inputs
         inputs.options.inG.prob_1 = round(...
-            DataSamples.known_prob_attended(select_trials), 2);
+            inputs.DataSamples.known_prob_attended(select_trials), 2);
         inputs.options.inG.mag_1 = round(...
-            DataSamples.known_mag_attended(select_trials), 2);
+            inputs.DataSamples.known_mag_attended(select_trials), 2);
         inputs.options.inG.prob_2 = round( ...
-            DataSamples.known_prob_unattended(select_trials), 2);
+            inputs.DataSamples.known_prob_unattended(select_trials), 2);
         inputs.options.inG.mag_2 = round( ...
-            DataSamples.known_mag_unattended(select_trials), 2);
+            inputs.DataSamples.known_mag_unattended(select_trials), 2);
         inputs.options.inG.n_samples = sum(select_trials);
         inputs.options.inG.exclude_sequences = exclude_sequences(select_trials);
         
