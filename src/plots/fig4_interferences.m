@@ -70,7 +70,7 @@ movegui(f, "center");
 t = tiledlayout(f, 3, 4, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[1, 1, 15.7, 11]);
+    Position=[1, 1, 15.5, 11]);
 
 % Subplots
 plotImageInAx(nexttile(1, [1, 2]), fullfile(getPath("Figures"), "fig4a.png"));
@@ -125,7 +125,7 @@ fontname(f, "arial");
 cbar.YAxisLocation = "right";
 
 
-%% === Save figure ========================================================
+% === Save figure ========================================================
 
 exportgraphics(f, fullfile(getPath("Figures"), "fig4.pdf"), ContentType="vector");
 exportgraphics(f, fullfile(getPath("Figures"), "fig4.png"), Resolution=600);
