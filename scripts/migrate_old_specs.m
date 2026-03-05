@@ -7,12 +7,14 @@ path_folder_old_specs = fullfile("C:", "Users", "jbenon", "Documents", "Hunt2018
 TrainingSpecs = load(fullfile(path_folder_old_specs, "_TrainingSpecs.mat"));
 FittingSpecs = load(fullfile(path_folder_old_specs, "_FittingSpecs.mat"));
 
+% Adapt FittingSpecs i_session number
+FittingSpecs.i_trial_test_Miles = FittingSpecs.i_trial_test_Miles - (724*1000);
+FittingSpecs.i_trial_train_Miles = FittingSpecs.i_trial_train_Miles - (724*1000);
+
 % Load new spec structure for initial rational training
 path_example_new_specs = fullfile(getPath("ModelsRaw"), "rational", "_DatasetSpecs.mat");
 DatasetSpecsRational = load(path_example_new_specs);
 
-% Generate new spec structure for initial irrational training
-% DatasetSpecsIrrational = selectMonkeyTrainTestDataset(fullfile(getPath("ModelsRaw"), "irrational_Franck", "_DatasetSpecs.mat"), "Franck", true);
 
 %% Create new rational initial training dataset
 DatasetSpecs = struct();
@@ -40,20 +42,20 @@ seed_rational = NaN(1, length(path_rational_networks));
 pattern_catch_seed = ".*loc_TO_attention-both_ARCH_sig_z_(\d+).mat";
 for i_network = 1:length(path_rational_networks)
     seed_token = regexp(path_rational_networks(i_network), pattern_catch_seed, "tokens");
-    seed_rational(i_network) = str2double(seed_token{1});
+    if ~ isempty(seed_token)
+        seed_rational(i_network) = str2double(seed_token{1});
+    end
 end
 
-for monkey = ["Franck", "Miles"]
+seed_rational = seed_rational(~ isnan(seed_rational));
+
+for monkey = ["Miles"]
     DatasetSpecs = struct();
     DatasetSpecs.batch_size = TrainingSpecs.n_networks_per_batch;
     DatasetSpecs.init_params = DatasetSpecsRational.init_params;
     DatasetSpecs.last_batch_trained = TrainingSpecs.last_batch_trained;
     DatasetSpecs.n_networks_cohort = TrainingSpecs.n_networks_cohort;
     DatasetSpecs.n_target_networks_cohort = TrainingSpecs.n_target_networks_cohort;
-
-    % Generate monkey trials dataset
-    DatasetSpecs.CueDatasetTest = TrainingSpecs.AllCueSamplesTest;
-    DatasetSpecs.CueDatasetTrain = TrainingSpecs.AllCueSamplesTrain;
 
     n_network = size(FittingSpecs.("i_trial_train_" + monkey), 2);
     CueDatasetTrain = cell(1, n_network);
