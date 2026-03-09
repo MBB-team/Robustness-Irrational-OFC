@@ -145,6 +145,8 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     end
 
     % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks);
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, ...
+        1:length(getDesiredNetworkConfigs()), ...
+        constraint_weight);
 
 end

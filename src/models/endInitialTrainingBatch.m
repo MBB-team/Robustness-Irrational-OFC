@@ -68,6 +68,3 @@ save(path_specs, "-struct", "DatasetSpecs");
 % Display progress summary
 fprintf(sprintf("\n%d / %d RNNs correctly trained per cohort\n\n", ...
     DatasetSpecs.n_networks_cohort, DatasetSpecs.n_target_networks_cohort));
-
-% Delete the parallel progress bar file
-parfor_progress(0);
