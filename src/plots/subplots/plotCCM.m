@@ -1,6 +1,6 @@
 function [] = plotCCM(ax, CCM_option, CCM_attribute, ...
     CCM_option_p, CCM_attribute_p, plot_options)
-% Code for figure M1b.
+% Code for figure M1C.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
@@ -186,19 +186,10 @@ set(ax, ...
     CLim=[-1, 1], ...
     XColor="none", ...
     YColor="none");
+xlim(ax, [0.5, 10.5]);
+ylim(ax, [0.5, 10.5]);
 setAxFontSize(ax);
-% Colorbar
 colormap(ax, defineDivergentColormap());
-cb = colorbar(...
-    ax, ...
-    Ticks=[-1, 0, 1], ...
-    FontName="Arial", ...
-    FontSize=8, ...
-    Location="eastoutside");
-cb.Label.String = "Correlation";
-cb.Label.FontSize = 8;
-cb.Label.FontName = "Arial";
-cb.Label.Position(1) = cb.Label.Position(1) - 0.5;
 
 % --- Highlight significative cells --- %
 
