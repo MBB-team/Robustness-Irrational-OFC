@@ -9,7 +9,7 @@ function [] = plotSchemeRobustness(ax, Data)
 %     Structure containing model analysis results. Must include:
 %       - config_ID: see gatherAllModels
 %       - is_irrational: see gatherAllModels
-%       - prop_consistent_impaired_units: see
+%       - prop_optimal_impaired_units: see
 %       computeRobustnessToUnitLesions
 %
 % OUTPUTS -----------------------------------------------------------------
@@ -23,9 +23,9 @@ end
 hold(ax, "on");
 
 % Plot robustness curve
-robustness = mean(Data.prop_consistent_impaired_units(:, ...
+robustness = mean(Data.prop_optimal_impaired_units(:, ...
     ismember(Data.config_ID, [9, 10]) & Data.is_irrational), 2)';
-plot(ax, 1:9, robustness(2:10), ...
+plot(ax, 1:9, robustness(1:9), ...
     Color="k", ...
     LineWidth=1);
 
@@ -46,9 +46,9 @@ legend(ax, avg_zone, ...
 xlabel(ax, "Prop. lesioned units");
 ylabel(ax, "P(rational)");
 xlim(ax, [0, 10]);
-ylim(ax, [0.49, .56]);
-xticks(ax, 1:2:9);
-xticklabels(ax, compose("%d%%", 10:20:90))
+ylim(ax, [0.5, .55]);
+xticks(ax, 1:4:9);
+xticklabels(ax, compose("%d%%", 10 * xticks(ax)))
 setAxFontSize(ax);
 
 hold(ax, "off");

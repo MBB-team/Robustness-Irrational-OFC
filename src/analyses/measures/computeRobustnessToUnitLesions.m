@@ -47,7 +47,7 @@ function analysis_output = computeRobustnessToUnitLesions(params, ...
 %       - prop_consistent_impaired_units <Nx1>: mean proportion of choices
 %       consistent with the unlesioned network when 1, 2, ..., N units are
 %       lesioned
-%       - avg_prop_optimal_impaired_units <1x1>: proportion of consistent
+%       - avg_prop_consistent_impaired_units <1x1>: proportion of consistent
 %       choices averaged between 10 and 50% of lesioned units
 
 arguments

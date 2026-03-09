@@ -55,7 +55,7 @@ switch measure_label
         y_lim = [0.5, 1.65];
         y_label = "E/I balance";
     case "avg_prop_optimal_impaired_units"
-        y_lim = [0.49, 0.54];
+        y_lim = [0.49, 0.545];
         y_label = "Tolerance to lesions (a.u.)";
 end
 xlim(ax, [8.4, 10.6]);

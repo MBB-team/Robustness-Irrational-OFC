@@ -51,6 +51,7 @@ legend(ax, ...
 % Aesthetics
 xlabel(ax, "Unit input");
 xlim(ax, [min(unit_inputs), max(unit_inputs)]);
+ylim(ax, [0, 1])
 xticks(ax, []);
 yticks(ax, []);
 set(ax, YColor="none");
