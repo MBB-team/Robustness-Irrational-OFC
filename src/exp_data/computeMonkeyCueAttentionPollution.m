@@ -40,7 +40,7 @@ for monkey = ["Franck", "Miles"]
         DataSamples.i_step(2:end), true];
     DataSamples = selectStructFieldColumns(DataSamples, is_decision_step);
 
-    % --- Initialize and fit the value model --- %
+    % --- Compute the pseudo attended value profile on all trials --- %
 
     % Initialize VBA model structure (preprocessing mode)
     preprocess_inputs = computeCueAttentionPollution();
@@ -60,6 +60,45 @@ for monkey = ["Franck", "Miles"]
     % Store the result
     CueAttentionPollution.(monkey) = analysis_output;
 
+    % --- Compute the pseudo attended value profile per session --- %
+
+    all_i_session = unique(DataSamples.i_session);
+    n_session = length(all_i_session);
+
+    % Initialize output
+    CueAttentionPollution.(monkey).per_session = cell(1, n_session);
+    CueAttentionPollution.(monkey).grad_diff_per_session = NaN(1, n_session);
+
+    % ~ Loop through sessions ~ %
+    for i_session = 1:n_session
+
+        % Select session trials
+        DataSamplesSession = selectStructFieldColumns(DataSamples, ...
+            DataSamples.i_session == all_i_session(i_session));
+
+        % Initialize VBA model structure (preprocessing mode)
+        preprocess_inputs = computeCueAttentionPollution();
+    
+        % Replace synthetic dataset by the monkey's actual cue sequences
+        preprocess_inputs.DataSamples = DataSamplesSession;
+        preprocess_inputs.options.inG.n_samples = length(DataSamplesSession.i_step);
+        preprocess_inputs.exclude_sequences = (DataSamplesSession.i_step <= 1);
+    
+        % Provide observed choices (in attention frame) to the model
+        preprocess_inputs.monkey_choices = DataSamplesSession.choice_attention;
+    
+        % Fit the model
+        analysis_output = computeCueAttentionPollution(NaN, struct(), NaN, ...
+            preprocess_inputs);
+    
+        % Store the result
+        CueAttentionPollution.(monkey).per_session{i_session} = analysis_output;
+        CueAttentionPollution.(monkey).grad_diff_per_session(i_session) = ...
+            analysis_output.value_function_attended_gradient_diff;
+
+        % Display progress
+        fprintf("%s - Session %d/%d\n", monkey, i_session, n_session);
+    end
 end
 
 % Save cue attention pollution metrics

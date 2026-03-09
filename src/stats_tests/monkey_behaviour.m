@@ -146,6 +146,14 @@ for monkey = ["Franck", "Miles"]
             subset_levels=monkey);
     end
 
+    % --- Test value profile assymetry --- %
+
+    group1 = CueAttentionPollution.(monkey).grad_diff_per_session';
+    stats_table = addOneSampleTtestStatsTableRow(stats_table, group1, 0.05 / 2, ...
+        dependent_variable="value_function_attended_gradient_diff", ...
+        subset_factors="monkey", ...
+        subset_levels=monkey);
+
 end
 
 
