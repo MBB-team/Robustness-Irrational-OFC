@@ -42,8 +42,9 @@ function analysis_output = predictMonkeyChoices(params, Config, ~, inputs)
 %     as the label of the fit session undergone by the RNN.
 %     - In analysis mode:
 %     Structure containing balanced accuracies:
-%       - bacc_Franck, bacc_Miles <1x1>: balanced accuracy for predicting
-%       the choices of each monkey
+%       - bacc_Franck, bacc_Miles, bacc_both <1x1>: balanced accuracy for
+%       predicting the choices of each monkey or the pooled choices of both
+%       monkeys
 %       - bacc_same_monkey <1x1>: balanced accuracy for the monkey matching
 %       the RNN's training condition (if identifiable)
 %       - bacc_other_monkey <1x1>: balanced accuracy for the other monkey
@@ -62,11 +63,15 @@ if isempty(params)
     % Load the experimental records
     MonkeyCueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
 
-    for monkey = ["Franck", "Miles"]
+    for monkey = ["Franck", "Miles", "both"]
 
         % Select trials attended by this monkey
-        ThisMonkeyRecords = selectStructFieldColumns(MonkeyCueSequences, ...
-            MonkeyCueSequences.monkey == monkey);
+        if monkey == "both"
+            ThisMonkeyRecords = MonkeyCueSequences;
+        else
+            ThisMonkeyRecords = selectStructFieldColumns(MonkeyCueSequences, ...
+                MonkeyCueSequences.monkey == monkey);
+        end
         ThisMonkeyRecords.i_trial = ThisMonkeyRecords.i_abs_trial;
 
         % Expand cue-sampling scenarios while preserving observed choices
@@ -78,7 +83,7 @@ else
 
     % --- Analysis mode: predict monkey choices --- %
 
-    for monkey = ["Franck", "Miles"]
+    for monkey = ["Franck", "Miles", "both"]
     
         % --- Run the RNN on the monkey's trials --- %
 

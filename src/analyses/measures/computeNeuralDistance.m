@@ -85,8 +85,9 @@ else
             expe_RDM = inputs.("RDM_" + monkey + "_" + area);
             
             % Vectorize the upper half of each RDM, diagonal excluded
-            vec_expe_RDM = reshape(triu(expe_RDM, 1), [], 1);
-            vec_network_RDM = reshape(triu(inputs.RDM, 1), [], 1);
+            vec_expe_RDM = reshape(expe_RDM(triu(true(size(expe_RDM)), 1)), [], 1);
+            inputs.RDM = reshape(inputs.RDM, 20, 20);
+            vec_network_RDM = reshape(inputs.RDM(triu(true(size(inputs.RDM)), 1)), [], 1);
 
             % Compute the correlation distance
             analysis_output.("dist_RDM_" + monkey + "_" + area) = ...
