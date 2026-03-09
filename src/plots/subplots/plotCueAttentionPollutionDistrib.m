@@ -34,12 +34,12 @@ arguments
     ax (1, 1) matlab.graphics.axis.Axes
     Data (1, 1) struct
     i_config (1, 1) double
+    plot_options.distrib_x_shift (1, 1) double = 0.15
     plot_options.line_width (1, 1) double = 0.5
     plot_options.monkey_line_style (1, 1) string = ":"
     plot_options.marker_size (1, 1) double = 3
     plot_options.y_lim (1, 2) double = [-1, 0.2]
     plot_options.line_y_coord (1, 1) double = 0.199
-    plot_options.line_x_shift (1, 1) double = - 0.15
     plot_options.star_y_shift (1, 1) double = -0.09
     plot_options.star_size (1, 1) double = 14
     plot_options.p_threshold (1, 1) double = 0.01
@@ -55,26 +55,28 @@ Data = selectStructFieldColumns(Data, Data.config_ID == i_config);
 
 % Plot rational stage distribution
 customViolinplot(ax, ...
-    1, Data.value_function_attended_gradient_diff(Data.is_rational)', ...
+    - plot_options.distrib_x_shift, Data.value_function_attended_gradient_diff(Data.is_rational)', ...
     Color=defineModelColor(i_config), ...
     FaceAlpha=0.1, ...
+    DensityDirection="negative", ...
     LineStyle=defineModelLineStyle(i_config), ...
     LineWidth=plot_options.line_width);
 
 % Plot irrational stage distribution
 customViolinplot(ax, ...
-    2, Data.value_function_attended_gradient_diff(Data.is_irrational)', ...
+    plot_options.distrib_x_shift, Data.value_function_attended_gradient_diff(Data.is_irrational)', ...
     Color=defineModelColor(i_config), ...
     FaceAlpha=0.5, ...
+    DensityDirection="positive", ...
     LineStyle=defineModelLineStyle(i_config), ...
     LineWidth=plot_options.line_width);
 
 % Aesthetics
 yline(ax, 0, "k:", LineWidth=0.1);
 ylabel(ax, "\DeltaGradient (att. - unatt.)");
-xlim(ax, [0.2, 2.3]);
+xlim(ax, [-0.8, 0.8]);
 ylim(ax, plot_options.y_lim);
-xticks(ax, 1:2);
+xticks(ax, plot_options.distrib_x_shift * [-2.5, 2.5]);
 xticklabels(ax, ["Rational", "Irrational"]);
 setAxFontSize(ax);
 
@@ -101,12 +103,12 @@ grad_diff_irrational = Data.value_function_attended_gradient_diff(Data.is_irrati
 [~, p] = ttest(grad_diff_rational, grad_diff_irrational);
 % Horizontal line
 line_y_coord = plot_options.line_y_coord;
-x_coord = plot_options.line_x_shift + [1, 2];
+x_coord =[-0.4, 0.4];
 plot(ax, x_coord, line_y_coord * ones(1, 2), ...
     Color=defineModelColor(i_config), ...
     LineWidth=plot_options.line_width);
 % Star
-x_star = 1.5 + plot_options.line_x_shift;
+x_star = 0;
 y_star = line_y_coord + plot_options.star_y_shift;
 if p < plot_options.p_threshold
     text(ax, x_star, y_star, "*", ...

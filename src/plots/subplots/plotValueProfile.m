@@ -1,4 +1,4 @@
-function [] = plotValueProfile(ax, value_profile, title_label, plot_options)
+function [] = plotValueProfile(ax, value_profile, title_label)
 % Code for figure 3a, 3b and 3c.
 %
 % INPUTS ------------------------------------------------------------------
@@ -12,9 +12,6 @@ function [] = plotValueProfile(ax, value_profile, title_label, plot_options)
 % title_label : <string 1x1>
 %     Subplot title.
 %
-% color_map :
-%     Name-value parameter controlling visual properties of the plot.
-%
 % OUTPUTS -----------------------------------------------------------------
 % None. The function draws into the provided axes.
 
@@ -22,14 +19,13 @@ arguments
     ax (1, 1) matlab.graphics.axis.Axes
     value_profile (:, :) double
     title_label (1, 1) string
-    plot_options.color_map (1, 1) string = "parula"
 end
 
 % Heatmap
 imagesc(ax, flipud(reshape(value_profile, 6, 6)));
 
 % Colormap
-colormap(ax, plot_options.color_map);
+colormap(ax, defineSequentialColormap());
 
 % Title
 title(ax, title_label);

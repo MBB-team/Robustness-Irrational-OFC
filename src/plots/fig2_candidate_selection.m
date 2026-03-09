@@ -44,15 +44,8 @@ close all;
 
 %% === Load data ==========================================================
 
-% Data = loadMeasureResults(["config_ID", "is_rational", "fit_step", ...
-%     "dist_RDM_avg_OFC", "dist_CCM_avg_OFC"], "rational_full");
-
-path_full = fullfile("C:", "Users", "jbenon", "Documents", "Bio_OFC_data_models", ...
-    "processed", "rational_full.mat");
-Data = load(path_full, ...
-    "config_ID", "is_rational", "fit_step", "seed", "fit_label", ...
-    "dist_RDM_avg_OFC", "dist_CCM_avg_OFC");
-
+Data = loadMeasureResults(["config_ID", "is_rational", "seed", "fit_step", "fit_label", ...
+    "dist_RDM_avg_OFC", "dist_CCM_avg_OFC"], "rational_full");
 
 %% === Generate figure ====================================================
 
@@ -61,6 +54,7 @@ f = figure(...
     Name = "Figure 2: selection of candidate idealized RNN models of the OFC", ...
     Units = "centimeters", ...
     Position = [0, 0, 18, 11.5], ...
+    NumberTitle="off", ...
     Color = "w");
 movegui(f, "center");
 
@@ -70,7 +64,6 @@ t = tiledlayout(f, 4, 4, ...
     Units="centimeters", ...
     Position=[0, 0.5, 16.5, 10]);
 
-
 % Subplots
 plotNeuralDistanceTrajectory(nexttile(3, [3, 2]), Data, false);
 
@@ -78,7 +71,7 @@ plotNeuralDistanceTrajectory(nexttile(3, [3, 2]), Data, false);
 writePanelLetter(nexttile(3, [3, 2]), "c", -0.4, -0.1);
 
 % Create additional inlay
-ax_inlay = axes(f, Units="centimeters", Position=[9.5, 8, 3, 3]);
+ax_inlay = axes(f, Units="centimeters", Position=[9.8, 8, 3, 3]);
 plotNeuralDistanceTrajectory(ax_inlay, Data, true);
 
 % Set font globally

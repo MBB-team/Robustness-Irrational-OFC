@@ -1,4 +1,4 @@
-function [] = plotAttendedValueProfile(ax, Data, select_data, title_label, plot_options)
+function [] = plotAttendedValueProfile(ax, value_profile, title_label)
 % Code for figure 4f, 4g, 4h and 4i.
 %
 % INPUTS ------------------------------------------------------------------
@@ -17,25 +17,20 @@ function [] = plotAttendedValueProfile(ax, Data, select_data, title_label, plot_
 % title_label : <string 1x1>
 %     Subplot title.
 %
-% color_map :
-%     Name-value parameter controlling visual properties of the plot.
-%
 % OUTPUTS -----------------------------------------------------------------
 % None. The function draws into the provided axes.
 
 arguments
     ax (1, 1) matlab.graphics.axis.Axes
-    Data (1, 1) struct
-    select_data (1, :) logical
+    value_profile (5, 5) double
     title_label (1, 1) string = ""
-    plot_options.color_map (1, 1) string = "parula"
 end
 
 % Heatmap
-imagesc(ax, flipud(reshape(mean(Data.value_function_attended(:, select_data), 2), 5, 5)));
+imagesc(ax, flipud(value_profile));
 
 % Colormap
-colormap(ax, plot_options.color_map);
+colormap(ax, defineSequentialColormap());
 
 % Ax aesthetics
 title(ax, title_label);

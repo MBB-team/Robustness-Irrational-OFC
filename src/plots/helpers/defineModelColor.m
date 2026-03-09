@@ -17,45 +17,18 @@ end
 % Initialize output
 color = NaN(length(config_ID), 3);
 
-default_colors = colororder();
-
 % Loop over all possible config IDs
 for i_config = 1:10
-    switch i_config
-        case 1
-            % loc -> loc (both)
-            config_color = default_colors(1, :);
-        case 2
-            % loc -> loc (diff)
-            config_color = default_colors(2, :);
-        case 3
-            % loc -> order (both)
-            config_color = default_colors(1, :);
-        case 4
-            % loc -> order (diff)
-            config_color = default_colors(2, :);
-        case 5
-            % loc -> attention (both)
-            config_color = default_colors(1, :);
-        case 6
-            % loc -> attention (diff)
-            config_color = default_colors(2, :);
-        case 7
-            % order -> order (both)
-            config_color = default_colors(1, :);
-        case 8
-            % order -> order (diff)
-            config_color = default_colors(2, :);
-        case 9
-            % order -> attention (both)
-            config_color = default_colors(1, :);
-        case 10
-            % order -> attention (diff)
-            config_color = default_colors(2, :);
-        otherwise
-            error("Unknown config ID: %d", i_config);
+    if mod(i_config, 2) == 1
+        % Synthesis models
+        config_color = [100, 143, 255];
+    else
+        % comparison models
+        config_color = [254, 97, 0];
     end
     if any(config_ID == i_config)
         color(config_ID == i_config, :) = config_color;
     end
 end
+
+color = color / 255;

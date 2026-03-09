@@ -28,6 +28,8 @@ arguments
     plot_options.x_shift (1, 1) double = 0.08
     plot_options.line_width (1, 1) double = 0.5
     plot_options.density_width (1, 1) double = 0.35
+    plot_options.option_line_style (1, 1) string = "-"
+    plot_options.attribute_line_style (1, 1) string = "--"
     plot_options.line_step_y_coord (1, 3) double = [1.05, 1.05, 1.6]
     plot_options.line_top_y_coord (1, 1) double = 1.659
     plot_options.line_x_shift (1, 1) double = 0.27
@@ -72,7 +74,7 @@ for i_step = 2:4
             FaceAlpha=0.5, ...
             DensityWidth=plot_options.density_width, ...
             DensityDirection=density_direction, ...
-            LineStyle=defineModelLineStyle(i_config), ...
+            LineStyle=plot_options.(trial_type + "_line_style"), ...
             LineWidth=plot_options.line_width);
 
     end

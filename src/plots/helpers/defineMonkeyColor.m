@@ -13,11 +13,9 @@ arguments
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
 end
 
-default_colors = colororder();
-
 switch monkey
     case "Franck"
-        color = default_colors(5, :);
+        color = [92, 199, 86] / 255; % green
     case "Miles"
-        color = default_colors(4, :);
+        color = [220, 38, 127] / 255; % IBM pink
 end

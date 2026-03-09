@@ -34,8 +34,7 @@ arguments
     plot_options.marker (1, 1) string = "o"
     plot_options.marker_size (1, 1) double = 6
     plot_options.line_width (1, 1) double = 1
-    plot_options.marker_edge_color (1, 3) double = [1, 1, 1]
-    plot_options.color_map (1, 1) function_handle = @parula
+    plot_options.marker_edge_color (1, 3) double = [0, 0, 0]
 end
 
 hold(ax, "on");
@@ -67,7 +66,7 @@ end
 % --- Scatter with error bars --- %
 
 % Discrete colormap
-color_map = plot_options.color_map(n_weights);
+color_map = defineSequentialColormap(n_weights);
 for i_weight = 1:n_weights
     % Scatter
     errorbar(ax, ...
@@ -82,6 +81,7 @@ for i_weight = 1:n_weights
 end
 
 % Colorbar
+colormap(color_map);
 cbar = colorbar(ax, ...
     Location="eastoutside", ...
     Ticks=[0, 1], ...

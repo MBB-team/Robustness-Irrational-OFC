@@ -40,7 +40,7 @@ arguments
     plot_options.marker_size (1, 1) double = 3
     plot_options.marker_edge_color (1, 3) double = [1, 1, 1]
     plot_options.line_style_option (1, 1) string = "-"
-    plot_options.line_style_attribute (1, 1) string = ":"
+    plot_options.line_style_attribute (1, 1) string = "--"
     plot_options.p_threshold (1, 1) double = 0.02
     plot_options.line_color (1, 3) double = [0, 0, 0]
     plot_options.line_y_coord_uncorrected (1, 1) double = 0.385
