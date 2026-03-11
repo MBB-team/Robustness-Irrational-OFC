@@ -1,6 +1,6 @@
 function [] = plotCCM(ax, CCM_option, CCM_attribute, ...
     CCM_option_p, CCM_attribute_p, plot_options)
-% Code for figure M1C.
+% Code for figure 2b and M1C.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>

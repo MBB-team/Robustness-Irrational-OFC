@@ -47,6 +47,8 @@ close all;
 Data = loadMeasureResults(["config_ID", "is_rational", "seed", "fit_step", "fit_label", ...
     "dist_RDM_avg_OFC", "dist_CCM_avg_OFC"], "rational_full");
 
+MonkeyNeuralGeometry = load(fullfile(getPath("MonkeyData"), "NeuralGeometry.mat"));
+
 %% === Generate figure ====================================================
 
 % Initialize the figure
@@ -65,9 +67,12 @@ t = tiledlayout(f, 4, 4, ...
     Position=[0, 0.5, 16.5, 10]);
 
 % Subplots
+plotImageInAx(nexttile(1, [4, 2]), fullfile(getPath("Figures"), "fig2ab.png"));
 plotNeuralDistanceTrajectory(nexttile(3, [3, 2]), Data, false);
 
 % Subplot letters
+writePanelLetter(nexttile(1, [4, 2]), "a", 0.8, -0.1);
+writePanelLetter(nexttile(1, [4, 2]), "b", 0.8, -8);
 writePanelLetter(nexttile(3, [3, 2]), "c", -0.4, -0.1);
 
 % Create additional inlay
