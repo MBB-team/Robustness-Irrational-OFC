@@ -1,4 +1,5 @@
-function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, i_select_configs, constraint_weight)
+function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, ...
+    i_select_configs, constraint_weight)
 % Finalizes a batch of initial RNN training by filtering unsuccessful
 % seeds.
 %
@@ -41,13 +42,8 @@ end
 DatasetSpecs = generateTrainTestDataset(path_specs);
 
 %  Exclude seeds that failed in any cohort
-if ~ isempty(constraint_weight)
-    % Do not trim unsuccessful seeds if the training was performed under
-    % biological constraints
-    i_select_configs = [];
-end
 [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
-    true, i_select_configs);
+    true, i_select_configs, constraint_weight);
 
 % Compute the number of successfully trained networks per cohort
 all_Config = getDesiredNetworkConfigs();
