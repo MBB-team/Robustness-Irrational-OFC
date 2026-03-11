@@ -87,12 +87,12 @@ subset_seeds = subset_seeds(1:n_subset);
 
 % Create paths to all RNNs with a shared seed
 subset_included_paths = strings(1, n_subset * n_trained_configs);
+escaped_path_networks = strrep(fullfile(path_networks, " "), "\", "\\");
 i_path = 1;
 for i_config = 1:n_configs
     for seed = subset_seeds
-        subset_included_paths(i_path) = fullfile(...
-            path_networks, defineFilenamePattern(...
-            all_Config{i_config}, seed, constraint_weight));
+        subset_included_paths(i_path) = escaped_path_networks + defineFilenamePattern(...
+            all_Config{i_config}, seed);
         i_path = i_path + 1;
     end
 end
@@ -101,10 +101,15 @@ end
 
 if delete_unshared_seeds
     % Identify unselected RNN paths
-    i_nonincluded_paths = ~ ismember(all_path, subset_included_paths);
-    subset_nonincluded_paths = all_path(i_nonincluded_paths);
+    is_included_path = false(size(all_path));
+    for i_network = 1:n_network
+        i_match = arrayfun(@(x) ~isempty(regexp(all_path(i_network), x, "once")), subset_included_paths);
+        if any(i_match)
+            is_included_path(i_network) = true;
+        end
+    end
     % Delete each unshared RNN
-    for nonincluded_path = subset_nonincluded_paths
+    for nonincluded_path = all_path(~ is_included_path)
         delete(nonincluded_path);
     end
 end

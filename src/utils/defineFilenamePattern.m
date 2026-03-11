@@ -68,11 +68,13 @@ else
     end
 
     % Constraint weight
-    if constraint_weight ~= 0
+    if constraint_weight == 0
+        filename_pattern = filename_pattern + "(_(\d)?(\.)?(\d)+)?";
+    else
         filename_pattern = filename_pattern + "_" + num2str(constraint_weight);
     end
 
 end
 
 % Add file extension
-filename_pattern = filename_pattern + ".mat";
+filename_pattern = filename_pattern + "\.mat";
