@@ -111,7 +111,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         initializeNewInitialTrainingBatch(path_specs);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = []
+    for i_config = 1:n_config
    
         Config = all_Config{i_config};
 
@@ -119,7 +119,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         for i_weight = 1:length(constraint_weight)
     
             % ~ Loop through RNNs to train ~ %
-            parfor i_network = (1:2) + shift_i_network  
+            parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network  
 
                 % Select initial conditions and datasets for training and testing
                 [init_params, input_train, output_train, input_test, ...
@@ -145,6 +145,8 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
     end
 
     % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, [1], constraint_weight);
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, ...
+        1:length(getDesiredNetworkConfigs()), ...
+        constraint_weight);
 
 end
