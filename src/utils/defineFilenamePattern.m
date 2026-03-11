@@ -77,4 +77,4 @@ else
 end
 
 % Add file extension
-filename_pattern = filename_pattern + "\.mat";
+filename_pattern = filename_pattern + ".mat";
