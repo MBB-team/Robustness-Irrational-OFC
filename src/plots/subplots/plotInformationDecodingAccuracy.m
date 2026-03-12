@@ -50,7 +50,6 @@ end
 
 % Heatmap
 imagesc(ax, decode_avg, [0, 1]);
-decode_avg
 
 % Grid
 for i_line = 0.5:2:6.5
@@ -80,8 +79,8 @@ y_tick_labels = [...
     "V(left) & V(right)", "V(left) - V(right)"];
 for i_label = 1:6
     text(ax, 0.3, i_label, y_tick_labels(i_label), ...
-    FontSize=8, ...
-    HorizontalAlignment="right");
+        FontSize=8, ...
+        HorizontalAlignment="right");
 end
 
 set(ax, YDir="reverse", YColor="none", XColor="none");
