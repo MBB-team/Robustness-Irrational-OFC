@@ -91,8 +91,14 @@ escaped_path_networks = strrep(fullfile(path_networks, " "), "\", "\\");
 i_path = 1;
 for i_config = 1:n_configs
     for seed = subset_seeds
-        subset_included_paths(i_path) = escaped_path_networks + defineFilenamePattern(...
+        filename_pattern = escaped_path_networks + defineFilenamePattern(...
             all_Config{i_config}, seed);
+        if constraint_weight == 0
+            % Allow for any constraint weight
+            filename_pattern = char(filename_pattern);
+            filename_pattern = string(filename_pattern(1:(end-4)) + '(_(\d)?(\.)?(\d)+)?\.mat');
+        end
+        subset_included_paths(i_path) = filename_pattern;
         i_path = i_path + 1;
     end
 end
