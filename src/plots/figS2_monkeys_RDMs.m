@@ -94,12 +94,22 @@ plotNeuralGeometryComparison(nexttile(12, [1, 1]), ...
     vec_RDM_Miles);
 
 % Colorbar
-cb = colorbar(nexttile(1, [1, 1]), ...
-    Ticks=[-0.3, 0, 0.3]);
-cb.Layout.Tile = "west";
+ax_top = nexttile(1, [1, 1]);
+ax_bottom = nexttile(9, [1, 1]);
+ax_top.Units = "centimeters";
+ax_bottom.Units = "centimeters";
+cb_pos = [...
+    ax_top.Position(1) - 2.23, ...
+    ax_bottom.Position(2) - 1.2, ...
+    0.4, ...
+    ax_top.Position(2) + ax_top.Position(4) - ax_bottom.Position(2)];
+cb = colorbar(ax_top, ...
+    Ticks=[-0.3, 0, 0.3], Location="westoutside");
 cb.Label.String = "Correlation";
 cb.Label.FontSize = 8;
+cb.Units = "centimeters";
 cb.Label.Position(1) = cb.Label.Position(1) + 0.9;
+cb.Position = cb_pos;
 
 % Set font globally
 fontname(f, "arial");
