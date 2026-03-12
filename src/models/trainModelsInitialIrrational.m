@@ -77,9 +77,15 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         TrainingConfig.outputs = "choice_" + Config.output_label;
     
         % ~ Loop through RNNs to train ~ %
-        parfor i_network_seed = (1:DatasetSpecs.batch_size) + shift_i_network
+        for i_network_seed = (1:DatasetSpecs.batch_size)
 
-            i_network = DatasetSpecs.seed_rational(i_network_seed);
+            i_network = DatasetSpecs.seed_rational(i_network_seed + shift_i_network);
+
+            % TEMPORARY: skip if the file already exists
+            network_path = fullfile(path_networks, defineFilenamePattern(Config, i_network));
+            if isfile(network_path)
+                continue;
+            end
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...

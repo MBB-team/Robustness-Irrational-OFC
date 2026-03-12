@@ -38,7 +38,7 @@ FLAGS.analyse_rational_constrained_networks       = false;
 % --- Which analysis functions to run -------------------------------------
 
 % Characterization of choice behaviour
-FLAGS.fit_one_value_profile                       = true;
+FLAGS.fit_one_value_profile                       = false;
 FLAGS.predictMonkeyChoices                        = false;
 FLAGS.predictOptimalChoices                       = false;
 
@@ -46,13 +46,13 @@ FLAGS.predictOptimalChoices                       = false;
 FLAGS.compute_framework_information_loss          = false;
 
 % Interference effects
-FLAGS.compute_cue_attention_pollution             = true;
+FLAGS.compute_cue_attention_pollution             = false;
 FLAGS.compute_cue_order_pollution                 = false;
 
 % Neural properties
 FLAGS.categorize_integration_units                = false;
 FLAGS.generate_neural_geometry_matrices           = false;
-FLAGS.compute_neural_distance                     = false;
+FLAGS.compute_neural_distance                     = true;
 
 % Biological constraints
 FLAGS.compute_EI_balance                          = false;

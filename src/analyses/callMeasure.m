@@ -121,6 +121,8 @@ end
 % ~ Loop through parameter vectors ~ %
 parfor i_data = 1:n_data_selected
 
+    tic;
+
     i_network = all_i_selected(i_data);
 
     % Extract parameters for this network
@@ -139,6 +141,9 @@ parfor i_data = 1:n_data_selected
     % Run analysis function
     TempOutputs{i_data} = analysis_function( ...
         params, Config, seed, preprocess_inputs_with_supp);
+
+    % Display code speed
+    fprintf("Network %d: t = %0.2f\n", i_network, toc);
 
 end
 

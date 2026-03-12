@@ -1,0 +1,68 @@
+% Fig. S5 | Comparison of CCM entries across monkeys.
+% 
+%   - a, the CCM entries of rational RNNs (y-axis) are plotted against the
+% CCM entries of their associated monkey (x-axis). Each dot is a given CCM
+% entry (blue: value synthesis, orange: value comparison), and lines relate
+% pairs of entries across monkeys. Accurate predictions of inter-individual 
+% ifferences would show up as oblique lines, aligned with the main diagonal
+% (positive slopes).
+% 
+%   - b, same thing for re-trained (irrational) RNNs.
+% 
+%   - c, Distribution of the average slope (across CCM cells) under the
+% null, for the value synthesis RNNs (irrational RNNs). The black line
+% shows the average slope in the actual data.
+% 
+%   - d, Same thing for value comparison RNNs.
+
+
+%% === Environment set-up =================================================
+
+setup;
+clear variables;
+close all;
+
+
+%% === Load data ==========================================================
+
+Data = loadMeasureResults(["config_ID", "is_rational", "is_irrational", "fit_label", ...
+    "CCM_option", "CCM_attribute"], "rational_last");
+
+MonkeyNeuralGeometry = load(fullfile(getPath("MonkeyData"), "NeuralGeometry.mat"));
+
+
+%% === Generate figure ====================================================
+
+close all;
+
+% Initialize the figure
+f = figure(...
+    Name = "Figure S5: comparison of CCM entries across monkeys", ...
+    Units = "centimeters", ...
+    Position = [0, 0, 18, 5], ...
+    NumberTitle="off", ...
+    Color = "w");
+movegui(f, "center");
+
+% Define the layout
+t = tiledlayout(f, 1, 3, ...
+    TileSpacing="loose", ...
+    Units="centimeters", ...
+    Position=[0.5, 0.5, 17, 4]);
+
+% Subplots
+plotCCMcellsComparison(nexttile(1, [1, 1]), Data, MonkeyNeuralGeometry, ...
+    "rational");
+plotCCMcellsComparison(nexttile(2, [1, 1]), Data, MonkeyNeuralGeometry, ...
+    "irrational");
+plotCCMslopesDistrib(nexttile(3, [1, 1]), Data, MonkeyNeuralGeometry);
+
+
+% Set font globally
+fontname(f, "arial");
+
+
+%% === Save figure ========================================================
+
+exportgraphics(f, fullfile(getPath("Figures"), "figS5.pdf"), ContentType="vector");
+exportgraphics(f, fullfile(getPath("Figures"), "figS5.png"), Resolution=600);
