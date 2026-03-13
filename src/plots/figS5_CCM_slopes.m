@@ -48,7 +48,7 @@ movegui(f, "center");
 t = tiledlayout(f, 1, 3, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[0.5, 0.5, 17, 4]);
+    Position=[1, 0.5, 16, 4]);
 
 % Subplots
 plotCCMcellsComparison(nexttile(1, [1, 1]), Data, MonkeyNeuralGeometry, ...
@@ -57,6 +57,10 @@ plotCCMcellsComparison(nexttile(2, [1, 1]), Data, MonkeyNeuralGeometry, ...
     "irrational");
 plotCCMslopesDistrib(nexttile(3, [1, 1]), Data, MonkeyNeuralGeometry);
 
+% Subplot letters
+writePanelLetter(nexttile(1, [1, 1]), "a", -0.4, -0.1);
+writePanelLetter(nexttile(2, [1, 1]), "b", -0.4, -0.1);
+writePanelLetter(nexttile(3, [1, 1]), "c", -0.4, -0.1);
 
 % Set font globally
 fontname(f, "arial");

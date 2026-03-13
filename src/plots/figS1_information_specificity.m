@@ -50,10 +50,6 @@ t = tiledlayout(f, 1, 3, ...
 plotInformationDecodingAccuracy(nexttile(1, [1, 2]), Data);
 plotSimpleNeuralDistanceTrajectory(nexttile(3, [1, 1]), Data);
 
-% Subplot letters
-writePanelLetter(nexttile(1, [1, 2]), "a", -0.4, 1);
-writePanelLetter(nexttile(3, [1, 1]), "b", -0.4, 1);
-
 % Legend
 ghost_plots = gobjects(1, 15);
 ax = nexttile(3, [1, 1]);
@@ -94,6 +90,10 @@ lgd = legend(ax, ghost_plots, ...
     Box="off", ...
     IconColumnWidth=20);
 lgd.Layout.Tile = "south";
+
+% Subplot letters
+writePanelLetter(nexttile(1, [1, 2]), "a", -2.3, -0.4);
+writePanelLetter(nexttile(3, [1, 1]), "b", -0.9, -0.4);
 
 % Set font globally
 fontname(f, "arial");
