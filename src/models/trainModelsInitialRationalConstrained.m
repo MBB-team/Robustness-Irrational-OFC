@@ -119,7 +119,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         for i_weight = 1:length(constraint_weight)
 
             % ~ Loop through RNNs to train ~ %
-            parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network
+            for i_network = (1:DatasetSpecs.batch_size) + shift_i_network
 
                 % TEMPORARY: skip if the file already exists
                 network_path = fullfile(path_networks, defineFilenamePattern(Config, i_network, constraint_weight(i_weight)));

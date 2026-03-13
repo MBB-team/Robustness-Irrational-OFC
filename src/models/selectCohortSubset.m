@@ -41,7 +41,7 @@ end
 % Load initial parameters to determine total number of RNNs trained per
 % cohort
 init_params = load(path_specs).init_params;
-n_trials_cohort = size(init_params, 2);
+n_networks_per_cohort = size(init_params, 2);
 
 % Load cohort configurations
 all_Config = getDesiredNetworkConfigs();
@@ -51,14 +51,20 @@ n_trained_configs = length(getDesiredNetworkConfigs());
 % --- Go through all trained RNNs --- %
 
 % Initialize storage of training status for each seed x cohort
-is_trained = false(n_trials_cohort, n_trained_configs);
+is_trained = false(n_networks_per_cohort, n_trained_configs);
 % Get paths to all trained RNNs
 all_path = getAllNetworkPaths(path_networks);
 n_network = length(all_path);
 % Define file patterns to match each cohort
 all_patterns = strings(1, n_trained_configs);
 for i_config = 1:n_trained_configs
-    all_patterns(i_config) = defineFilenamePattern(all_Config{i_config}, NaN, constraint_weight);
+    pattern = defineFilenamePattern(all_Config{i_config}, NaN);
+    if constraint_weight ~= 0
+        % Allow for any constraint weight
+        pattern = char(pattern);
+        pattern = string(pattern(1:(end-4)) + "(_(\d)?(\.)?(\d)*)?\.mat");
+    end
+    all_patterns(i_config) = pattern;
 end
 
 % ~ Loop through RNNs and identify their cohort ~ %
@@ -66,7 +72,11 @@ for i_network = 1:n_network
     seeds = regexp(all_path(i_network), all_patterns, "tokens");
     i_cohort = find(~ cellfun(@isempty, seeds), 1);
     if ~ isempty(i_cohort)
-        is_trained(str2double(seeds{i_cohort}{1}), i_cohort) = true;
+        if constraint_weight == 0
+            is_trained(str2double(seeds{i_cohort}{1}), i_cohort) = true;
+        else
+            is_trained(str2double(seeds{i_cohort}{1}(1)), i_cohort) = true;
+        end
     end
 end
 
@@ -88,10 +98,10 @@ for i_config = 1:n_configs
     for seed = subset_seeds
         filename_pattern = escaped_path_networks + defineFilenamePattern(...
             all_Config{i_config}, seed);
-        if constraint_weight == 0
+        if constraint_weight ~= 0
             % Allow for any constraint weight
             filename_pattern = char(filename_pattern);
-            filename_pattern = string(filename_pattern(1:(end-4)) + '(_(\d)?(\.)?(\d)+)?\.mat');
+            filename_pattern = string(filename_pattern(1:(end-4)) + "(_(\d)?(\.)?(\d)*)?\.mat");
         end
         subset_included_paths(i_path) = filename_pattern;
         i_path = i_path + 1;

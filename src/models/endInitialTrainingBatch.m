@@ -49,11 +49,6 @@ DatasetSpecs = generateTrainTestDataset(path_specs);
 all_Config = getDesiredNetworkConfigs();
 n_config = length(all_Config);
 DatasetSpecs.n_networks_cohort = length(subset_included_paths) / n_config;
-if ~ isempty(constraint_weight)
-    % Consider that each cohort is defined by a pair (configuration,
-    % constraint weight)
-    DatasetSpecs.n_networks_cohort = DatasetSpecs.n_networks_cohort / length(constraint_weight);
-end
 
 % Mark this batch as fully trained
 DatasetSpecs.last_batch_trained = true;
