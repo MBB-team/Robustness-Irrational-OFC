@@ -15,18 +15,16 @@ close all;
 
 %% === Load data ==========================================================
 
-CueSequences = load(fullfile(getPath("MonkeyData"), "CueSequences.mat"));
+ChoiceDifficulty = load(fullfile(getPath("MonkeyData"), "ChoiceDifficulty.mat"));
 
 
 %% === Generate figure ====================================================
-
-close all;
 
 % Initialize the figure
 f = figure(...
     Name = "Figure S6: choice difficulty as a function of choice onset time", ...
     Units = "centimeters", ...
-    Position = [0, 0, 4.5, 4.5], ...
+    Position = [0, 0, 6, 5.5], ...
     NumberTitle="off", ...
     Color = "w");
 movegui(f, "center");
@@ -35,10 +33,10 @@ movegui(f, "center");
 t = tiledlayout(f, 1, 1, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[0, 0, 4.5, 4.5]);
+    Position=[1, 1, 4, 3]);
 
 % Subplots
-
+plotMonkeyChoiceDifficulty(nexttile(1, [1, 1]), ChoiceDifficulty);
 
 % Set font globally
 fontname(f, "arial");

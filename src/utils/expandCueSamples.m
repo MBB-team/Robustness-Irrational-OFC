@@ -24,6 +24,10 @@ function CueSamples = expandCueSamples(CueSamples, monkey, options)
 %     Whether to override existing monkey choices and recompute them from
 %     inferred option values. Default is true.
 %
+% zscore_value_profile (optional) : <logical 1x1>
+%     Whether to z-score the value profile used to compute estimated option
+%     values. Default is false.
+%
 % OUTPUTS -----------------------------------------------------------------
 % CueSamples : <struct 1x1>
 %     Structure containing the original cue-sample fields and all derived
@@ -56,6 +60,7 @@ arguments
     CueSamples (1, 1) struct
     monkey (1, 1) string {mustBeMember(monkey, ["", "Franck", "Miles"])} = ""
     options.override_choice = true
+    options.zscore_value_profile = false
 end
 
 % Number of cue samples
@@ -255,6 +260,10 @@ if monkey == ""
 else
     value_function = load(fullfile(getPath("MonkeyData"), ...
         "ValueProfile.mat")).(monkey).value_function;
+end
+% Z-score the value function if necessary
+if options.zscore_value_profile
+    value_function = zscore(value_function, 0, "all");
 end
 % Map the value function onto attribute pairs for each option
 for output_label = ["loc", "order", "attention"]
