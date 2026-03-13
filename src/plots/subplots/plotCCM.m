@@ -35,7 +35,7 @@ arguments
     plot_options.color_thick (1, 3) double = 0 * ones(1, 3)
     plot_options.line_width_thick (1, 1) double = 0.8
     plot_options.p_threshold (1, 1) double = 0.05 / (36 * 2)
-    plot_options.font_size_text_label (1, 1) double = 6
+    plot_options.font_size_text_label (1, 1) double = 5.5
     plot_options.font_size_trial_type (1, 1) double = 8
     plot_options.star_font_size (1, 1) double = 16
     plot_options.star_y_shift (1, 1) double = 0.3
@@ -145,7 +145,7 @@ for t = 1:3
 end
 
 % Cue rank
-shift_cue = 0.7;
+shift_cue = 0.8;
 for i_cue = 1:3
     text_color = (0.2 * (4 - i_cue) - 0.1) * ones(1, 3);
     if plot_options.labels(1)
@@ -210,7 +210,7 @@ ylim(ax, [0.5, 10.5]);
 setAxFontSize(ax);
 colormap(ax, defineDivergentColormap());
 if ~ isempty(plot_options.y_label)
-    text(ax, -1.5, 5.5, plot_options.y_label, ...
+    text(ax, -1.7, 5.5, plot_options.y_label, ...
         FontSize=8, ...
         FontWeight="bold", ...
         Rotation=90, ...
@@ -218,7 +218,7 @@ if ~ isempty(plot_options.y_label)
         VerticalAlignment="middle");
 end
 if ~ isempty(plot_options.title)
-    text(ax, 5.5, -1.5, plot_options.title, ...
+    text(ax, 5.5, -1.7, plot_options.title, ...
         FontSize=8, ...
         FontWeight="bold", ...
         HorizontalAlignment="center", ...
