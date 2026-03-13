@@ -1,5 +1,5 @@
  function [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
-    delete_unshared_seeds, i_select_configs, constraint_weight)
+    delete_unshared_seeds, constraint_weight)
 % Identifies RNN seeds shared across all cohorts and optionally deletes
 % unshared ones.
 %
@@ -21,10 +21,6 @@
 %     Whether seeds that are not shared across cohorts should be deleted.
 %     Defaults to false.
 %
-% i_select_configs (optional) : <logical 1xN>
-%     Vector of configuration IDs indicating which RNN configurations to
-%     consider. By default, considers all existing configurations.
-%
 % constraint_weight (optional) : <float 1xN>
 %     Vector of relative weight of the biological constraint term compared
 %     to the behavioural objective in the joint optimization.
@@ -38,7 +34,6 @@ arguments
     path_specs (1, 1) string
     path_networks (1, 1) string
     delete_unshared_seeds (1,1) {mustBeNumericOrLogical} = false
-    i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
     constraint_weight (1, :) double = 0
 end
 
@@ -51,7 +46,7 @@ n_trials_cohort = size(init_params, 2);
 % Load cohort configurations
 all_Config = getDesiredNetworkConfigs();
 n_configs = length(getDesiredNetworkConfigs());
-n_trained_configs = length(i_select_configs);
+n_trained_configs = length(getDesiredNetworkConfigs());
 
 % --- Go through all trained RNNs --- %
 
@@ -63,7 +58,7 @@ n_network = length(all_path);
 % Define file patterns to match each cohort
 all_patterns = strings(1, n_trained_configs);
 for i_config = 1:n_trained_configs
-    all_patterns(i_config) = defineFilenamePattern(all_Config{i_select_configs(i_config)}, NaN, constraint_weight);
+    all_patterns(i_config) = defineFilenamePattern(all_Config{i_config}, NaN, constraint_weight);
 end
 
 % ~ Loop through RNNs and identify their cohort ~ %

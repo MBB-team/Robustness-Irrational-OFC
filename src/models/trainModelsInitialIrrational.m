@@ -77,7 +77,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         TrainingConfig.outputs = "choice_" + Config.output_label;
     
         % ~ Loop through RNNs to train ~ %
-        for i_network_seed = (1:DatasetSpecs.batch_size)
+        parfor i_network_seed = (1:DatasetSpecs.batch_size)
 
             i_network = DatasetSpecs.seed_rational(i_network_seed + shift_i_network);
 
@@ -108,7 +108,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         end
     end
 
-    % Filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, 1:n_config);
+    % Do not filter unsuccessful seeds from this batch
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, false);
 
 end

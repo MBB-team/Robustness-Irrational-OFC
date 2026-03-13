@@ -112,29 +112,35 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
     % ~ Loop through configurations to train ~ %
     for i_config = 1:n_config
-   
+
         Config = all_Config{i_config};
 
         % ~ Loop through constraint weights to apply ~ %
         for i_weight = 1:length(constraint_weight)
-    
+
             % ~ Loop through RNNs to train ~ %
-            parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network  
+            parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network
+
+                % TEMPORARY: skip if the file already exists
+                network_path = fullfile(path_networks, defineFilenamePattern(Config, i_network, constraint_weight(i_weight)));
+                if isfile(network_path)
+                    continue;
+                end
 
                 % Select initial conditions and datasets for training and testing
                 [init_params, input_train, output_train, input_test, ...
                     output_test] = selectTrainingData(DatasetSpecs, i_network, Config);
-                
+
                 % Train a single RNN
                 out = performTraining(Config, input_train, output_train, init_params, ...
                     constraint=constraint, ...
                     constraint_field=constraint_field, ...
                     constraint_weight=constraint_weight(i_weight));
-    
+
                 % Evaluate RNN performance on training and test datasets
                 [fit_train, fit_test, params] = testTrainingGeneralizability(out, ...
                     Config, input_train, output_train, input_test, output_test);      
-                
+
                 % Save the RNN if it achieves sufficient performance on the test set
                 saveInitialTrainingNetwork(Config, i_network, "FitRationalConstrained", ...
                     params, fit_train, fit_test, out, path_networks, 1:n_config, ...
@@ -144,9 +150,8 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         end
     end
 
-    % Filter unsuccessful seeds from this batch
+    % Do not filter unsuccessful seeds from this batch
     DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, ...
-        1:n_config, ...
-        constraint_weight);
+        false, constraint_weight);
 
 end

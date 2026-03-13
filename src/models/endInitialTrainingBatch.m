@@ -1,5 +1,5 @@
 function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, ...
-    i_select_configs, constraint_weight)
+    delete_unshared_seeds, constraint_weight)
 % Finalizes a batch of initial RNN training by filtering unsuccessful
 % seeds.
 %
@@ -16,9 +16,9 @@ function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, ...
 %     Path to the directory in which RNNs meeting the performance threshold
 %     are saved.
 %
-% i_select_configs (optional) : <logical 1xN>
-%     Vector of configuration IDs indicating which RNN configurations to
-%     consider. By default, considers all existing configurations.
+% delete_unshared_seeds (optional) : <logical 1x1>
+%     Whether seeds that are not shared across cohorts should be deleted.
+%     Defaults to false.
 %
 % constraint_weight (optional) : <float 1xN>
 %     Vector of relative weight of the biological constraint term compared
@@ -34,7 +34,7 @@ function [DatasetSpecs] = endInitialTrainingBatch(path_specs, path_networks, ...
 arguments
     path_specs (1, 1) string
     path_networks (1, 1) string
-    i_select_configs (1, :) double = 1:length(getDesiredNetworkConfigs())
+    delete_unshared_seeds (1,1) {mustBeNumericOrLogical} = false
     constraint_weight (1, :) double = []
 end
 
@@ -43,7 +43,7 @@ DatasetSpecs = generateTrainTestDataset(path_specs);
 
 %  Exclude seeds that failed in any cohort
 [subset_included_paths] = selectCohortSubset(path_specs, path_networks, ...
-    true, i_select_configs, constraint_weight);
+    delete_unshared_seeds, constraint_weight);
 
 % Compute the number of successfully trained networks per cohort
 all_Config = getDesiredNetworkConfigs();
