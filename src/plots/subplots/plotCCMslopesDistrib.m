@@ -86,9 +86,8 @@ for i_config = 9:10
     slopes_H0 = NaN(2 * n_cells, plot_options.n_MonteCarlo_simu);
     for i_simu = 1:plot_options.n_MonteCarlo_simu
         % Shuffle the model CCM cells
-        i_shuffle = repmat(randperm(n_cells)', 2, 1);
-        CCM_comp_Franck_shuffled = CCM_comp_Franck(i_shuffle);
-        CCM_comp_Miles_shuffled = CCM_comp_Miles(i_shuffle);
+        CCM_comp_Franck_shuffled = CCM_comp_Franck(randperm(2 * n_cells));
+        CCM_comp_Miles_shuffled = CCM_comp_Miles(randperm(2 * n_cells));
         slopes_H0(:, i_simu) = (CCM_comp_Franck_shuffled - CCM_comp_Miles_shuffled) ./ (CCM_Franck - CCM_Miles);
     end
     distrib_slopes_H0 = mean(slopes_H0, 1)';
@@ -131,7 +130,7 @@ for i_config = 9:10
 
     fprintf("Config %d: p(H0 >= actual data) = %0.1e\n", ...
         i_config, ...
-        sum(distrib_slopes_H0 >= mean_slope));
+        mean(distrib_slopes_H0 >= mean_slope));
 
 end
 
