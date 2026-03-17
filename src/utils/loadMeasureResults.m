@@ -43,6 +43,6 @@ for label = measure_labels
     if ~ ismember(label, available_measures)
         warning("Non-existing variable: %s", label);
     else
-        Data.(label) = load(path_file).(label);
+        Data.(label) = load(path_file, label).(label);
     end
 end
