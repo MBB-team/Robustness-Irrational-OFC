@@ -31,7 +31,7 @@ arguments
     plot_options.n_MonteCarlo_simu (1, 1) double = 1e4
     plot_options.line_width (1, 1) double = 0.7
     plot_options.x_shift (1, 1) double = 0.1
-    plot_options.marker_size (1, 1) double = 7
+    plot_options.marker_size (1, 1) double = 5
 end
 
 hold(ax, "on");
@@ -49,7 +49,7 @@ select_CCM_cell(:, 7) = false;
 select_CCM_cell(:, 8) = false;
 select_CCM_cell = triu(select_CCM_cell, 1);
 select_CCM_cell = select_CCM_cell(:);
-n_cells = sum(select_CCM_cell);
+n_cells = 2 * sum(select_CCM_cell);
 
 % Select cells in monkeys' CCMs
 CCM_option_Franck = MonkeyNeuralGeometry.OFC.Franck.CCM_option(:);
@@ -83,12 +83,16 @@ for i_config = 9:10
     mean_slope = mean(slopes);
 
     % Simulate the null hypothesis
-    slopes_H0 = NaN(2 * n_cells, plot_options.n_MonteCarlo_simu);
+    slopes_H0 = NaN(n_cells, plot_options.n_MonteCarlo_simu);
+    CCM_both_monkeys = [CCM_comp_Franck, CCM_comp_Miles];
     for i_simu = 1:plot_options.n_MonteCarlo_simu
         % Shuffle the model CCM cells
-        CCM_comp_Franck_shuffled = CCM_comp_Franck(randperm(2 * n_cells));
-        CCM_comp_Miles_shuffled = CCM_comp_Miles(randperm(2 * n_cells));
-        slopes_H0(:, i_simu) = (CCM_comp_Franck_shuffled - CCM_comp_Miles_shuffled) ./ (CCM_Franck - CCM_Miles);
+        CCM_both_monkeys_shuffled = NaN(size(CCM_both_monkeys));
+        for i_cell = 1:n_cells
+            CCM_both_monkeys_shuffled(i_cell, :) = CCM_both_monkeys(i_cell, randperm(2));
+        end
+        % Store the mean slope
+        slopes_H0(:, i_simu) = (CCM_both_monkeys_shuffled(:, 1) - CCM_both_monkeys_shuffled(:, 2)) ./ (CCM_Franck - CCM_Miles);
     end
     distrib_slopes_H0 = mean(slopes_H0, 1)';
 
@@ -136,7 +140,8 @@ end
 
 % Aesthetics
 xlim(ax, [-0.8, 0.8]);
-xticks(ax, plot_options.x_shift * 4 * [-1, 1]);
+ylim(ax, [-1.2, 1.2]);
+xticks(ax, plot_options.x_shift * 3.5 * [-1, 1]);
 xticklabels(ax, ["Synthesis", "Comparison"]);
 ylabel(ax, "Mean slope");
 yline(ax, 0, "k:", LineWidth=plot_options.line_width);

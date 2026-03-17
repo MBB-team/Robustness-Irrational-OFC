@@ -33,8 +33,6 @@ MonkeyNeuralGeometry = load(fullfile(getPath("MonkeyData"), "NeuralGeometry.mat"
 
 %% === Generate figure ====================================================
 
-close all;
-
 % Initialize the figure
 f = figure(...
     Name = "Figure S5: comparison of CCM entries across monkeys", ...
