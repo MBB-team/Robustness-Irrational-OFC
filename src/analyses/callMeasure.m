@@ -71,6 +71,7 @@ if isempty(options.select_data)
 end
 n_data_selected = sum(options.select_data);
 all_i_selected = find(options.select_data);
+i_select_data = find(options.select_data);
 
 % --- Initialize analysis outputs --- %
 
@@ -90,14 +91,7 @@ for supp_variable = options.supp_variable
 end
 
 analysis_output = analysis_function(params, Config, seed, preprocess_inputs_with_supp);
-
 all_output_names = string(fieldnames(analysis_output))';
-
-% Preallocate final storage
-AnalysisOutputs = struct();
-for output_name = all_output_names
-    AnalysisOutputs.(output_name) = NaN(numel(analysis_output.(output_name)), n_data_selected);
-end
 
 % Temporary storage for parallel loop (parfor-safe)
 TempOutputs = cell(1, n_data_selected);
@@ -149,9 +143,23 @@ end
 
 % --- Aggregate analysis outputs --- %
 
-for i_data = 1:n_data_selected
-    for output_name = all_output_names
-        AnalysisOutputs.(output_name)(:, i_data) = reshape(TempOutputs{i_data}.(output_name), [], 1);
+AnalysisOutputs = struct();
+
+% Get the names of the variables already saved in the .mat file
+name_saved_variables = who("-file", params_file_path);
+
+for output_name = all_output_names
+    if ismember(output_name, name_saved_variables)
+        % Copy the previously saved variables into the new structure
+        saved_variable = load(params_file_path, output_name).(output_name);
+        AnalysisOutputs.(output_name) = saved_variable;
+    else
+        % Create a new empty field for the new variable
+        AnalysisOutputs.(output_name) = NaN(numel(analysis_output.(output_name)), n_data);
+    end
+    % Erase old results or empty storage with new results
+    for i_data = 1:n_data_selected
+        AnalysisOutputs.(output_name)(:, i_select_data(i_data)) = reshape(TempOutputs{i_data}.(output_name), [], 1);
     end
 end
 
