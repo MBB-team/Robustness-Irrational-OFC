@@ -60,10 +60,6 @@ arguments
     options.impaired_z (:,:) double {mustBeFinite} = []
 end
 
-% Convert impairment masks to logical arrays
-options.impaired_x = logical(options.impaired_x);
-options.impaired_z = logical(options.impaired_z);
-
 % Initialize storage variables
 n_samples = size(input, 1);
 activity_x = NaN(n_samples, length(Weights.biases_x));
