@@ -1,5 +1,5 @@
 function [] = plotCCMdistanceDistribPerArea(ax, Data, plot_options)
-% Code for figure 3g.
+% Code for figure 3g and S7d.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
