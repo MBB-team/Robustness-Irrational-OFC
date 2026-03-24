@@ -75,7 +75,6 @@ t = tiledlayout(f, 3, 4, ...
     Position=[1, 1, 15.5, 11]);
 
 % Subplots
-plotImageInAx(nexttile(1, [1, 2]), fullfile(getPath("Figures"), "fig4a.png"));
 plotCueOrderPollutionDistrib(nexttile(5, [1, 1]), Data, 9);
 plotCueOrderPollutionDistrib(nexttile(6, [1, 1]), Data, 10);
 plotMonkeyIrrationalChoices(nexttile(9, [1, 1]), MonkeyPropData, false);
@@ -142,7 +141,6 @@ legend(ax_middle_left, ghost_plots, ...
 hold off;
 
 % Subplot letters
-writePanelLetter(nexttile(1, [1, 2]), "a", -0.2, -0.1);
 writePanelLetter(nexttile(5, [1, 1]), "b", -0.5, -0.1);
 writePanelLetter(nexttile(6, [1, 1]), "c", -0.5, -0.1);
 writePanelLetter(nexttile(9, [1, 1]), "d", -0.4, 0);
@@ -161,5 +159,5 @@ cbar.YAxisLocation = "right";
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig4.pdf"), ContentType="vector");
-exportgraphics(f, fullfile(getPath("Figures"), "fig4.png"), Resolution=600);
+exportgraphics(f, fullfile(getPath("Figures"), "fig4bcdefghijk.pdf"), ContentType="vector");
+exportgraphics(f, fullfile(getPath("Figures"), "fig4bcdefghijk.png"), Resolution=600);

@@ -67,12 +67,9 @@ t = tiledlayout(f, 4, 4, ...
     Position=[0, 0.5, 16.5, 10]);
 
 % Subplots
-plotImageInAx(nexttile(1, [4, 2]), fullfile(getPath("Figures"), "fig2ab.png"));
 plotNeuralDistanceTrajectory(nexttile(3, [3, 2]), Data, false);
 
 % Subplot letters
-writePanelLetter(nexttile(1, [4, 2]), "a", 0.8, -0.1);
-writePanelLetter(nexttile(1, [4, 2]), "b", 0.8, -8);
 writePanelLetter(nexttile(3, [3, 2]), "c", -0.4, -0.1);
 
 % Create additional inlay
@@ -85,5 +82,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig2.pdf"), ContentType="vector");
-exportgraphics(f, fullfile(getPath("Figures"), "fig2.png"), Resolution=600);
+exportgraphics(f, fullfile(getPath("Figures"), "fig2c.pdf"), ContentType="vector");
+exportgraphics(f, fullfile(getPath("Figures"), "fig2c.png"), Resolution=600);

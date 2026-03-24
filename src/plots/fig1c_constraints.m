@@ -45,6 +45,8 @@ close all;
 
 all_constraint_label = ["info_transfer_rate", "energetic_budget_avg", ...
     "prop_optimal_impaired_one_unit_reversed"];
+all_constraint_xaxis_label = ["info_transfer_rate", "energetic_budget_avg", ...
+    "prop_optimal_impaired_one_unit"];
 n_constraint = length(all_constraint_label);
 all_Data = cell(1, n_constraint);
 
@@ -52,7 +54,7 @@ for i_constraint = 1:n_constraint
     all_Data{i_constraint} = loadMeasureResults([...
         "config_ID", "fit_label", ...
         "constraint_label", "constraint_weight", ...
-        all_constraint_label(i_constraint), "bacc_optimal_avg"], ...
+        all_constraint_xaxis_label(i_constraint), "bacc_optimal_avg"], ...
         "rational_" + all_constraint_label(i_constraint) + "_last");
 end
 
@@ -75,17 +77,14 @@ t = tiledlayout(f, 3, 5, ...
     Position=[0, 0.5, 16.5, 11.5]);
 
 % Subplots
-plotImageInAx(nexttile(1, [3, 4]), fullfile(getPath("Figures"), "fig1ab.png"));
 plotConstraintsVsRationality(nexttile(5, [1, 1]), all_Data{1}, ...
     "info_transfer_rate", "Information transfer rate (a.u.)");
 plotConstraintsVsRationality(nexttile(10, [1, 1]), all_Data{2}, ...
     "energetic_budget_avg", "Energetic budget (a.u.)");
 plotConstraintsVsRationality(nexttile(15, [1, 1]), all_Data{3}, ...
-    "prop_optimal_impaired_one_unit_reversed", "Tolerance to damage (a.u.)");
+    "prop_optimal_impaired_one_unit", "Tolerance to damage (a.u.)");
 
 % Subplot letters
-writePanelLetter(nexttile(1, [3, 4]), "a", 0.7, -0.5);
-writePanelLetter(nexttile(1, [3, 4]), "b", 0.7, -5);
 writePanelLetter(nexttile(5, [1, 1]), "c", -0.4, -0.1);
 writePanelLetter(nexttile(10, [1, 1]), "d", -0.4, -0.1);
 writePanelLetter(nexttile(15, [1, 1]), "e", -0.4, -0.1);
@@ -96,5 +95,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig1.pdf"), ContentType="vector");
-exportgraphics(f, fullfile(getPath("Figures"), "fig1.png"), Resolution=600);
+exportgraphics(f, fullfile(getPath("Figures"), "fig1c.pdf"), ContentType="vector");
+exportgraphics(f, fullfile(getPath("Figures"), "fig1c.png"), Resolution=600);
