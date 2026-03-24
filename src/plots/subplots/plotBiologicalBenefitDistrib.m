@@ -33,8 +33,8 @@ arguments
     plot_options.line_y_coord_prop (1, 1) double = 0.01
     plot_options.line_x_shift (1, 1) double = 0.3
     plot_options.p_threshold (1, 1) double = 0.005
-    plot_options.star_y_shift_prop (1, 1) double = - 0.067
-    plot_options.label_y_shift_prop (1, 1) double = - 0.03
+    plot_options.star_y_shift_prop (1, 1) double = - 0.08
+    plot_options.label_y_shift_prop (1, 1) double = - 0.033
     plot_options.star_size (1, 1) double = 14
 end
 

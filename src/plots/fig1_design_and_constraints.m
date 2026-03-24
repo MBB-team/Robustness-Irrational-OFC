@@ -44,7 +44,7 @@ close all;
 %% === Load data ==========================================================
 
 all_constraint_label = ["info_transfer_rate", "energetic_budget_avg", ...
-    "prop_optimal_impaired_units"];
+    "prop_optimal_impaired_one_unit_reversed"];
 n_constraint = length(all_constraint_label);
 all_Data = cell(1, n_constraint);
 
@@ -54,11 +54,6 @@ for i_constraint = 1:n_constraint
         "constraint_label", "constraint_weight", ...
         all_constraint_label(i_constraint), "bacc_optimal_avg"], ...
         "rational_" + all_constraint_label(i_constraint) + "_last");
-    % Only consider the tolerance to damage of one unit
-    if all_constraint_label(i_constraint) == "prop_optimal_impaired_units"
-        all_Data{i_constraint}.prop_optimal_impaired_units = ...
-            all_Data{i_constraint}.prop_optimal_impaired_units(1, :);
-    end
 end
 
 
@@ -85,8 +80,8 @@ plotConstraintsVsRationality(nexttile(5, [1, 1]), all_Data{1}, ...
     "info_transfer_rate", "Information transfer rate (a.u.)");
 plotConstraintsVsRationality(nexttile(10, [1, 1]), all_Data{2}, ...
     "energetic_budget_avg", "Energetic budget (a.u.)");
-% plotConstraintsVsRationality(nexttile(15, [1, 1]), all_Data{3}, ...
-%     "prop_optimal_impaired_units", "Tolerance to damage (a.u.)");
+plotConstraintsVsRationality(nexttile(15, [1, 1]), all_Data{3}, ...
+    "prop_optimal_impaired_one_unit_reversed", "Tolerance to damage (a.u.)");
 
 % Subplot letters
 writePanelLetter(nexttile(1, [3, 4]), "a", 0.7, -0.5);
