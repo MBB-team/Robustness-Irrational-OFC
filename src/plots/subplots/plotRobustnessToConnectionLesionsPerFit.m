@@ -38,7 +38,7 @@ arguments
     plot_options.line_y_coord_top (1, 1) double = 0.6099
     plot_options.line_x_shift (1, 1) double = - 0.2
     plot_options.line_y_coord_bottom (1, 1) double = 0.59
-    plot_options.star_y_shift (1, 1) double = 0.008
+    plot_options.star_y_shift (1, 1) double = 0.009
     plot_options.star_size (1, 1) double = 14
 end
 

@@ -1,5 +1,5 @@
 function [] = plotMonkeyChoiceDifficulty(ax, ChoiceDifficulty, plot_options)
-% Code for figure 4d and 4e.
+% Code for figure S6.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>

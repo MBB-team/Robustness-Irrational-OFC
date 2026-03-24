@@ -27,7 +27,7 @@ arguments
     plot_options.line_y_coord_top (1, 1) = 4.599
     plot_options.line_x_shift (1, 1) double = - 0.2
     plot_options.line_y_shift (1, 1) double = 0.1
-    plot_options.star_bottom_shift (1, 1) double = - 0.27
+    plot_options.star_bottom_shift (1, 1) double = - 0.2
 end
 
 hold(ax, "on");
