@@ -72,6 +72,7 @@ else
 
     % Generate all possible combinations of n impaired units
     all_impaired = 1:Config.n_units_z;
+    all_impaired = all_impaired';
     n_comb = size(all_impaired, 1);
 
     % Initialize storage of choice proportions across combinations
