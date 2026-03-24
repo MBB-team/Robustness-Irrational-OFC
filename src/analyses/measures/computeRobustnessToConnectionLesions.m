@@ -1,6 +1,7 @@
 function analysis_output = computeRobustnessToConnectionLesions(params, ...
     Config, ~, inputs)
-% Quantifies the robustness of an RNN to lesions of recurrent connections.
+% Quantifies the robustness of an RNN to lesions of forward and recurrent
+% connections.
 %
 % This measure evaluates how the network's choices degrade when a subset of
 % recurrent connections is randomly lesioned (set to zero). For different
@@ -56,6 +57,8 @@ end
 
 if isempty(params)
 
+    rng(0);
+
     % --- Preprocessing mode: generate cue sequences dataset and random
     % recurrent connection subsets --- %
 
@@ -66,25 +69,32 @@ if isempty(params)
     % Define the size of connection subsets to lesion. If RNNs have varying
     % numbers of recurrent connections, this block and the followings
     % should be moved to the analysis mode.
+    N_UNITS_X = 9;
     N_UNITS_Z = 10;
-    n_connections = N_UNITS_Z * N_UNITS_Z;
+    n_connections_forward = N_UNITS_X * N_UNITS_Z;
+    n_connections_recur = N_UNITS_Z * N_UNITS_Z;
     N_COMB = 100;
     ALL_PROP_LESION = linspace(10, 100, 10) / 100;
-    all_n_lesioned_connec = round(n_connections * ALL_PROP_LESION);
+    all_n_lesioned_forward_connec = round(n_connections_forward * ALL_PROP_LESION);
+    all_n_lesioned_recur_connec = round(n_connections_recur * ALL_PROP_LESION);
     n_lesion_level = length(ALL_PROP_LESION);
     
-    % Initialize storage for recurrent connection subsets
+    % Initialize storage for connection subsets
+    analysis_output.forward_connec_subset = cell(n_lesion_level, 1);
     analysis_output.recur_connec_subset = cell(n_lesion_level, 1);
 
     % Randomly select recurrent connections for each lesion level
     for i_lesion_level = 1:n_lesion_level
-        n_lesioned_connec = all_n_lesioned_connec(i_lesion_level);
-        analysis_output.recur_connec_subset{i_lesion_level} = ...
-            NaN(N_COMB, n_lesioned_connec);
+        n_lesioned_forward_connec = all_n_lesioned_forward_connec(i_lesion_level);
+        n_lesioned_recur_connec = all_n_lesioned_recur_connec(i_lesion_level);
+        analysis_output.forward_connec_subset{i_lesion_level} = NaN(N_COMB, n_lesioned_forward_connec);
+        analysis_output.recur_connec_subset{i_lesion_level} = NaN(N_COMB, n_lesioned_recur_connec);
         for i_comb = 1:N_COMB
             % Randomly pick connections to lesion
-            all_i_lesioned = randperm(n_connections, n_lesioned_connec);
-            analysis_output.recur_connec_subset{i_lesion_level}(i_comb, :) = all_i_lesioned;
+            all_i_forward_lesioned = randperm(n_connections_forward, n_lesioned_forward_connec);
+            all_i_recur_lesioned = randperm(n_connections_recur, n_lesioned_recur_connec);
+            analysis_output.forward_connec_subset{i_lesion_level}(i_comb, :) = all_i_forward_lesioned;
+            analysis_output.recur_connec_subset{i_lesion_level}(i_comb, :) = all_i_recur_lesioned;
         end
     end
 
@@ -128,6 +138,8 @@ else
 
             % Remove recurrent connections
             WeightsLesioned = Weights;
+            WeightsLesioned.connect_x_to_z(...
+                inputs.forward_connec_subset{i_lesion_level}(i_comb, :)) = 0;
             WeightsLesioned.connect_z_to_z(...
                 inputs.recur_connec_subset{i_lesion_level}(i_comb, :)) = 0;
 
