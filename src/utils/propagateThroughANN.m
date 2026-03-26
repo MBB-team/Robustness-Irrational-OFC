@@ -41,6 +41,12 @@ function [activity_x, activity_z, output] = propagateThroughANN(...
 % impaired_z (optional) : <bool 1xZ>
 %     Mask indicating z-layer units to be silenced (set to empty).
 %
+% noise_x (optional) : <float 1xX>
+%     Neural noise added to x-layer units (set to 0).
+%
+% noise_z (optional) : <float 1xZ>
+%     Neural noise added to z-layer units (set to 0).
+%
 % OUTPUTS -----------------------------------------------------------------
 % activity_x : <float NxX>
 %     Activity of x-layer units for each input sample.
@@ -58,6 +64,8 @@ arguments
     i_step (:,:) double = []
     options.impaired_x (:,:) double {mustBeFinite} = []
     options.impaired_z (:,:) double {mustBeFinite} = []
+    options.noise_x (:,:) double {mustBeFinite} = zeros(size(input, 1), length(Weights.biases_x))
+    options.noise_z (:,:) double {mustBeFinite} = zeros(size(input, 1), length(Weights.biases_z))
 end
 
 % Initialize storage variables
@@ -82,6 +90,9 @@ for i_sample = 1:n_samples
             (input(i_sample, :) * Weights.connect_in_to_x), ...
             Weights.biases_x);
 
+        % Add internal noise if requested
+        activity_x(i_sample, :) = activity_x(i_sample, :) + options.noise_x(i_sample, :);
+
         % Apply x-layer impairment if requested
         if ~ isempty(options.impaired_x)
             activity_x(i_sample, options.impaired_x) = 0;
@@ -90,6 +101,9 @@ for i_sample = 1:n_samples
         activity_z(i_sample, :) = f_activation(...
             (activity_x(i_sample, :) * Weights.connect_x_to_z), ...
             Weights.biases_z);
+
+        % Add internal noise if requested
+        activity_z(i_sample, :) = activity_z(i_sample, :) + options.noise_z(i_sample, :);
 
         % Apply z-layer impairment if requested
         if ~ isempty(options.impaired_z)
@@ -104,14 +118,16 @@ for i_sample = 1:n_samples
             + (activity_z(i_sample - 1, :) * Weights.connect_z_to_x), ...
             Weights.biases_x);
 
+        activity_x(i_sample, :) = activity_x(i_sample, :) + options.noise_x(i_sample, :);
         if ~ isempty(options.impaired_x)
             activity_x(i_sample, options.impaired_x) = 0;
         end
 
         activity_z(i_sample, :) = f_activation(...
             (activity_x(i_sample, :) * Weights.connect_x_to_z), ...
-            Weights.biases_z);   
+            Weights.biases_z);
 
+        activity_z(i_sample, :) = activity_z(i_sample, :) + options.noise_z(i_sample, :); 
         if ~ isempty(options.impaired_z)
             activity_z(i_sample, options.impaired_z) = 0;
         end     
@@ -123,6 +139,7 @@ for i_sample = 1:n_samples
             (input(i_sample, :) * Weights.connect_in_to_x), ...
             Weights.biases_x);
 
+        activity_x(i_sample, :) = activity_x(i_sample, :) + options.noise_x(i_sample, :);
         if ~ isempty(options.impaired_x)
             activity_x(i_sample, options.impaired_x) = 0;
         end
@@ -132,6 +149,7 @@ for i_sample = 1:n_samples
             + (activity_z(i_sample - 1, :) * Weights.connect_z_to_z), ...
             Weights.biases_z);
 
+        activity_z(i_sample, :) = activity_z(i_sample, :) + options.noise_z(i_sample, :); 
         if ~ isempty(options.impaired_z)
             activity_z(i_sample, options.impaired_z) = 0;
         end
