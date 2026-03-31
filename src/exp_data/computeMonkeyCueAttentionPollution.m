@@ -67,7 +67,7 @@ for monkey = ["Franck", "Miles"]
 
     % Initialize output
     CueAttentionPollution.(monkey).per_session = cell(1, n_session);
-    CueAttentionPollution.(monkey).grad_diff_per_session = NaN(1, n_session);
+    CueAttentionPollution.(monkey).regressor_diff_per_session = NaN(1, n_session);
 
     % ~ Loop through sessions ~ %
     for i_session = 1:n_session
@@ -93,8 +93,8 @@ for monkey = ["Franck", "Miles"]
     
         % Store the result
         CueAttentionPollution.(monkey).per_session{i_session} = analysis_output;
-        CueAttentionPollution.(monkey).grad_diff_per_session(i_session) = ...
-            analysis_output.value_function_attended_gradient_diff;
+        CueAttentionPollution.(monkey).regressor_diff_per_session(i_session) = ...
+            analysis_output.value_function_attended_regressor_diff;
 
         % Display progress
         fprintf("%s - Session %d/%d\n", monkey, i_session, n_session);

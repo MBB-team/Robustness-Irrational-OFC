@@ -44,12 +44,14 @@ function analysis_output = computeCueAttentionPollution(params, Config, seed, in
 %       magnitude cue is the last attended cue
 %       - value_function_attended <5x5>: value profile of the attended
 %       option as a function of its attended and unattended attributes
-%       - value_function_attended_gradient_att <4x5>: discrete gradient of
-%       the value profile along the attended attribute dimension
-%       - value_function_attended_gradient_unatt <5x4>: discrete gradient
-%       of the value profile along the unattended attribute dimension
-%       - value_function_attended_gradient_diff <1x1>: difference between
-%       mean attended and unattended gradients
+%       - value_function_attended_regressor_att <1x1>: coefficient for the
+%       rank of the attended cue, obtained from a GLM predicting the 
+%       pseudo-value of the attended option based on the ranks of both
+%       attended and unattended cues.
+%       - value_function_attended_regressor_unatt <1x1>: coefficient for
+%       the rank of the unattended cue in the same GLM
+%       - value_function_attended_regressor_diff <1x1>: difference between
+%       the coefficients for attended and unattended cue ranks
 
 arguments
     params (:,1) double = []
@@ -60,7 +62,7 @@ end
 
 if isempty(params)
 
-    % --- Preprocessing mode: define datasets and VBA model --- %
+    % --- Preprocessing mode: define VBA model and regressors --- %
 
     % Define VBA evolution and observation functions
     analysis_output.f_fname = [];
@@ -99,6 +101,10 @@ if isempty(params)
     % Disable VBA verbosity and display
     analysis_output.options.verbose = false;
     analysis_output.options.DisplayWin = false;
+
+    % Define the regressors of the attentional pseudo value function
+    analysis_output.regressor_att = reshape(meshgrid(1:5)', [], 1);
+    analysis_output.regressor_unatt = reshape(meshgrid(1:5), [], 1);
 
 else
 
@@ -189,21 +195,20 @@ else
     analysis_output.value_function_attended = ...
         analysis_output.value_function_attended(2:end, 2:end);
 
-    % Difference between consecutive lines: discrete gradient with respect
-    % to the attended attribute
-    analysis_output.value_function_attended_gradient_att = ...
-        analysis_output.value_function_attended(2:end, :) - ...
-        analysis_output.value_function_attended(1:(end- 1), :);
+    % --- Compute the influence of each dimension on the attentional
+    % pseudo-value profile --- %
 
-    % Difference between consecutive columns: discrete gradient with respect
-    % to the unattended attribute
-    analysis_output.value_function_attended_gradient_unatt = ...
-        analysis_output.value_function_attended(:, 2:end) - ...
-        analysis_output.value_function_attended(:, 1:(end- 1));
+    % Predict the pseudo value from the ranks of the attended and
+    % unattended cues
+    mdl = fitglm([inputs.regressor_att, inputs.regressor_unatt], ...
+        reshape(analysis_output.value_function_attended, [], 1), ...
+        Intercept=true);
 
-    % Difference between mean gradients (attended - unattended attribute)
-    analysis_output.value_function_attended_gradient_diff = ...
-        mean(analysis_output.value_function_attended_gradient_att, "all") - ...
-        mean(analysis_output.value_function_attended_gradient_unatt, "all");
+    % Save regressor coefficients and difference
+    analysis_output.value_function_attended_regressor_att = mdl.Coefficients.Estimate(2);
+    analysis_output.value_function_attended_regressor_unatt = mdl.Coefficients.Estimate(3);
+    analysis_output.value_function_attended_regressor_diff = ...
+        analysis_output.value_function_attended_regressor_att - ...
+        analysis_output.value_function_attended_regressor_unatt;
 
 end
