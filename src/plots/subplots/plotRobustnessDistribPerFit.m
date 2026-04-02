@@ -1,4 +1,4 @@
-function [] = plotAlternativeRobustnessMeasurePerFit(ax, measure_type, DataIndirect, DataFranck, DataMiles, plot_options)
+function [] = plotRobustnessDistribPerFit(ax, measure_type, DataIndirect, DataFranck, DataMiles, plot_options)
 % Code for figure S8.
 %
 % INPUTS ------------------------------------------------------------------
@@ -14,15 +14,21 @@ function [] = plotAlternativeRobustnessMeasurePerFit(ax, measure_type, DataIndir
 %     to be rational, then distorted to fit monkeys' behaviour. Must
 %     include:
 %       - config_ID, is_rational, is_irrational: see gatherAllModels
-%       - avg_prop_optimal_impaired_connec: see
-%       computeRobustnessToConnectionLesions
+%       - avg_prop_optimal_impaired_units, 
+%       avg_prop_optimal_impaired_connec, or avg_prop_optimal_noise: see
+%       computeRobustnessToUnitLesions, 
+%       computeRobustnessToConnectionLesions or
+%       computeRobustnessToInternalNoise
 %
 % DataFranck, DataMiles : <struct 1x1>
 %     Structure containing model analysis results for models trained
 %     directly on the behaviour of the monkey. Must include:
 %       - config_ID, is_irrational: see gatherAllModels
-%       - avg_prop_optimal_impaired_connec: see
-%       computeRobustnessToConnectionLesions
+%       - avg_prop_optimal_impaired_units, 
+%       avg_prop_optimal_impaired_connec, or avg_prop_optimal_noise: see
+%       computeRobustnessToUnitLesions, 
+%       computeRobustnessToConnectionLesions or
+%       computeRobustnessToInternalNoise
 %
 % p_threshold, line_width, priors_color, priors_face_alpha, star_size, 
 % line_y_coord_top, line_y_coord_bottom, line_x_shift, line_y_shift, 
@@ -34,7 +40,7 @@ function [] = plotAlternativeRobustnessMeasurePerFit(ax, measure_type, DataIndir
 
 arguments
     ax (1, 1) matlab.graphics.axis.Axes
-    measure_type (1, 1) string {mustBeMember(measure_type, ["impaired_connec", "noise"])}
+    measure_type (1, 1) string
     DataIndirect (1, 1) struct
     DataFranck (1, 1) struct
     DataMiles (1, 1) struct
@@ -42,7 +48,7 @@ arguments
     plot_options.p_threshold (1, 1) double = 0.005
     plot_options.line_y_coord_top (1, 1) double = 0.999
     plot_options.line_x_shift (1, 1) double = - 0.2
-    plot_options.line_y_coord_bottom (1, 1) double = 0.9
+    plot_options.line_y_coord_bottom (1, 1) double = 0.95
     plot_options.star_y_shift (1, 1) double = 0.06
     plot_options.star_size (1, 1) double = 14
 end
@@ -51,20 +57,21 @@ hold(ax, "on");
 
 % Aesthetics
 xlim(ax, [-0.9, 5.9]);
-if measure_type == "impaired_connec"
-    ylim(ax, [0.45, 0.6]);
-    yticks(ax, 0.45:0.05:0.6);
-else
-    ylim(ax, [0.5, 0.7]);
-    yticks(ax, 0.5:0.05:0.7);
-end
+ylim(ax, [0.45, 0.7]);
+yticks(ax, 0.45:0.05:0.7)
 y_lim = ylim();
 xticks(ax, [0:2, 3.5 + (0:2)]);
-xticklabels(ax, repmat(["Rat.", "Irrat.\newline(distort)", "Irrat.\newline(direct)"], 1, 2));
-if measure_type == "impaired_connec"
-    ylabel(ax, "Tolerance to disconnections (a.u.)");
-else
-    ylabel(ax, "Tolerance to neural noise (a.u.)");
+xticklabels(ax, repmat(["Rat.", "Irrat. distort.", "Irrat. direct"], 1, 2));
+xtickangle(ax, 45);
+switch measure_type
+    case "impaired_units"
+        ylabel(ax, "Tolerance to lesions (a.u.)");
+    case "impaired_connec"
+        ylabel(ax, "Tolerance to disconnections (a.u.)");
+    case "noise"
+        ylabel(ax, "Tolerance to neural noise (a.u.)");
+    otherwise
+        error("Unknown robustness measure label.")
 end
 setAxFontSize(ax);
 

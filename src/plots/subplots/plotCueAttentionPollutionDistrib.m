@@ -73,7 +73,7 @@ customViolinplot(ax, ...
 
 % Aesthetics
 yline(ax, 0, "k:", LineWidth=0.1);
-ylabel(ax, "\Delta\beta (att. - unatt.)");
+ylabel(ax, "\beta_{att} - \beta_{unatt}");
 xlim(ax, [-0.8, 0.8]);
 ylim(ax, plot_options.y_lim);
 xticks(ax, plot_options.distrib_x_shift * [-2.5, 2.5]);
