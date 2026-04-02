@@ -33,7 +33,7 @@ Data = loadMeasureResults([...
         "config_ID", "is_rational", "is_irrational", ...
         "energetic_budget_avg", "code_redundancy", "info_transfer_rate", ...
         "EI_balance", ...
-        "avg_prop_optimal_impaired_units", "prop_optimal_impaired_units"], ...
+        "avg_prop_optimal_impaired_units"], ...
         "rational_last");
 
 
@@ -43,43 +43,30 @@ Data = loadMeasureResults([...
 f = figure(...
     Name = "Figure 5: potential biological benefits of irrational circuits", ...
     Units = "centimeters", ...
-    Position = [0, 0, 18, 8], ...
+    Position = [0, 0, 18, 4.5], ...
     NumberTitle="off", ...
     Color = "w");
 movegui(f, "center");
 
 % Define the layout
-t = tiledlayout(f, 2, 5, ...
+t = tiledlayout(f, 1, 5, ...
     TileSpacing="loose", ...
     Units="centimeters", ...
-    Position=[0.8, 0.5, 17, 6]);
+    Position=[0.8, 0.3, 17, 3.5]);
 
 % Subplots
-plotSchemeEnergeticBudget(nexttile(1, [1, 1]));
-plotSchemeCodeRedundancy(nexttile(2, [1, 1]));
-% plotSchemeInfoTransferRate(nexttile(3, [1, 1]));
-plotSchemeEIbalance(nexttile(4, [1, 1]));
-plotSchemeRobustness(nexttile(5, [1, 1]), Data);
-plotBiologicalBenefitDistrib(nexttile(6, [1, 1]), Data, "energetic_budget_avg");
-plotBiologicalBenefitDistrib(nexttile(7, [1, 1]), Data, "code_redundancy");
-plotBiologicalBenefitDistrib(nexttile(8, [1, 1]), Data, "info_transfer_rate");
-plotBiologicalBenefitDistrib(nexttile(9, [1, 1]), Data, "EI_balance");
-plotBiologicalBenefitDistrib(nexttile(10, [1, 1]), Data, "avg_prop_optimal_impaired_units");
-
-% Prepare subplot letter adjustment
-ax_square = nexttile(4, [1, 1]);
-ax_nonsquare = nexttile(1, [1, 1]);
-set(ax_square, Units="centimeters");
-set(ax_nonsquare, Units="centimeters");
-shift_d_letter = ax_nonsquare.Position(2) + ax_nonsquare.Position(4) ...
-    - ax_square.Position(2) - ax_square.Position(4);
+plotBiologicalBenefitDistrib(nexttile(1, [1, 1]), Data, "energetic_budget_avg");
+plotBiologicalBenefitDistrib(nexttile(2, [1, 1]), Data, "code_redundancy");
+plotBiologicalBenefitDistrib(nexttile(3, [1, 1]), Data, "info_transfer_rate");
+plotBiologicalBenefitDistrib(nexttile(4, [1, 1]), Data, "EI_balance");
+plotBiologicalBenefitDistrib(nexttile(5, [1, 1]), Data, "avg_prop_optimal_impaired_units");
 
 % Subplot letters
-writePanelLetter(nexttile(1, [1, 1]), "a", -0.4, 1);
-writePanelLetter(nexttile(2, [1, 1]), "b", -0.4, 1);
-writePanelLetter(nexttile(3, [1, 1]), "c", -0.4, 1);
-writePanelLetter(nexttile(4, [1, 1]), "d", -0.4, 1 + shift_d_letter);
-writePanelLetter(nexttile(5, [1, 1]), "e", -0.4, 1);
+writePanelLetter(nexttile(1, [1, 1]), "a", -0.4, 0.1);
+writePanelLetter(nexttile(2, [1, 1]), "b", -0.4, 0.1);
+writePanelLetter(nexttile(3, [1, 1]), "c", -0.4, 0.1);
+writePanelLetter(nexttile(4, [1, 1]), "d", -0.4, 0.1);
+writePanelLetter(nexttile(5, [1, 1]), "e", -0.4, 0.1);
 
 % Set font globally
 fontname(f, "arial");
