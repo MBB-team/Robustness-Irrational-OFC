@@ -1,4 +1,4 @@
-function [] = trainModelsInitialIrrational(monkey, target_config)
+function [] = trainModelsInitialIrrational(monkey)
 % Trains RNNs to exhibit irrational decision-making behaviour.
 %
 % This function trains multiple cohorts of RNNs that implement slightly
@@ -46,12 +46,11 @@ function [] = trainModelsInitialIrrational(monkey, target_config)
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 05/02/2026
+% Date: 28/04/2026
 
 
 arguments
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
-    target_config (1, 1) double
 end
 
 % Initialize folders and training specifications
@@ -66,7 +65,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         initializeNewInitialTrainingBatch(path_specs, monkey);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = target_config
+    for i_config = 1:n_config
    
         Config = all_Config{i_config};
 

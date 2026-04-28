@@ -1,5 +1,5 @@
 function [] = trainModelsInitialRationalConstrained(constraint, ...
-    constraint_weight, target_config)
+    constraint_weight)
 % Trains RNNs to exhibit rational decision-making behaviour under
 % biological constraints.
 %
@@ -57,10 +57,6 @@ function [] = trainModelsInitialRationalConstrained(constraint, ...
 %     Vector of relative weight of the constraint term compared to the
 %     behavioural objective in the joint optimization.
 %
-% constraint_field (optional) : <string 1x1>
-%     Name of the scalar field in the constraint function's output
-%     structure that is used as the constraint signal.
-%
 % -------------------------------------------------------------------------
 % IMPLEMENTATION DETAILS
 % -------------------------------------------------------------------------
@@ -78,13 +74,12 @@ function [] = trainModelsInitialRationalConstrained(constraint, ...
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 12/02/2026
+% Date: 28/04/2026
 
 
 arguments
     constraint (1, 1) function_handle
     constraint_weight (1, :) double
-    target_config (1, :) double = 1:length(getDesiredNetworkConfigs())
 end
 
 
@@ -100,7 +95,7 @@ elseif isequal(constraint, @computeCodeRedundancy)
 end
 
 % Initialize folders and training specifications
-[all_Config, ~, path_networks, path_specs, DatasetSpecs] = ...
+[all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
     prepareInitialTraining("rational_" + constraint_field);
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
@@ -111,7 +106,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         initializeNewInitialTrainingBatch(path_specs);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = target_config
+    for i_config = 1:n_config
 
         Config = all_Config{i_config};
 
