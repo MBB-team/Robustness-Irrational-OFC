@@ -7,8 +7,8 @@ GlobalConfig = struct();
 GlobalConfig.rng_seed = 0;
 
 % Parameters for model training
-GlobalConfig.batch_size_initial_training = 10;
-GlobalConfig.n_models_per_cohort = 10;
+GlobalConfig.batch_size_initial_training = 50;
+GlobalConfig.n_models_per_cohort = 1000;
 GlobalConfig.n_trials_train_rational = 500;
 GlobalConfig.n_trials_test_rational = 500;
 GlobalConfig.n_trials_train_irrational = 2000;
