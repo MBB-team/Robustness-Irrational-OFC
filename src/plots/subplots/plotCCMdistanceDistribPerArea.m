@@ -27,7 +27,7 @@ arguments
     plot_options.line_y_coord_top (1, 1) = 4.599
     plot_options.line_x_shift (1, 1) double = - 0.2
     plot_options.line_y_shift (1, 1) double = 0.1
-    plot_options.star_bottom_shift (1, 1) double = - 0.2
+    plot_options.star_bottom_shift (1, 1) double = - 0.08
 end
 
 hold(ax, "on");
@@ -35,6 +35,7 @@ hold(ax, "on");
 % Aesthetics
 xlim(ax, [0.1, 6.4]);
 ylim(ax, [1.4, 4.6]);
+height = diff(ylim(ax));
 xticks(ax, 1:6);
 xticklabels(ax, repmat(["OFC", "dlPFC", "ACC"], 1, 2));
 ylabel(ax, "Neural CCM distance (a.u.)");
@@ -72,7 +73,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 2.5 + (i_config - 9) * 3;
-    y_star = line_y_coord + plot_options.star_bottom_shift;
+    y_star = line_y_coord + plot_options.star_bottom_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
@@ -90,7 +91,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 1.5 + (i_config - 9) * 3;
-    y_star = line_y_coord + plot_options.star_bottom_shift;
+    y_star = line_y_coord + plot_options.star_bottom_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...

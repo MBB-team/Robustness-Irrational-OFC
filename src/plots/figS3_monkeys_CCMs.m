@@ -1,13 +1,15 @@
-% Fig. S3 | CCM matrices for neural populations recorded in either the OFC,
-% dlPFC or ACC. Panels on the left show CCM matrices (color code depicts 
-% he Pearson correlation coefficients between vectors of t-statistics
-% associated with regression coefficient estimates for the kth attended
-% cue at cue onset time t, across integration units, going from blue -low
-% correlation- to red -high correlation-), organized by cue index in the
-% sequence (k=1, 2 or 3) and response time (t=1, 2 or 3). Panels on the
-% right show CCM cells from monkey M (y-axis) plotted against RDM cells
-% from monkey F (x-axis). Asterisks indicate significant correlations, with
-% p-value < 0.0007 (correction for multiple comparisons across CCM cells).
+% Fig. S3 | CCMs for neural populations recorded in either the OFC, dlPFC
+% or ACC.
+%
+% Panels on the left show CCMs (color code depicts the Pearson correlation
+% coefficients between vectors of t-statistics associated with regression
+% coefficient estimates for the kth attended cue at cue onset time t,
+% across integration units, going from blue – low correlation – to pink
+% – high correlation –), organized by cue index in the sequence (k=1, 2 or
+% 3) and response time (t=1, 2 or 3). Asterisks indicate significant
+% correlations, with p-value < 0.0007 (correction for multiple comparisons
+% across CCM cells). Panels on the right show CCM cells from monkey M
+% (y-axis) plotted against CCM cells from monkey F (x-axis).
 
 
 %% === Environment set-up =================================================
@@ -135,5 +137,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS3.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS3.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS3.png"), Resolution=600);

@@ -1,13 +1,28 @@
-% Fig. S8 | Comparing the tolerance to disconnections in rational and
-% irrational RNNs. Distributions (across cohort instances) of the tolerance
-% to neural disconnections, measured as the retained rate of rational
-% choice from 10% to 50% of recurrent connections within the integration
-% layer, for value synthesis (blue) and value comparison (orange) RNNs that
-% rely on a temporal option identity format and an attentional value
+% Fig. S8 | Comparing the tolerance to structural lesions and neural noise
+% in rational and irrational RNNs.
+% 
+% a, Distributions (across network instances) of tolerance to unit lesions,
+% measured as the retained rate of rational choice from 10% to 50% of
+% lesions, for value synthesis (blue) and value comparison (orange) RNNs
+% that rely on a temporal option identity format and an attentional value
 % readout format. Asterisks indicate a significant difference between
 % rational (light) and irrational (dark) RNNs, with p-value < 0.005. Note
-% that both types of irrational models (either retrained from rational RNNs 
+% that both types of irrational models (either retrained from rational RNNs
 % or directly trained from monkeys' irrational choices) are shown here.
+% 
+% b and c, Same format as panel a, showing the tolerance to connection
+% lesions from 10% to 50% of lesions (b), and the tolerance to neural noise
+% averaged the over the full range of noise variance (c).
+% 
+% d, Tolerance to unit lesions as a function of lesion level. Asterisks
+% indicate significant differences between rational (dotted line, circles)
+% models and irrational (solid lines) models, including both retrained
+% (triangles) or trained directly (diamonds) RNNs, for value synthesis
+% (blue) and value comparison (orange) models, with p-value < 0.005 for
+% each comparison.
+% 
+% e and f, Same format as panel d, showing the tolerance to connection
+% lesions (e) and neural noise (f).
 
 
 %% === Environment set-up =================================================
@@ -90,5 +105,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS8.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS8.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS8.png"), Resolution=600);

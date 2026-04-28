@@ -1,5 +1,5 @@
 function [] = plotAttendedValueProfile(ax, value_profile, title_label)
-% Code for figure 4f, 4g, 4h and 4i.
+% Code for figure 4f-i.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>

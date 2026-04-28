@@ -1,38 +1,35 @@
-% Fig. 2 | Selection of candidate idealized RNN models of the OFCs.
-%
-%   - a, Schematic procedure for extracting within-trial activity patterns
-% from OFC neural recordings and RNN models. At each trial, a sequence of
-% decision-relevant cues is sampled by the monkey, until a choice is
-% triggered. Within-trial activity patterns of OFC neurons are constructed
-% as the average firing rate of each neuron, from 100 msec to 500 msec
-% after each cue onset. Similarly, within-trial activity patterns of RNN
-% models are the activation strengths of integration units in response to
-% each cue.
+% Fig. 2 | Selection of candidate idealized RNN models of the OFC.
 % 
-%   - b, Summary of neural distance metrics for comparing activity patterns
-% of OFC neurons and RNN models. Representation Dissimilarity Matrices or
-% RDMs quantify how dissimilar evoked activity patterns are for any pair of
-% cue (2x2x5 = 20 possibilities at first cue onset). Cross-correlational
-% matrices or CCMs quantify the similarity of profiles of neural
-% sensitivity to present and past cues. Although CCM-based distance metrics
-% are insensitive to cue type (probability or magnitude), they quantify
+% a, Schematic procedure for extracting within-trial activity patterns from
+% OFC neural recordings and RNN models. At each trial, a sequence of cues
+% is sampled until a choice is triggered. Within-trial activity patterns of
+% OFC neurons are constructed as the average firing rate of each neuron,
+% from 100 ms to 500 ms after each cue onset. Similarly, within-trial
+% activity patterns of RNN models are the activation strengths of
+% integration units in response to each cue.
+% 
+% b, Summary of neural distance metrics for comparing activity patterns of
+% OFC neurons and RNN models. RDMs quantify how dissimilar evoked activity
+% patterns are for any pair of cues (2x2x5 = 20 possibilities at first cue
+% onset). CCMs quantify the similarity of profiles of neural sensitivity to
+% present and past cue ranks. Although CCM-based distance metrics are
+% insensitive to cue type (probability or magnitude), they quantify
 % potential internal memory traces about previously sampled cues. Full RDM
 % and CCM summary statistics for all monkeys and brain regions can be
 % eyeballed in the Supplementary Materials.
 % 
-%   - c, Neural distance trajectories between OFC and RNN cohorts during
-% rational training. Points show the average distance between activity
-% patterns of OFC recordings and RNN models (across the 1000 RNN
-% instances), computed using either RDMs (x-axis) or CCMs (y-axis) metrics.
-% Black crosses indicate the initial (random) state of RNN cohorts, black
-% triangles/dots/diamonds denote their final rational state. Intermediary
-% points show the neural distance at various stages of RNN training (from
-% 0% to 100%, by steps of 2%), where color, line style and marker type
-% indicate the type of computation (value synthesis vs value comparison),
-% the identity format of the attended option (spatial vs temporal), and the
-% value readout format (spatial vs temporal vs attentional), respectively.
-% Only two RNN cohorts significantly improve in both neural distance
-% metrics as rational training unfolds (grey area). 
+% c, Average neural distance trajectories between OFC and RNN cohorts (over
+% 1,000 RNN instances), computed using either RDMs (x-axis) or CCMs
+% (y-axis) metrics. Black crosses indicate the initial (random) state of
+% RNN cohorts, black triangles/dots/diamonds denote their final rational
+% state. Intermediary points show the neural distance at various stages of
+% RNN training (from 0% to 100%, by steps of 2%), where color, line style
+% and marker type indicate the type of computation (value synthesis vs
+% value comparison), the identity format of the attended option (spatial vs
+% temporal), and the value readout format (spatial vs temporal vs
+% attentional), respectively. The gray shaded area indicates the
+% two-dimensional region that falls below the 95% confidence interval of
+% both pre-training neural distances. 
 
 
 %% === Environment set-up =================================================
@@ -82,5 +79,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig2c.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "fig2c.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "fig2c.png"), Resolution=600);

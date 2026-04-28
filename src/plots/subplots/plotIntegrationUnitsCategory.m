@@ -1,5 +1,5 @@
 function [] = plotIntegrationUnitsCategory(ax, Data, plot_options)
-% Code for figure 3f.
+% Code for figure 3h.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>

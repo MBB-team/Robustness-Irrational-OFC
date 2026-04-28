@@ -43,12 +43,9 @@ arguments
     plot_options.line_style_attribute (1, 1) string = "--"
     plot_options.p_threshold (1, 1) double = 0.02
     plot_options.line_color (1, 3) double = [0, 0, 0]
-    plot_options.line_y_coord_uncorrected (1, 1) double = 0.385
-    plot_options.line_y_coord_corrected (1, 1) double = 0.045
-    plot_options.line_top_y_coord_uncorrected (1, 1) double = 0.419
-    plot_options.line_top_y_coord_corrected (1, 1) double = 0.0599
-    plot_options.star_y_shift_uncorrected (1, 1) double = -0.028
-    plot_options.star_y_shift_corrected (1, 1) double = -0.012
+    plot_options.line_top_y_coord (1, 1) double = 0.999
+    plot_options.line_bottom_y_coord (1, 1) double = 0.89
+    plot_options.star_y_shift (1, 1) double = -0.08
     plot_options.star_size (1, 1) double = 14
     plot_options.star_x_shift (1, 1) double = 0.1
 
@@ -59,10 +56,12 @@ hold(ax, "on");
 % Aesthetics
 xlim(ax, [1.5, 4.5]);
 if is_corrected
-    ylim(ax, [-0.12, 0.06]);
+    ylim(ax, [-0.12, 0.07]);
 else
     ylim(ax, [0, 0.42]);
 end
+y_lim = ylim(ax);
+height = diff(y_lim);
 xticks(ax, 2:4);
 xlabel(ax, "Within-trial time step");
 if is_corrected
@@ -116,17 +115,9 @@ for monkey = ["Franck", "Miles"]
 
                 % Horizontal line
                 if i_step == 2 && j_step == 4
-                    if is_corrected
-                        line_y_coord = plot_options.line_top_y_coord_corrected;
-                    else
-                        line_y_coord = plot_options.line_top_y_coord_uncorrected;
-                    end
+                    line_y_coord = y_lim(1) + plot_options.line_top_y_coord * height;
                 else
-                    if is_corrected
-                        line_y_coord = plot_options.line_y_coord_corrected;
-                    else
-                        line_y_coord = plot_options.line_y_coord_uncorrected;
-                    end
+                    line_y_coord = y_lim(1) + plot_options.line_bottom_y_coord * height;
                 end
                 x_coord = [i_step, j_step];
                 if i_step == 2 && j_step == 3
@@ -144,11 +135,7 @@ for monkey = ["Franck", "Miles"]
                 else
                     x_star = mean([i_step, j_step]) + plot_options.star_x_shift;
                 end
-                if is_corrected
-                    y_star = line_y_coord + plot_options.star_y_shift_corrected;
-                else
-                    y_star = line_y_coord + plot_options.star_y_shift_uncorrected;
-                end
+                y_star = line_y_coord + plot_options.star_y_shift * height;
                 text(ax, x_star, y_star, "*", ...
                     HorizontalAlignment="center", ...
                     FontSize=plot_options.star_size, ...

@@ -30,7 +30,7 @@ arguments
     plot_options.line_x_shift (1, 1) double = - 0.15
     plot_options.line_y_shift (1, 1) double = 0.005
     plot_options.star_size (1, 1) double = 14
-    plot_options.star_bottom_shift (1, 1) double = - 0.0125
+    plot_options.star_bottom_shift (1, 1) double = - 0.08
     plot_options.star_x_shift (1, 1) double = 0.1
 end
 
@@ -39,6 +39,7 @@ hold(ax, "on");
 % Aesthetics
 xlim(ax, [0.1, 6.4]);
 ylim(ax, [0.735, 0.89]);
+height = diff(ylim(ax));
 xticks(ax, 1:6);
 xticklabels(ax, repmat(["Rational", "Irration.\newline(same)", "Irration.\newline(other)"], 1, 2));
 ylabel(ax, "Balanced accuracy");
@@ -100,7 +101,7 @@ for i_config = 9:10
         end
         % Star
         x_star = plot_options.line_x_shift + star_x_shift + 2.5 + (i_config - 9) * 3;
-        y_star = line_y_coord + plot_options.star_bottom_shift;
+        y_star = line_y_coord + plot_options.star_bottom_shift * height;
         if p < plot_options.p_threshold && mean(dist_rational) < mean(dist_irrational_other)
             text(ax, x_star, y_star, "*", ...
                 HorizontalAlignment="center", ...
@@ -120,7 +121,7 @@ for i_config = 9:10
         end
         % Star
         x_star = plot_options.line_x_shift + star_x_shift + 1.5 + (i_config - 9) * 3;
-        y_star = line_y_coord + plot_options.star_bottom_shift;
+        y_star = line_y_coord + plot_options.star_bottom_shift * height;
         if p < plot_options.p_threshold && mean(dist_rational) < mean(dist_irrational_same)
             text(ax, x_star, y_star, "*", ...
                 HorizontalAlignment="center", ...

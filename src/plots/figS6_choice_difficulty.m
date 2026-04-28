@@ -1,9 +1,11 @@
-% Fig. S6 | Choice difficulty as a function of choice onset time. Average
-% choice ease, as measured in terms of the absolute value difference
-% between options (where option values are derived from each monkey's
-% estimated value profile), is plotted against choice onset time, for both
-% option (light) and attribute (dark) trials. Red and blue colors indicate
-% monkeys (red: monkey F, blue: monkey M).
+% Fig. S6 | Choice ease as a function of choice onset time.
+% 
+% Average choice ease, as measured in terms of the absolute value
+% difference between options (where option values are derived from each
+% monkey's estimated value profile), is plotted against choice onset time,
+% for both option (solid line) and attribute (dashed line) trials. Colors
+% and marker shapes designate monkeys (green circle: monkey F, pink
+% triangle: monkey M).
 
 
 %% === Environment set-up =================================================
@@ -44,5 +46,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS6.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS6.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS6.png"), Resolution=600);

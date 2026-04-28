@@ -1,19 +1,18 @@
 % Fig. S5 | Comparison of CCM entries across monkeys.
 % 
-%   - a, the CCM entries of rational RNNs (y-axis) are plotted against the
-% CCM entries of their associated monkey (x-axis). Each dot is a given CCM
+% a, The CCM entries of rational RNNs (y-axis) are plotted against the CCM
+% entries of their associated monkey (x-axis). Each dot is a given CCM
 % entry (blue: value synthesis, orange: value comparison), and lines relate
-% pairs of entries across monkeys. Accurate predictions of inter-individual 
-% ifferences would show up as oblique lines, aligned with the main diagonal
-% (positive slopes).
+% pairs of entries across monkeys. Accurate predictions of inter-individual
+% differences would show up as oblique lines, aligned with the main
+% diagonal (positive slopes).
 % 
-%   - b, same thing for re-trained (irrational) RNNs.
+% b, Same thing for re-trained (irrational) RNNs.
 % 
-%   - c, Distribution of the average slope (across CCM cells) under the
-% null, for the value synthesis RNNs (irrational RNNs). The black line
-% shows the average slope in the actual data.
-% 
-%   - d, Same thing for value comparison RNNs.
+% c, Distribution of the average slope (across CCM cells) under the null,
+% for the irrational value synthesis RNNs (blue) and irrational value
+% comparison RNNs (orange). The horizontal lines with a diamond show the
+% average slope in the actual data.
 
 
 %% === Environment set-up =================================================
@@ -66,5 +65,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS5.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS5.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS5.png"), Resolution=600);

@@ -33,7 +33,7 @@ arguments
     plot_options.line_step_y_coord (1, 3) double = [1.05, 1.05, 1.6]
     plot_options.line_top_y_coord (1, 1) double = 1.659
     plot_options.line_x_shift (1, 1) double = 0.27
-    plot_options.star_y_shift (1, 1) double = -0.11
+    plot_options.star_y_shift (1, 1) double = - 0.08
     plot_options.star_size (1, 1) double = 14
     plot_options.p_threshold (1, 1) double = 0.005
 end
@@ -45,6 +45,7 @@ xlabel(ax, "Within-trial time step");
 ylabel(ax, "Value readout std.");
 xlim(ax, [1, 5]);
 ylim(ax, [0, 1.66]);
+height = diff(ylim(ax));
 xticks(ax, 2:4);
 setAxFontSize(ax);
 
@@ -92,7 +93,7 @@ for i_step = 2:4
         LineWidth=plot_options.line_width);
     % Star
     x_star = i_step;
-    y_star = line_y_coord + plot_options.star_y_shift;
+    y_star = line_y_coord + plot_options.star_y_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
@@ -115,7 +116,7 @@ plot(ax, x_coord, line_y_coord * ones(1, 2), ...
     LineWidth=plot_options.line_width);
 % Star
 x_star = 3;
-y_star = line_y_coord + plot_options.star_y_shift;
+y_star = line_y_coord + plot_options.star_y_shift * height;
 if p < plot_options.p_threshold
     text(ax, x_star, y_star, "*", ...
         HorizontalAlignment="center", ...

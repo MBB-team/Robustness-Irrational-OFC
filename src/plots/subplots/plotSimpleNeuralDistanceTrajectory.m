@@ -1,5 +1,5 @@
 function [] = plotSimpleNeuralDistanceTrajectory(ax, Data, plot_options)
-% Code for figure S1b, S7a, S7b and S7c.
+% Code for figure S1b and S7a-c.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>

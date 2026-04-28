@@ -40,7 +40,7 @@ arguments
     plot_options.marker_size (1, 1) double = 3
     plot_options.y_lim (1, 2) double = [-1, 0.2]
     plot_options.line_y_coord (1, 1) double = 0.199
-    plot_options.star_y_shift (1, 1) double = -0.09
+    plot_options.star_y_shift (1, 1) double = -0.08
     plot_options.star_size (1, 1) double = 14
     plot_options.p_threshold (1, 1) double = 0.01
 end
@@ -76,6 +76,7 @@ yline(ax, 0, "k:", LineWidth=0.1);
 ylabel(ax, "\beta_{att} - \beta_{unatt}");
 xlim(ax, [-0.8, 0.8]);
 ylim(ax, plot_options.y_lim);
+height = diff(ylim(ax));
 xticks(ax, plot_options.distrib_x_shift * [-2.5, 2.5]);
 xticklabels(ax, ["Rational", "Irrational"]);
 setAxFontSize(ax);
@@ -109,7 +110,7 @@ plot(ax, x_coord, line_y_coord * ones(1, 2), ...
     LineWidth=plot_options.line_width);
 % Star
 x_star = 0;
-y_star = line_y_coord + plot_options.star_y_shift;
+y_star = line_y_coord + plot_options.star_y_shift * height;
 if p < plot_options.p_threshold
     text(ax, x_star, y_star, "*", ...
         HorizontalAlignment="center", ...

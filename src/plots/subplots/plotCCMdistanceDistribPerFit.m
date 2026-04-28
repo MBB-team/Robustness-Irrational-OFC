@@ -14,7 +14,7 @@ function [] = plotCCMdistanceDistribPerFit(ax, Data, plot_options)
 %
 % p_threshold, line_width, priors_color, priors_face_alpha, star_size, 
 % line_y_coord_top, line_y_coord_bottom, line_x_shift, line_y_shift, 
-% star_top_shift, star_bottom_shift :
+% star_bottom_shift :
 %     Name-value parameters controlling visual properties of the plot.
 %
 % OUTPUTS -----------------------------------------------------------------
@@ -32,8 +32,7 @@ arguments
     plot_options.line_y_coord_bottom (1, 1) = 4.55
     plot_options.line_x_shift (1, 1) double = - 0.2
     plot_options.line_y_shift (1, 1) double = 0.13
-    plot_options.star_top_shift (1, 1) double = 0.04
-    plot_options.star_bottom_shift (1, 1) double = - 0.35
+    plot_options.star_bottom_shift (1, 1) double = - 0.08
 end
 
 hold(ax, "on");
@@ -41,6 +40,7 @@ hold(ax, "on");
 % Aesthetics
 xlim(ax, [-0.9, 6.4]);
 ylim(ax, [1.2, 5.3]);
+height = diff(ylim(ax));
 xticks(ax, 0:6);
 xticklabels(ax, ["Initial\newlinestate", ...
     repmat(["Ratio.", "Irratio.\newline(same)", "Irratio.\newline(other)"], 1, 2)]);
@@ -89,7 +89,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 0.5 + (i_config - 9) * 2;
-    y_star = line_y_coord + plot_options.star_bottom_shift;
+    y_star = line_y_coord + plot_options.star_bottom_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
@@ -107,7 +107,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 2.5 + (i_config - 9) * 3;
-    y_star = line_y_coord + plot_options.star_bottom_shift;
+    y_star = line_y_coord + plot_options.star_bottom_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
@@ -125,7 +125,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 1.5 + (i_config - 9) * 3;
-    y_star = line_y_coord + plot_options.star_bottom_shift;
+    y_star = line_y_coord + plot_options.star_bottom_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...

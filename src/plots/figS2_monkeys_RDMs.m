@@ -1,11 +1,13 @@
-% Fig. S2 | RDM matrices at first cue onset for neural populations recorded
-% in either the OFC, dlPFC or ACC. Panels on the left show RDM matrices
-% (color code depicts the Pearson correlation coefficients between activity
-% patterns that are elicited in response to first cue, going from blue -low
-% correlation- to red -high correlation-), organized by cue spatial side
-% (left:L or right:R), type (probability or magnitude) and rank (from 1 to
-% 5). Panels on the right show RDM cells from monkey M (y-axis) plotted
-% against RDM cells from monkey F (x-axis). 
+% Fig. S2 | RDMs at first cue onset for neural populations recorded in
+% either the OFC, dlPFC or ACC.
+% 
+% Panels on the left show RDMs (color code depicts the Pearson correlation
+% coefficients between activity patterns that are elicited in response to
+% first cue, going from blue – low correlation – to pink – high
+% correlation –), organized by cue spatial side (left: L or right: R), type
+% (probability or magnitude) and rank (from 1 to 5). Panels on the right
+% show RDM cells from monkey M (y-axis) plotted against RDM cells from
+% monkey F (x-axis).  
 
 
 %% === Environment set-up =================================================
@@ -106,5 +108,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS2.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS2.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS2.png"), Resolution=600);

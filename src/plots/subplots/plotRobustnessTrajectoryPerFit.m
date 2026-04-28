@@ -1,5 +1,5 @@
 function [] = plotRobustnessTrajectoryPerFit(ax, measure_type, DataIndirect, DataFranck, DataMiles, plot_options)
-% Code for figure S8.
+% Code for figure S8d-e.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
@@ -55,7 +55,7 @@ arguments
     plot_options.line_style_irrational_direct (1, 1) string = "-"
     plot_options.face_alpha (1, 1) double = 0.1
     plot_options.p_threshold (1, 1) double = 0.005
-    plot_options.star_y_coord (1, 1) double = 0.025
+    plot_options.star_y_shift (1, 1) double = 0.04
     plot_options.star_size (1, 1) double = 14
     plot_options.plot_legend (1, 1) logical = false
 end
@@ -182,7 +182,7 @@ if plot_options.plot_legend
 end
 
 % Aesthetics
-ylim(ax, [0.48, 0.7]);
+ylim(ax, [0.47, 0.7]);
 switch measure_type
     case "impaired_units"
         xlabel(ax, "Perc. lesions");
@@ -206,6 +206,7 @@ else
     xticklabels(ax, compose("%d", 10:20:100));
 end
 y_lim = ylim(ax);
+height = diff(ylim);
 setAxFontSize(ax);
 
 % --- Stats --- %
@@ -228,7 +229,7 @@ for i_impairement_level = i_select_impairement_level
     % Plot
     if is_signif
         text(ax, x_values(i_impairement_level), ...
-            y_lim(1) + plot_options.star_y_coord * diff(y_lim), "*", ...
+            y_lim(1) + plot_options.star_y_shift *height, "*", ...
             FontSize=plot_options.star_size, ...
             HorizontalAlignment="center");
     end

@@ -1,5 +1,5 @@
 function [] = plotRobustnessDistribPerFit(ax, measure_type, DataIndirect, DataFranck, DataMiles, plot_options)
-% Code for figure S8.
+% Code for figure S8a-c.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
@@ -49,7 +49,7 @@ arguments
     plot_options.line_y_coord_top (1, 1) double = 0.999
     plot_options.line_x_shift (1, 1) double = - 0.2
     plot_options.line_y_coord_bottom (1, 1) double = 0.95
-    plot_options.star_y_shift (1, 1) double = 0.06
+    plot_options.star_y_shift (1, 1) double = - 0.065
     plot_options.star_size (1, 1) double = 14
 end
 
@@ -59,7 +59,8 @@ hold(ax, "on");
 xlim(ax, [-0.9, 5.9]);
 ylim(ax, [0.45, 0.7]);
 yticks(ax, 0.45:0.05:0.7)
-y_lim = ylim();
+y_lim = ylim(ax);
+height = diff(ylim);
 xticks(ax, [0:2, 3.5 + (0:2)]);
 xticklabels(ax, repmat(["Rat.", "Irrat. distort.", "Irrat. direct"], 1, 2));
 xtickangle(ax, 45);
@@ -112,7 +113,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 0.5 + (i_config - 9) * 3.5;
-    y_star = line_y_coord - plot_options.star_y_shift * diff(y_lim);
+    y_star = line_y_coord + plot_options.star_y_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
@@ -130,7 +131,7 @@ for i_config = 9:10
         LineWidth=plot_options.line_width);
     % Star
     x_star = plot_options.line_x_shift + 1.5 + (i_config - 9) * 3.5;
-    y_star = line_y_coord - plot_options.star_y_shift * diff(y_lim);
+    y_star = line_y_coord + plot_options.star_y_shift * height;
     if p < plot_options.p_threshold
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...

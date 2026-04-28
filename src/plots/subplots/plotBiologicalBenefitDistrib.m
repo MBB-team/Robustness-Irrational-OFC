@@ -1,5 +1,5 @@
 function [] = plotBiologicalBenefitDistrib(ax, Data, measure_label, plot_options)
-% Code for figure 3f.
+% Code for figure 5a-e.
 %
 % INPUTS ------------------------------------------------------------------
 % ax : <matlab.graphics.axis.Axes 1x1>
@@ -33,7 +33,7 @@ arguments
     plot_options.line_y_coord_prop (1, 1) double = 0.01
     plot_options.line_x_shift (1, 1) double = 0.3
     plot_options.p_threshold (1, 1) double = 0.005
-    plot_options.star_y_shift_prop (1, 1) double = - 0.08
+    plot_options.star_y_shift_prop (1, 1) double = - 0.06
     plot_options.label_y_shift_prop (1, 1) double = - 0.033
     plot_options.star_size (1, 1) double = 14
 end
@@ -60,6 +60,7 @@ switch measure_label
 end
 xlim(ax, [8.4, 10.6]);
 ylim(ax, y_lim);
+height = diff(ylim(ax));
 xticks(ax, []);
 ylabel(ax, y_label);
 setAxFontSize(ax);
@@ -105,7 +106,7 @@ for i_config = 9:10
     if p < plot_options.p_threshold
         % Star
         x_star = i_config;
-        y_star = line_y_coord + diff(y_lim) * plot_options.star_y_shift_prop;
+        y_star = line_y_coord + height * plot_options.star_y_shift_prop;
         text(ax, x_star, y_star, "*", ...
             HorizontalAlignment="center", ...
             FontSize=plot_options.star_size, ...
@@ -113,7 +114,7 @@ for i_config = 9:10
     else
         % "n.s." label
         x_label = i_config;
-        y_label = line_y_coord + diff(y_lim) * plot_options.label_y_shift_prop;
+        y_label = line_y_coord + height * plot_options.label_y_shift_prop;
         text(ax, x_label, y_label, "n.s.", ...
             HorizontalAlignment="center", ...
             FontSize=8, ...

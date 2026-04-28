@@ -1,21 +1,21 @@
 % Fig. S7 | Evaluating the accuracy of neural predictions of irrational
-% RNNs directly trained on monkeys’ choices.
+% RNNs directly trained on monkeys' choices.
 % 
-%   - a, Neural distance trajectories between OFC and RNN cohorts during
-% direct irrational training. Points show the average distance between
-% activity patterns of OFC recordings and RNN models (across the 1,000 RNN
+% a, Neural distance trajectories between OFC and RNN cohorts during direct
+% irrational training. Points show the average distance between activity
+% patterns of OFC recordings and RNN models (across the 1,000 RNN
 % instances), computed using either RDMs (x-axis) or CCMs (y-axis) metrics,
-% either at initialization (black dots) or at training convergence (see
+% either at initialization (black crosses) or at training convergence (see
 % legend).
 % 
-%   - b and c, Same, for DLPFC and ACC neurons, respectively.
+% b and c, Same, for dlPFC and ACC neurons, respectively.
 % 
-%   - d, Distributions (across cohort instances) of final neural CCM
-% distances between irrational models and the OFC, the DLPFC and the ACC,
-% for value synthesis (blue) and value comparison (orange) RNNs that rely
-% on a temporal option identity format and an attentional value readout
-% format. Asterisks indicate significant differences between distances with
-% OFC on the one hand, and both DLPFC and ACC on the other hand, with
+% d, Distributions (across cohort instances) of final neural CCM distances
+% between irrational models and the OFC, the dlPFC and the ACC, for value
+% synthesis (blue) and value comparison (orange) RNNs that rely on a
+% temporal option identity format and an attentional value readout format.
+% Asterisks indicate significant differences between distances with OFC on
+% the one hand, and both dlPFC and ACC on the other hand, with
 % p-value < 0.005. This panel reproduces Fig 3g in the main text.
 
 
@@ -85,7 +85,7 @@ plotSimpleNeuralDistanceTrajectory(nexttile(3, [1, 1]), Data, ...
     x_lim=[0.3, 0.7], ...
     y_lim=[2, 4], ...
     title="Distance with the ACC");
-plotCCMdistanceDistribPerArea(nexttile(6, [1, 1]), Data);
+plotCCMdistanceDistribPerArea(nexttile(6, [1, 1]), Data, star_bottom_shift=-0.065);
 
 % Legend
 ghost_plots = gobjects(1, 15);
@@ -150,5 +150,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS7.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS7.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS7.png"), Resolution=600);

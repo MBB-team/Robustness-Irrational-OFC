@@ -91,11 +91,11 @@ cbar.Label.String = "Constraint weight";
 cbar.Label.Position(1) = cbar.Label.Position(1) - 1.5;
 
 % Aesthetics
-ylim(ax, [0.45,  1]);
+ylim(ax, [0.45, 0.8]);
 xlabel(ax, x_label);
 ylabel(ax, "P(rational choice)");
 xticks(ax, []);
-yticks(ax, 0.5:0.1:1);
+yticks(ax, 0.5:0.1:0.8);
 setAxFontSize(ax);
 
 hold(ax, "off");

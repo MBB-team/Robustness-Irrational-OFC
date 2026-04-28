@@ -10,3 +10,4 @@ arguments
 end
 
 fontsize(ax, 8, "points");
+fontname(ax, "Arial")

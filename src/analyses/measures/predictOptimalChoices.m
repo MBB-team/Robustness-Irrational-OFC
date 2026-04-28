@@ -73,14 +73,14 @@ else
 
     % --- Compare RNN and optimal choices --- %
 
-    % Select monkey choices in the same reference frame as the RNN
+    % Select optimal choices in the same reference frame as the RNN
     optimal_choices = inputs.DataSamplesAll.("choice_" + Config.output_label);
     optimal_choices = optimal_choices';
 
     % Compute balanced accuracy at each trial step
     analysis_output.bacc_optimal = NaN(3, 1);
     for i_step = 2:4
-        select_step = inputs.DataSamplesAll.i_step == i_step;
+        select_step = (inputs.DataSamplesAll.i_step == i_step);
         analysis_output.bacc_optimal(i_step - 1) = computeBalancedAccuracy(...
             optimal_choices(select_step), network_choices(select_step));
     end

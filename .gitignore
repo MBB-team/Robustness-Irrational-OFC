@@ -1,3 +1,6 @@
 **.asv
+**.af
+**.af~lock~
+
 data/models/
 data/monkeys/raw/

@@ -1,13 +1,13 @@
 % Fig. S1 | Specificity of information content in RNN cohorts.
 % 
-%   - a, Decoding accuracy of each type of option values (lines) is shown
-% for each RNN cohort (columns).
+% a, Decoding accuracy of each type of output (lines) is shown for each RNN
+% cohort (columns).
 % 
-%   - b, Neural distance trajectories between OFC and RNN cohorts during
+% b, Neural distance trajectories between OFC and RNN cohorts during
 % rational training. Points show the average distance between activity
 % patterns of OFC recordings and RNN models (across the 1,000 RNN
 % instances), computed using either RDMs (x-axis) or CCMs (y-axis) metrics,
-% either at initialization (black dots) or at training convergence (see
+% either at initialization (black crosses) or at training convergence (see
 % legend). This is a simple summary of Fig. 2c in the main text.
 
 
@@ -101,5 +101,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS1.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS1.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS1.png"), Resolution=600);

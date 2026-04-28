@@ -1,41 +1,41 @@
 % Fig. 3 | Behavioral and neural realism of candidate RNN models of the
 % OFC.
-%
-%   - a/b, Estimated option values for monkey F(a) and M(b) are shown as a
-% function of reward’s magnitude rank (x-axis) and probability rank
-% (y-axis).
-%
-%   - c, Rational options values are defined as the expected reward, i.e.
-% the product of reward magnitude and probability. Note that when an
-% attribute is unknown (cf. question mark), the rational model replaces it
-% with its mean.
-%  
-%   - d, Monkeys’ estimated values (y-axis) are plotted against rational
-% values (x-axis). Each point represents a specific combination of
-% probability and magnitude ranks, including cases where one or both
-% attributes are unknown.
 % 
-%   - e, Balanced accuracy for predicting monkey choices. Each color
-% corresponds to one of the two candidate models (blue: value synthesis,
-% orange: value comparison). Lighter distributions correspond to rational
-% models, darker distributions to irrational models, and distributions with
-% a dashed outline represent irrational models trained on one monkey and
-% tested on the other. Within each violin plot, the horizontal line denotes
-% the mean, and the thicker vertical line represents the interquartile
-% range (25th – 75th percentile). Asterisks indicate significant
-% differences, with p-value < 0.005.
+% a and b, Estimated option values (see Methods) for monkey F (a) and M (b)
+% are shown as a function of reward's magnitude rank (x-axis) and
+% probability rank (y-axis).
 % 
-%   - f, Neural CCM distance between models and the OFC. The white
-% distribution corresponds to random RNN initializations (identical for
-% both RNN cohorts). g, Neural CCM distance between irrational models and
-% the OFC, the dlPFC and the ACC. h, Proportion of units classified as
-% offer value, chosen value or chosen option cells, in RNNs models and in
-% recorded OFC neurons (black dotted lines), at the time of choice.
-%
-%   - g, Neural CCM distance between irrational models and the OFC, the
-% dlPFC and the ACC. h, Proportion of units classified as offer value,
-% chosen value or chosen option cells, in RNNs models and in recorded OFC
-% neurons (black dotted lines), at the time of choice.
+% c, Rational options values are defined as the expected reward, i.e. the
+% product of reward magnitude and probability. Note that when an attribute
+% is unknown (cf. question mark), the rational model replaces it with its a
+% priori expected rank.
+% 
+% d, Monkeys' estimated values (y-axis) are plotted against rational values
+% (x-axis). Each point represents a specific combination of probability and
+% magnitude ranks, including cases where one or both attributes are
+% unknown.
+% 
+% e, Balanced accuracy for predicting monkey choices (green circle:
+% monkey F, pink triangle: monkey M), under each candidate model (blue:
+% value synthesis, orange: value comparison). Lighter distributions
+% correspond to rational models, darker distributions to irrational models,
+% and right-most distributions represent irrational models trained on one
+% monkey and tested on the other. Within each violin plot, the horizontal
+% line denotes the mean, and the thicker vertical line represents the
+% interquartile range (25th – 75th percentile). Asterisks indicate
+% significant differences, with p-value < 0.005.
+% 
+% f, Neural CCM distance between models and the OFC. The white distribution
+% corresponds to random RNN initializations (identical for both RNN
+% cohorts).
+% 
+% g, Neural CCM distance (averaged across monkey-specific distances)
+% between irrational models and the OFC, the dlPFC and the ACC.
+% 
+% h, Percentage of units classified as offer value, chosen value or chosen
+% option cells, in rational and irrational RNN models and in recorded OFC
+% neurons (green circle: monkey F, pink triangle: monkey M), at the time of
+% choice.
 
 
 %% === Environment set-up =================================================
@@ -123,5 +123,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig3.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "fig3.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "fig3.png"), Resolution=600);

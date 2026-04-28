@@ -1,39 +1,43 @@
 % Fig. 4 | Interference mechanisms in irrational models and monkeys.
-%
-%   - a, Schematic procedure for evaluating the RNNs' sensitivity to cue
+% 
+% a, Schematic procedure for evaluating the RNNs' sensitivity to cue
 % presentation order.
 % 
-%   - b, Standard deviation of the irrational value synthesis RNNs' outputs
-% in response to random permutations of cue sequence orders (y-axis), as a
-% function of cue onset times (x-axis) during option trials only (light) or
-% attribute trials only (dark). Asterisks indicate p-value < 0.005.
-%
-%   - c, Same format as panel b, but for irrational value comparison RNNs.
-%
-%   - d, Rate of monkeys' irrational choices (y-axis), as a function of cue
-% onset time, for both option (light) and attribute (dark) trials.
-% Asterisks indicate that the difference between time steps (averaged over
-% both monkeys and trial types) are significant, with p-value < 0.02.
-%
-%   - e, Average residual irrational choice rate, once decision difficulty
-% has been regressed away (same format as panel d).
-%
-%   - f, Average value output of irrational value synthesis RNNs (greyscale
-% nuances), as a function of the rank of both previously (x-axis) and
-% currently (y-axis) attended cues (see Methods).
-%
-%   - g, Same format as panel f, but for irrational value comparison RNNs.
-%
-%   - h/i, Same format as panel f, but for both monkeys (h: monkey F,
-% i: monkey M). 
-%
-%   - j, Average difference in the gradient of the RNNs' value output
-% w.r.t. cue rank (attended cue minus unattended cue, see Methods), for
-% both rational (light) and irrational (dark) variants of RNNs (blue: value
-% synthesis, orange: value comparison). The asterisk denotes a significant
-% difference between rational and irrational RNNs, with p-value < 0.01.
-% Black dotted lines indicate the gradient difference for both monkeys.
-
+% b, Standard deviation of the irrational value synthesis RNNs' outputs in
+% response to random permutations of cue sequence orders (y-axis), as a
+% function of cue onset times (x-axis) during option trials only (solid
+% line) or attribute trials only (dashed line). Asterisks indicate
+% p-value < 0.005.
+% 
+% c, Same format as panel b, but for irrational value comparison RNNs.
+% 
+% d, Rate of monkeys' irrational choices (y-axis; green circle: monkey F,
+% pink triangle: monkey M), as a function of cue onset time, for both
+% option (solid) and attribute (dashed) trials. Vertical error bars show
+% the standard error. Asterisks indicate that the difference between time
+% steps (averaged over both trial types) are significant, with
+% p-value < 0.02.
+% 
+% e, Average residual irrational choice rate, once decision difficulty has
+% been regressed away (same format as panel d).
+% 
+% f, Average value output (color scale) of irrational value synthesis RNNs,
+% as a function of the rank of both previously (x-axis) and currently
+% (y-axis) attended cues (see Methods).
+% 
+% g, Same format as panel f, but for irrational value comparison RNNs.
+% 
+% h and i, Same format as panel f, but for both monkeys (h: monkey F,
+% i: monkey M).
+% 
+% j, Difference between the contributions of cue ranks to the attended
+% pseudo-value (attended cue minus unattended cue; see Methods), for both
+% rational (light) and irrational (dark) variants of value synthesis RNNs.
+% The asterisk denotes a significant difference between rational and
+% irrational RNNs, with p-value < 0.01. Colored dotted lines indicate the
+% attended/unattended cue contribution difference for both monkeys.
+% 
+% k, Same format as panel j, but for value comparison RNNs.
 
 
 %% === Environment set-up =================================================
@@ -91,7 +95,6 @@ plotAttendedValueProfile(nexttile(7, [1, 1]), ...
 plotAttendedValueProfile(nexttile(8, [1, 1]), ...
     MonkeyAttentionPollution.Miles.value_function_attended, ...
     sprintf("Monkey M \\color[rgb]{%f, %f, %f}▲", defineMonkeyColor("Miles")));
-plotMonkeyIrrationalChoices(nexttile(10, [1, 1]), MonkeyResidualsData, true);
 plotCueAttentionPollutionDistrib(nexttile(11, [1, 1]), Data, 9);
 plotCueAttentionPollutionDistrib(nexttile(12, [1, 1]), Data, 10);
 
@@ -159,5 +162,5 @@ cbar.YAxisLocation = "right";
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig4bcdefghijk.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "fig4bcdefghijk.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "fig4bcdefghijk.png"), Resolution=600);

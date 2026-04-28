@@ -1,7 +1,9 @@
 % Fig. S4 | Comparison of RDM and CCM variance over brain regions and over
-% subjects. Black curves depict the distribution, under the null, of the
-% log ratio of RDM (left) and CCM (right) variance over regions and
-% monkeys. Red lines show the log ratio of variances in the actual data.
+% subjects.
+% 
+% Grey areas depict the distribution, under the null, of the log ratio of
+% RDM (left) and CCM (right) variance over regions and monkeys. Pink lines
+% show the log ratio of variances in the actual data.
 
 
 %% === Environment set-up =================================================
@@ -45,5 +47,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "figS4.pdf"), ContentType="vector");
+saveas(f, fullfile(getPath("Figures"), "figS4.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "figS4.png"), Resolution=600);

@@ -1,22 +1,23 @@
 % Fig. 5 | Potential biological benefits of irrational circuits.
-%
+% 
 % For all panels, asterisks indicate a significant difference between
 % rational (light) and irrational (dark) RNNs (blue: value synthesis,
-% orange: value comparison), with p-value < 0.005.
+% orange: value comparison), with
+% p-value < 0.005.
 % 
-% - a, Metabolic cost, measured as the average network activity, over all
-% trials, trial steps, and units.
-% 
-% - b, Neural code redundancy, measured as the average co-activation
-% probability over all integration units pairs.
-% 
-% - c, Information transfer rate, measured as the entropy of units response
+% a, Metabolic cost, measured as the average network activity, over all
+% trials, trial steps, and units. 
+
+% b, Neural code redundancy, measured as the average co-activation
+% probability over all integration units pairs. 
+
+% c, Information transfer rate, measured as the entropy of units response
 % outputs.
 % 
-% - d, Excitatory-inhibitory balance, measured as the relative proportion
-% of negative and positive connection weights.
+% d, Excitatory-inhibitory balance, measured as the relative proportion of
+% positive and negative connection weights.
 % 
-% - e, Tolerance to neural loss, measured as the retained rate of rational
+% e, Tolerance to neural loss, measured as the retained rate of rational
 % choice from 10% to 50% of lesioned units.
 
 
@@ -74,5 +75,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-exportgraphics(f, fullfile(getPath("Figures"), "fig5.pdf"), ContentType="vector");
+% saveas(f, fullfile(getPath("Figures"), "fig5.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "fig5.png"), Resolution=600);
