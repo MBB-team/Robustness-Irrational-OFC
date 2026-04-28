@@ -1,5 +1,5 @@
 function [] = trainModelsInitialRationalConstrained(constraint, ...
-    constraint_weight, constraint_field)
+    constraint_weight, target_config)
 % Trains RNNs to exhibit rational decision-making behaviour under
 % biological constraints.
 %
@@ -84,7 +84,7 @@ function [] = trainModelsInitialRationalConstrained(constraint, ...
 arguments
     constraint (1, 1) function_handle
     constraint_weight (1, :) double
-    constraint_field (1, 1) string = ""
+    target_config (1, :) double = 1:length(getDesiredNetworkConfigs())
 end
 
 
@@ -100,7 +100,7 @@ elseif isequal(constraint, @computeCodeRedundancy)
 end
 
 % Initialize folders and training specifications
-[all_Config, n_config, path_networks, path_specs, DatasetSpecs] = ...
+[all_Config, ~, path_networks, path_specs, DatasetSpecs] = ...
     prepareInitialTraining("rational_" + constraint_field);
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
@@ -111,7 +111,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
         initializeNewInitialTrainingBatch(path_specs);
 
     % ~ Loop through configurations to train ~ %
-    for i_config = 1:n_config
+    for i_config = target_config
 
         Config = all_Config{i_config};
 
@@ -120,12 +120,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
             % ~ Loop through RNNs to train ~ %
             for i_network = (1:DatasetSpecs.batch_size) + shift_i_network
-
-                % TEMPORARY: skip if the file already exists
-                network_path = fullfile(path_networks, defineFilenamePattern(Config, i_network, constraint_weight(i_weight)));
-                if isfile(network_path)
-                    continue;
-                end
 
                 % Select initial conditions and datasets for training and testing
                 [init_params, input_train, output_train, input_test, ...
@@ -143,7 +137,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
                 % Save the RNN if it achieves sufficient performance on the test set
                 saveInitialTrainingNetwork(Config, i_network, "FitRationalConstrained", ...
-                    params, fit_train, fit_test, out, path_networks, 1:n_config, ...
+                    params, fit_train, fit_test, out, path_networks, i_config, ...
                     constraint_field, constraint_weight(i_weight));
 
             end

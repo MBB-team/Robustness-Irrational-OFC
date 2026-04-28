@@ -1,4 +1,4 @@
-function [] = trainModelsInitialIrrational(monkey)
+function [] = trainModelsInitialIrrational(monkey, target_config)
 % Trains RNNs to exhibit irrational decision-making behaviour.
 %
 % This function trains multiple cohorts of RNNs that implement slightly
@@ -51,6 +51,7 @@ function [] = trainModelsInitialIrrational(monkey)
 
 arguments
     monkey (1, 1) string {mustBeMember(monkey, ["Franck", "Miles"])}
+    target_config (1, 1) double
 end
 
 % Initialize folders and training specifications
@@ -63,10 +64,9 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
     % Load or initialize a new batch of training specifications for RNNs
     [DatasetSpecs, shift_i_network] = ...
         initializeNewInitialTrainingBatch(path_specs, monkey);
-    shift_i_network = 0;
 
     % ~ Loop through configurations to train ~ %
-    for i_config = 1:n_config
+    for i_config = target_config
    
         Config = all_Config{i_config};
 
@@ -80,12 +80,6 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         parfor i_network_seed = (1:DatasetSpecs.batch_size)
 
             i_network = DatasetSpecs.seed_rational(i_network_seed + shift_i_network);
-
-            % TEMPORARY: skip if the file already exists
-            network_path = fullfile(path_networks, defineFilenamePattern(Config, i_network));
-            if isfile(network_path)
-                continue;
-            end
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
@@ -108,7 +102,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         end
     end
 
-    % Do not filter unsuccessful seeds from this batch
-    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, false);
+    % Filter unsuccessful seeds from this batch
+    DatasetSpecs = endInitialTrainingBatch(path_specs, path_networks, true);
 
 end
