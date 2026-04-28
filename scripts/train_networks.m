@@ -9,8 +9,6 @@
 %   - Initial training
 %   - Re-training / distortion procedures
 %   - Training under biological constraints
-% across multiple rationality regimes (rational, irrational, subjectively
-% rational).
 %
 % -------------------------------------------------------------------------
 % ADDITIONAL TRAINING PROCEDURES (NOT INCLUDED IN THIS SCRIPT)
@@ -44,10 +42,17 @@
 % below.
 %
 % -------------------------------------------------------------------------
+% RUN TIME
+% -------------------------------------------------------------------------
+% Training on a CPU takes approximately 1h per model, and a few days if
+% there is an additional training constraint. All training scripts are
+% compatible with parallel processing.
+%
+% -------------------------------------------------------------------------
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 12/02/2026
+% Date: 28/04/2026
 
 
 %% === Environment set-up =================================================
@@ -63,24 +68,27 @@ FLAGS = struct();
 
 % Main paper training pipeline
 FLAGS.train_rational_networks                 = true;
-FLAGS.train_irrational_networks               = true;
 FLAGS.distort_rational_networks_to_irrational = true;
 
-% For supplementary material only
-FLAGS.train_rational_subj_networks            = true;
-FLAGS.distort_irrational_networks_to_rational = true;
-
-% For figure 1 only: training with biological constraints
+% Figure 1 only: training with biological constraints
 FLAGS.constraint_energetic_budget             = true;
 FLAGS.constraint_info_transfer_rate           = true;
 FLAGS.constraint_robustness                   = true;
 FLAGS.constraint_EI_balance                   = true;
-FLAGS.constraint_weights                      = [0.01, 0.1, 1, 10, 100];
-FLAGS.train_rational_constrained_networks = any([...
+FLAGS.constraint_weights                      = [0.001, 0.01, 0.1, 1, 10, 100, 1000];
+FLAGS.train_rational_constrained_networks = ...
+    any([...
     FLAGS.constraint_energetic_budget, ...
     FLAGS.constraint_info_transfer_rate, ...
     FLAGS.constraint_robutsness, ...
     FLAGS.constraint_EI_balance]);
+
+% Supplementary material
+FLAGS.train_irrational_networks               = true;
+
+% Additional analyses (not included in the paper)
+FLAGS.train_rational_subj_networks            = true;
+FLAGS.distort_irrational_networks_to_rational = true;
 
 
 %% === Call model training functions ======================================

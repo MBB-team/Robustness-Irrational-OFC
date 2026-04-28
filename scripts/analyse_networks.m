@@ -9,10 +9,17 @@
 % defined below.
 %
 % -------------------------------------------------------------------------
+% RUN TIME
+% -------------------------------------------------------------------------
+% Most analyses are completed across all models (last step only) in a few
+% minutes, except for the robustness computations, which take approximately
+% 40s per model.
+%
+% -------------------------------------------------------------------------
 % AUTHOR & VERSION
 % -------------------------------------------------------------------------
 % Author: Juliette Bénon
-% Date: 12/02/2026
+% Date: 28/04/2026
 
 
 %% === Environment set-up =================================================
@@ -30,7 +37,7 @@ FLAGS = struct();
 FLAGS.analyse_last_step_only                      = true;
 
 % Which networks to analyse (identified by their initial training procedure)
-FLAGS.analyse_rational_networks                   = true;
+FLAGS.analyse_rational_networks                   = false;
 FLAGS.analyse_irrational_networks                 = false;
 FLAGS.analyse_rational_subj_networks              = false;
 FLAGS.analyse_rational_constrained_networks       = false;
@@ -39,8 +46,8 @@ FLAGS.analyse_rational_constrained_networks       = false;
 
 % Characterization of choice behaviour
 FLAGS.fit_one_value_profile                       = false;
-FLAGS.predictMonkeyChoices                        = false;
-FLAGS.predictOptimalChoices                       = false;
+FLAGS.predict_monkey_choices                      = false;
+FLAGS.predict_optimal_choices                     = false;
 
 % Characterization of neural coding
 FLAGS.compute_framework_information_loss          = false;
@@ -52,7 +59,7 @@ FLAGS.compute_cue_order_pollution                 = false;
 % Neural properties
 FLAGS.categorize_integration_units                = false;
 FLAGS.generate_neural_geometry_matrices           = false;
-FLAGS.compute_neural_distance                     = true;
+FLAGS.compute_neural_distance                     = false;
 
 % Biological constraints
 FLAGS.compute_EI_balance                          = false;
@@ -61,6 +68,7 @@ FLAGS.compute_energetic_budget                    = false;
 FLAGS.compute_code_redundancy                     = false;
 FLAGS.compute_robustness_to_unit_lesions          = false;
 FLAGS.compute_robustness_to_connection_lesions    = false;
+FLAGS.compute_robustness_to_noise                 = false;
 
 
 %% === Call measure functions =============================================
@@ -113,14 +121,14 @@ for folder_name = all_folder_names
         fprintf("Done.\n");
     end
 
-    if FLAGS.predictMonkeyChoices
+    if FLAGS.predict_monkey_choices
         fprintf("\n Predict monkey choices...\n");
         callMeasure(@predictMonkeyChoices, file_name, ...
             supp_variable="fit_label");
         fprintf("Done.\n");
     end
 
-    if FLAGS.predictOptimalChoices
+    if FLAGS.predict_optimal_choices
         fprintf("\n Predict optimal choices...\n");
         callMeasure(@predictOptimalChoices, file_name);
         fprintf("Done.\n");
@@ -206,6 +214,12 @@ for folder_name = all_folder_names
     if FLAGS.compute_robustness_to_connection_lesions
         fprintf("\n Compute robustness to connection lesions...\n");
         callMeasure(@computeRobustnessToConnectionLesions, file_name);
+        fprintf("Done.\n");
+    end
+
+    if FLAGS.compute_robustness_to_noise
+        fprintf("\n Compute robustness to internal noise...\n");
+        callMeasure(@computeRobustnessToInternalNoise, file_name);
         fprintf("Done.\n");
     end
 
