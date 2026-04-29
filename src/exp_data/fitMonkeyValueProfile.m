@@ -51,7 +51,7 @@ for monkey = ["Franck", "Miles"]
     preprocess_inputs.monkey_choices = DataSamples.choice_loc;
 
     % Fit the model
-    analysis_output = fitOneValueProfile(NaN, struct(), [], preprocess_inputs);
+    analysis_output = fitOneValueProfile(NaN, struct(), NaN, preprocess_inputs);
     ValueProfile.(monkey) = analysis_output;
 
 end

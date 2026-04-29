@@ -90,6 +90,8 @@ else
             "_DatasetSpecs.mat");
         DatasetSpecs = generateTrainTestDataset(path_specs, false);
         DataSamples = expandCueSamples(DatasetSpecs.CueDatasetTest{seed});
+    else
+        DataSamples = inputs.DataSamples;
     end
 
     % --- Define the VBA model --- %
