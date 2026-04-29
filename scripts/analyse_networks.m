@@ -1,6 +1,16 @@
 % =========================================================================
-% MASTER ANALYSIS PIPELINE
+% MASTER MODEL ANALYSIS PIPELINE
 % =========================================================================
+%
+% -------------------------------------------------------------------------
+% OVERVIEW
+% -------------------------------------------------------------------------
+% This script orchestrates the analysis pipeline applied to trained network
+% models. It controls:
+%   - Selection of networks to analyse (e.g., rational, irrational, ...)
+%   - Selection of training stages to analyse (full history, last step
+%   only)
+%   - Execution of analysis modules
 %
 % -------------------------------------------------------------------------
 % USAGE
@@ -23,6 +33,7 @@
 
 
 %% === Environment set-up =================================================
+
 setup;
 clear variables;
 close all hidden;
