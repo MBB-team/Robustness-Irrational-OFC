@@ -69,7 +69,7 @@ Each model file follows the naming convention: `[input format]_TO_[output format
 For example, `loc_TO_attention_both_ARCH_sig_z_5.mat` corresponds to a model that takes spatial input (left/right option), outputs both attended and unattended values, and was trained with random seed 5.
 
 > [!NOTE]
-> `ARCH_sig_z` indicates a sigmoid activation function with recurrent connections within the integration layer (`z`). Alternative configurations (e.g. Gaussian activation or different recurrent connections) can be specified by modifying `getDesiredNetworkConfigs` (see [Source code > Model training](#model-training)).
+> `ARCH_sig_z` indicates a sigmoid activation function with recurrent connections within the integration layer (`z`). Alternative configurations (e.g. Gaussian activation or different recurrent connections) can be specified by modifying `getDesiredNetworkConfigs` (see [Source code > :arrows_clockwise: Model training](#arrows_clockwise-model-training)).
 
 Models trained under biological constraints include an additional parameter: `[input format]_TO_[output format]_[value computation]_ARCH_sig_z_[rng seed]_[constraint weight].mat`.
 
@@ -276,7 +276,7 @@ Models can be trained using `scripts/train_networks.m`, which automates the exec
 
 > Bénon, J. (2026). <i>Irrational value computations in the orbitofrontal cortex reflect circuit-level robustness</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
 
-Download and unzip the files corresponding to each training procedure, then copy their content to `data/models/raw/` to reproduce the following architecture (for more details, see [Data > Raw trained models](#robot-raw-trained-models)):
+Download and unzip the files corresponding to each training procedure, then copy their content to `data/models/raw/` to reproduce the following architecture (for more details, see [Data > :robot: Raw trained models](#robot-raw-trained-models)):
 
 ```
 data/
