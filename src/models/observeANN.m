@@ -77,12 +77,6 @@ output = reshape(output, [], 1);
 if isfield(in, "constraint") && isfield(in, "constraint_field") && ...
         isfield(in, "constraint_weight") && isfield(in, "constraint_inputs")
 
-    % Modify the function behaviour if necessary
-    if isequal(in.constraint, @computeRobustnessToUnitLesions)
-        % Compute robustness to 1-unit lesions only
-        in.Config.n_units_z_lesion = 1;
-    end
-
     % Process the vector of parameters
     analysis_output = in.constraint(P, in.Config, 0, in.constraint_inputs);
 

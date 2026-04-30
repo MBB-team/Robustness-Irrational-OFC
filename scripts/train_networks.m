@@ -68,14 +68,14 @@ close all hidden;
 FLAGS = struct();
 
 % Main paper training pipeline
-FLAGS.train_rational_networks                 = true;
+FLAGS.train_rational_networks                 = false;
 FLAGS.train_irrational_networks               = false;
 FLAGS.distort_rational_networks_to_irrational = false;
 
 % Figure 1 only: training with biological constraints
 FLAGS.constraint_energetic_budget             = false;
 FLAGS.constraint_info_transfer_rate           = false;
-FLAGS.constraint_robustness                   = false;
+FLAGS.constraint_robustness                   = true;
 FLAGS.constraint_EI_balance                   = false;
 FLAGS.constraint_weights                      = [0.001, 0.01, 0.1, 1, 10, 100, 1000];
 FLAGS.train_rational_constrained_networks = ...
@@ -158,7 +158,7 @@ if FLAGS.train_rational_constrained_networks
     tic
     if FLAGS.constraint_robustness
         fprintf("\nConstraint on the robustness to unit lesions...\n");
-        trainModelsInitialRationalConstrained(@computeRobustnessToUnitLesions, FLAGS.constraint_weights);
+        trainModelsInitialRationalConstrained(@computeSimpleRobustnessToUnitLesions, FLAGS.constraint_weights);
         fprintf("Done.\n");
     end
     toc
