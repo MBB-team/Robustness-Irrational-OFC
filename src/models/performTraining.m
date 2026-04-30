@@ -136,7 +136,7 @@ if ~ train_all_params
 end
 
 % Special initialization for reduced ("value comparison") architectures
-if Config.n_params < 220
+if Config.n_params < 220 && train_all_params
     % Initialize readout weights as differences between single value
     % readouts
     posterior.muPhi(Config.ParamRange.readout) = ...

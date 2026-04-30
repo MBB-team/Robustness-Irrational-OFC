@@ -44,7 +44,7 @@ function [] = trainModelsInitialRational()
     prepareInitialTraining("rational");
 
 % ~ Train RNNs until the target number of models per cohort is reached ~ %
-while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
+while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort
 
     % Load or initialize a new batch of training specifications for RNNs
     [DatasetSpecs, shift_i_network] = ...
@@ -56,7 +56,7 @@ while DatasetSpecs.n_networks_cohort < DatasetSpecs.n_target_networks_cohort + 1
         Config = all_Config{i_config};
     
         % ~ Loop through RNNs to train ~ %
-        parfor i_network = (1:DatasetSpecs.batch_size) + shift_i_network
+        for i_network = (1:DatasetSpecs.batch_size) + shift_i_network
 
             % Select initial conditions and datasets for training and testing
             [init_params, input_train, output_train, input_test, ...
