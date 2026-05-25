@@ -1,7 +1,7 @@
 # Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits
 [![MATLAB](https://img.shields.io/badge/MATLAB-R2024b-648fff)](https://www.mathworks.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-dc267f)](LICENSE)
-[![DOI](https://img.shields.io/badge/DOI-10.1101%2F2025.07.10.664081)](https://doi.org/10.1101/2025.07.10.664081)
+[![DOI](https://img.shields.io/badge/DOI-10.1101%2F2025.07.10.664081-fe6100)](https://doi.org/10.1101/2025.07.10.664081)
 
 This repository contains the code used in:
 > Bénon, J., Pessiglione, M., Vinckier, F., & Daunizeau, J. (2026). *Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits*. bioRxiv. [https://doi.org/10.1101/2025.07.10.664081](https://doi.org/10.1101/2025.07.10.664081)
