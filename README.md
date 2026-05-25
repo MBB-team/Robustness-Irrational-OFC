@@ -4,7 +4,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.32124898-fe6100)](https://doi.org/10.6084/m9.figshare.32124898)
 
 This repository contains the code used in:
-> (in review)
+> Bénon, J., Pessiglione, M., Vinckier, F., & Daunizeau, J. (2026). *Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits*. bioRxiv. [https://doi.org/10.1101/2025.07.10.664081](https://doi.org/10.1101/2025.07.10.664081)
 
 **Quick navigation**
 - :brain: Understand the code and data structure → see [Repository structure](#repository-structure)  
@@ -19,12 +19,12 @@ This repository contains the code used in:
     - [Results](#results)
 - [Full pipeline](#full-pipeline)
     - [Overview](#overview)
-    1. [Configure MATLAB project](#1-configure-matlab-project)
-    2. [Download raw experimental data](#2-download-raw-experimental-data)
-    3. [Process experimental data](#3-process-experimental-data)
-    4. [Train models](#4-train-models)
-    5. [Analyse trained models](#5-analyse-trained-models)
-    6. [Generate results](#6-generate-results)
+    - [1. Configure MATLAB project](#1-configure-matlab-project)
+    - [2. Download raw experimental data](#2-download-raw-experimental-data)
+    - [3. Process experimental data](#3-process-experimental-data)
+    - [4. Train models](#4-train-models)
+    - [5. Analyse trained models](#5-analyse-trained-models)
+    - [6.Generate results](#6-generate-results)
 - [Dependencies](#dependencies)
 - [Citation](#citation)
 - [Contact](#contact)
@@ -78,6 +78,7 @@ Models trained under biological constraints include an additional parameter: `[i
 Each `.mat` files contains:
 - a `Config` structure describing the model architecture
 - one or more `Fit[fit label]` structure storing training trajectories
+
 Rational models include multiple training stages:
 - `FitRational`: initial rational training
 - `FitIrrationalFranck`: distortion from the rational state to an irrational state based on monkey F's choices
@@ -212,7 +213,7 @@ Then, open MATLAB in the project root directory and run `setup` to configure pat
 
 The experimental dataset is required for comparisons between models and monkeys. It was collected by Hunt and colleagues, with analysis results published in: 
 
-> Hunt, L. T., Malalasekera, W. M. N., de Berker, A. O., Miranda, B., Farmer, S. F., Behrens, T. E. J., & Kennerley, S. W. (2018). Triple dissociation of attention and decision computations across prefrontal cortex. Nature Neuroscience, 21(10), 1471–1481. [https://doi.org/10.1038/s41593-018-0239-5](https://doi.org/10.1038/s41593-018-0239-5)
+> Hunt, L. T., Malalasekera, W. M. N., de Berker, A. O., Miranda, B., Farmer, S. F., Behrens, T. E. J., & Kennerley, S. W. (2018). Triple dissociation of attention and decision computations across prefrontal cortex. *Nature Neuroscience, 21*(10), 1471–1481. [https://doi.org/10.1038/s41593-018-0239-5](https://doi.org/10.1038/s41593-018-0239-5)
 
 The dataset can be freely downloaded from the CRCNS platform:
 
@@ -276,7 +277,7 @@ Models can be trained using `scripts/train_networks.m`, which automates the exec
 
 > Bénon, J. (2026). <i>Irrational value computations in the orbitofrontal cortex reflect circuit-level robustness</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
 
-Download and unzip the files corresponding to each training procedure, then copy their content to `data/models/raw/` to reproduce the following architecture (for more details, see [Data > :robot: Raw trained models](#robot-raw-trained-models)):
+Download and unzip the files corresponding to each training procedure, then copy their content to `data/models/raw/` to reproduce the following architecture:
 
 ```
 data/
@@ -295,7 +296,7 @@ data/
 > [!NOTE]
 > More details on the analysis results data format: [Data > :microscope: Model analysis results](#microscope-model-analysis-results)
 
-Models can be analysed using `scripts/analyse_networks.m`, which automated the execution of analysis functions in `src/analyses/measures/`. The script contains flags controlling:
+Models can be analysed using `scripts/analyse_networks.m`, which automates the execution of analysis functions in `src/analyses/measures/`. The script contains flags controlling:
 - which training steps are analysed
 - which training procedures are included
 - which analyses are performed
@@ -374,7 +375,7 @@ All statistical analyses can be computed by running scripts in `src/stats_tests/
 
 - MATLAB (tested on MATLAB R2024b)
 - Statistic and Machine Learning Toolbox
-- Parallel Processing Toolbox (required for model training only)
+- Parallel Processing Toolbox (strongly recommanded for model training, useful for model analysis)
 - VBA toolbox (adapted version included in `src/VBA_dep/`)
 
 ## Citation
