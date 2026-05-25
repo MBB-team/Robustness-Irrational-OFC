@@ -1,7 +1,7 @@
-# Biological profits of irrational computations in the orbitofrontal cortex
+# Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits
 [![MATLAB](https://img.shields.io/badge/MATLAB-R2024b-648fff)](https://www.mathworks.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-dc267f)](LICENSE)
-[![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.32124898-fe6100)](https://doi.org/10.6084/m9.figshare.32124898)
+[![DOI](https://img.shields.io/badge/DOI-10.1101%2F2025.07.10.664081)](https://doi.org/10.1101/2025.07.10.664081)
 
 This repository contains the code used in:
 > Bénon, J., Pessiglione, M., Vinckier, F., & Daunizeau, J. (2026). *Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits*. bioRxiv. [https://doi.org/10.1101/2025.07.10.664081](https://doi.org/10.1101/2025.07.10.664081)
@@ -244,7 +244,7 @@ The experimental data can be processed using `scripts/analyse_exp_data.m`, which
 
 :fast_forward: Alternatively, processed experimental data can be freely downloaded from:
 
-> Bénon, J. (2026). <i>Irrational value computations in the orbitofrontal cortex reflect circuit-level robustness</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
+> Bénon, J. (2026). <i>Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
 
 Download and unzip the file `monkeys_processed.zip`, then copy its content to `data/monkeys/processed/` to reproduce the following architecture:
 
@@ -275,7 +275,7 @@ Models can be trained using `scripts/train_networks.m`, which automates the exec
 
 :fast_forward: Alternatively, raw trained models can be freely downloaded from:
 
-> Bénon, J. (2026). <i>Irrational value computations in the orbitofrontal cortex reflect circuit-level robustness</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
+> Bénon, J. (2026). <i>Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
 
 Download and unzip the files corresponding to each training procedure, then copy their content to `data/models/raw/` to reproduce the following architecture:
 
@@ -346,7 +346,7 @@ Below are example flag configurations corresponding to different sets of results
 
 :fast_forward: Alternatively, processed model data can be freely downloaded from:
 
-> Bénon, J. (2026). <i>Irrational value computations in the orbitofrontal cortex reflect circuit-level robustness</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
+> Bénon, J. (2026). <i>Irrational decisions reflect robustness constraints on value computations implemented by orbitofrontal circuits</i>. figshare. [https://doi.org/10.6084/m9.figshare.32124898](https://doi.org/10.6084/m9.figshare.32124898)
 
 Download and unzip the file `models_processed.zip`, then copy its content to `data/models/processed/` to reproduce the following architecture:
 
