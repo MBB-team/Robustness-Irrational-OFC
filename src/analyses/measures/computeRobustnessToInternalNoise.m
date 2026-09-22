@@ -38,9 +38,13 @@ function analysis_output = computeRobustnessToInternalNoise(params, ...
 %     Structure containing the measure results:
 %       - prop_optimal_noise <Nx1>: mean proportion of optimal choices when
 %       noise with variance 0.001, 0.05, ..., 0.5 is added
+%       - avg_prop_optimal_noise <1x1>: proportion of optimal choices
+%       averaged across all levels of noise variance
 %       - prop_consistent_noise <Nx1>: mean proportion of choices
 %       consistent with the network without noise when noise with varaince 
 %       0.001, 0.005, ..., 0.5 is added
+%       - avg_prop_consistent_noise <1x1>: proportion of consistent choices
+%       averaged across all levels of noise variance
 
 arguments
     params (:,1) double = []
@@ -137,5 +141,9 @@ else
         analysis_output.prop_optimal_noise(i_noise_level) = mean(prop_optimal);
         analysis_output.prop_consistent_noise(i_noise_level) = mean(prop_consistent);
     end
+
+    % Average across all noise variance levels
+    analysis_output.avg_prop_optimal_noise = mean(analysis_output.prop_optimal_noise);
+    analysis_output.avg_prop_consistent_noise = mean(analysis_output.prop_consistent_noise);
 
 end

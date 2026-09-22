@@ -34,7 +34,7 @@ Data = loadMeasureResults([...
         "config_ID", "is_rational", "is_irrational", ...
         "energetic_budget_avg", "code_redundancy", "info_transfer_rate", ...
         "EI_balance", ...
-        "avg_prop_optimal_impaired_units"], ...
+        "avg_prop_optimal_noise"], ...
         "rational_last");
 
 
@@ -60,7 +60,7 @@ plotBiologicalBenefitDistrib(nexttile(1, [1, 1]), Data, "energetic_budget_avg");
 plotBiologicalBenefitDistrib(nexttile(2, [1, 1]), Data, "code_redundancy");
 plotBiologicalBenefitDistrib(nexttile(3, [1, 1]), Data, "info_transfer_rate");
 plotBiologicalBenefitDistrib(nexttile(4, [1, 1]), Data, "EI_balance");
-plotBiologicalBenefitDistrib(nexttile(5, [1, 1]), Data, "avg_prop_optimal_impaired_units");
+plotBiologicalBenefitDistrib(nexttile(5, [1, 1]), Data, "avg_prop_optimal_noise");
 
 % Subplot letters
 writePanelLetter(nexttile(1, [1, 1]), "a", -0.4, 0.1);
@@ -75,5 +75,5 @@ fontname(f, "arial");
 
 %% === Save figure ========================================================
 
-% saveas(f, fullfile(getPath("Figures"), "fig5.pdf"));
+saveas(f, fullfile(getPath("Figures"), "fig5.pdf"));
 exportgraphics(f, fullfile(getPath("Figures"), "fig5.png"), Resolution=600);

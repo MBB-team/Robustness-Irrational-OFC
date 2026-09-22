@@ -54,9 +54,9 @@ switch measure_label
     case "EI_balance"
         y_lim = [0.5, 1.65];
         y_label = "E/I balance";
-    case "avg_prop_optimal_impaired_units"
-        y_lim = [0.49, 0.545];
-        y_label = "Tolerance to lesions (a.u.)";
+    case "avg_prop_optimal_noise"
+        y_lim = [0.5, 0.62];
+        y_label = "Tolerance to neural noise (a.u.)";
 end
 xlim(ax, [8.4, 10.6]);
 ylim(ax, y_lim);
